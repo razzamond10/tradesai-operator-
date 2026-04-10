@@ -77,7 +77,7 @@ const App = () => {
       {/* Hero Section 1 */}
       <section style={{ padding: '5rem 2rem 4rem', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
         <div style={{ marginBottom: '1.5rem' }}>
-          <div style={{ width: '80px', height: '80px', margin: '0 auto 1rem', background: 'rgba(255,255,255,0.1)', borderRadius: '16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem' }}>⚙️</div>
+          <img src="/logo.jpg" alt="Trades AI Operator" style={{ width: '140px', height: 'auto', margin: '0 auto', borderRadius: '12px' }} />
         </div>
         <h1 style={{ fontSize: '3rem', fontWeight: '800', lineHeight: '1.1', marginBottom: '1rem', letterSpacing: '-1px' }}>Trades AI Operator</h1>
         <p style={{ fontSize: '1rem', color: '#aaa', marginBottom: '1.5rem' }}>24/7 AI receptionist built for every UK trade business.</p>
