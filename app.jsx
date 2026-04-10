@@ -2,15 +2,18 @@
 import React, { useState, useEffect } from 'react';
 
 const App = () => {
-  const [page, setPage] = useState('landing');
-  const [clientEmail, setClientEmail] = useState('');
-  const [formData, setFormData] = useState({ businessName: '', email: '', phone: '', tradeType: 'Plumbing', password: '' });
+  const [currentPage, setCurrentPage] = useState('landing');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
+  const [isScrolled, setIsScrolled] = useState(false);
   const [hoveredFeature, setHoveredFeature] = useState(null);
   const [expandedFeature, setExpandedFeature] = useState(null);
-  const [isScrolled, setIsScrolled] = useState(false);
   const [showVideo, setShowVideo] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [bookingFormData, setBookingFormData] = useState({ name: '', email: '', phone: '', businessName: '', tradeType: 'Plumbing' });
+
+  const [signupForm, setSignupForm] = useState({ businessName: '', email: '', phone: '', tradeType: 'Plumbing', password: '' });
+  const [signinForm, setSigninForm] = useState({ email: '', password: '' });
+  const [bookingForm, setBookingForm] = useState({ name: '', email: '', phone: '', businessName: '', tradeType: 'Plumbing' });
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -18,25 +21,45 @@ const App = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Check if user is logged in
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('userEmail');
+    if (savedEmail) {
+      setUserEmail(savedEmail);
+      setIsAuthenticated(true);
+    }
+  }, []);
+
   const handleSignup = (e) => {
     e.preventDefault();
-    localStorage.setItem('clientEmail', formData.email);
-    localStorage.setItem('clientData', JSON.stringify(formData));
-    setClientEmail(formData.email);
-    setPage('dashboard');
+    localStorage.setItem('userEmail', signupForm.email);
+    localStorage.setItem('userData', JSON.stringify(signupForm));
+    setUserEmail(signupForm.email);
+    setIsAuthenticated(true);
+    setCurrentPage('dashboard');
+  };
+
+  const handleSignin = (e) => {
+    e.preventDefault();
+    // Simple auth check (in production, this would validate against backend)
+    localStorage.setItem('userEmail', signinForm.email);
+    setUserEmail(signinForm.email);
+    setIsAuthenticated(true);
+    setCurrentPage('dashboard');
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userData');
+    setUserEmail('');
+    setIsAuthenticated(false);
+    setCurrentPage('landing');
   };
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
-    alert(`Thanks ${bookingFormData.name}! We'll confirm your free test call within 24 hours.\n\nEmail: ${bookingFormData.email}\nPhone: ${bookingFormData.phone}`);
-    setBookingFormData({ name: '', email: '', phone: '', businessName: '', tradeType: 'Plumbing' });
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem('clientEmail');
-    localStorage.removeItem('clientData');
-    setClientEmail('');
-    setPage('landing');
+    alert(`Thanks ${bookingForm.name}! We'll confirm your free test call within 24 hours.\n\nEmail: ${bookingForm.email}\nPhone: ${bookingForm.phone}`);
+    setBookingForm({ name: '', email: '', phone: '', businessName: '', tradeType: 'Plumbing' });
   };
 
   const features = [
@@ -86,18 +109,19 @@ const App = () => {
     }
   ];
 
-  if (page === 'dashboard') {
+  // DASHBOARD PAGE
+  if (currentPage === 'dashboard' && isAuthenticated) {
     return (
       <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0512 0%, #15082a 35%, #1f0f3a 65%, #0f0520 100%)', color: '#fff', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
         <header style={{ padding: '1.5rem 2rem', borderBottom: '1px solid rgba(200,150,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'linear-gradient(180deg, rgba(25,15,45,0.8) 0%, rgba(15,5,25,0.4) 100%)', backdropFilter: 'blur(10px)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer' }} onClick={() => setCurrentPage('landing')}>
             <img src="/logo.jpg" alt="Trades Ai Operator" style={{ height: '40px', width: 'auto', borderRadius: '8px' }} />
             <h1 style={{ fontSize: '1.1rem', fontWeight: '700', margin: 0 }}>Trades <span style={{ color: '#d4af37' }}>Ai</span> Operator</h1>
           </div>
           <button onClick={handleLogout} style={{ padding: '0.6rem 1.2rem', background: 'linear-gradient(135deg, #ff5555 0%, #cc3333 100%)', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: '600', fontSize: '0.9rem' }}>Logout</button>
         </header>
         <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2.5rem 2rem' }}>
-          <p style={{ color: '#aaa', marginBottom: '0.5rem', fontSize: '0.95rem' }}>Welcome back, <strong>{clientEmail}</strong></p>
+          <p style={{ color: '#aaa', marginBottom: '0.5rem', fontSize: '0.95rem' }}>Welcome back, <strong>{userEmail}</strong></p>
           <p style={{ color: '#666', marginBottom: '2.5rem', fontSize: '0.9rem' }}>Your 24/7 AI receptionist is live and answering calls.</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
             {[{ icon: '📊', label: 'Total Interactions', value: '0' }, { icon: '💰', label: 'Revenue Tracked', value: '£0' }, { icon: '📅', label: 'Jobs Booked', value: '0' }, { icon: '📸', label: 'Photo Quotes', value: '0' }].map((stat) => (
@@ -113,28 +137,72 @@ const App = () => {
     );
   }
 
-  if (page === 'signup') {
+  // SIGNIN PAGE
+  if (currentPage === 'signin') {
     return (
-      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0512 0%, #15082a 35%, #1f0f3a 65%, #0f0520 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
-        <div style={{ maxWidth: '420px', width: '100%', padding: '2.5rem', background: 'linear-gradient(135deg, rgba(50,25,80,0.35) 0%, rgba(30,15,60,0.35) 100%)', backdropFilter: 'blur(20px)', border: '1px solid rgba(150,120,200,0.2)', borderRadius: '16px', boxShadow: '0 25px 50px rgba(0,0,0,0.4)' }}>
-          <h2 style={{ textAlign: 'center', fontSize: '1.8rem', fontWeight: '700', color: '#fff', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Get Started</h2>
-          <p style={{ textAlign: 'center', color: '#999', fontSize: '0.9rem', marginBottom: '2rem' }}>Join UK trade businesses using Trades Ai Operator.</p>
-          <form onSubmit={handleSignup}>
-            {[{ key: 'businessName', placeholder: 'Business Name', type: 'text' }, { key: 'email', placeholder: 'Email Address', type: 'email' }, { key: 'phone', placeholder: 'Phone Number', type: 'tel' }].map(field => (
-              <input key={field.key} type={field.type} placeholder={field.placeholder} value={formData[field.key]} onChange={(e) => setFormData({...formData, [field.key]: e.target.value})} required style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box', transition: 'all 0.3s ease' }} onFocus={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.5)'; e.target.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.2)'; e.target.style.background = 'rgba(255,255,255,0.05)'; }} />
-            ))}
-            <select value={formData.tradeType} onChange={(e) => setFormData({...formData, tradeType: e.target.value})} style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }}>
-              {['Plumbing', 'Electrical', 'HVAC', 'Roofing', 'Building', 'Gas Engineer', 'Handyman', 'Carpentry'].map(t => <option key={t} value={t}>{t}</option>)}
-            </select>
-            <input type="password" placeholder="Password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} required style={{ width: '100%', padding: '0.9rem', marginBottom: '2rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }} />
-            <button type="submit" style={{ width: '100%', padding: '0.9rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', marginBottom: '1rem', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>Create Account</button>
-            <button type="button" onClick={() => setPage('landing')} style={{ width: '100%', padding: '0.9rem', background: 'transparent', color: '#00d4ff', border: '1px solid rgba(0,212,255,0.4)', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', transition: 'all 0.3s ease' }} onMouseEnter={(e) => { e.target.style.background = 'rgba(0,212,255,0.1)'; e.target.style.borderColor = 'rgba(0,212,255,0.7)'; }} onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.borderColor = 'rgba(0,212,255,0.4)'; }}>Back to Home</button>
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0512 0%, #15082a 35%, #1f0f3a 65%, #0f0520 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+        <div style={{ maxWidth: '400px', width: '100%', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', justifyContent: 'center' }} onClick={() => setCurrentPage('landing')}>
+            <img src="/logo.jpg" alt="Trades Ai Operator" style={{ height: '40px', width: 'auto', borderRadius: '8px' }} />
+            <h1 style={{ fontSize: '1.1rem', fontWeight: '700', margin: 0, color: '#fff' }}>Trades <span style={{ color: '#d4af37' }}>Ai</span> Operator</h1>
+          </div>
+        </div>
+
+        <div style={{ maxWidth: '400px', width: '100%', padding: '2.5rem', background: 'linear-gradient(135deg, rgba(50,25,80,0.35) 0%, rgba(30,15,60,0.35) 100%)', backdropFilter: 'blur(20px)', border: '1px solid rgba(150,120,200,0.2)', borderRadius: '16px', boxShadow: '0 25px 50px rgba(0,0,0,0.4)' }}>
+          <h2 style={{ textAlign: 'center', fontSize: '1.8rem', fontWeight: '700', color: '#fff', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Sign In</h2>
+          <p style={{ textAlign: 'center', color: '#999', fontSize: '0.9rem', marginBottom: '2rem' }}>Welcome back to your receptionist.</p>
+          
+          <form onSubmit={handleSignin}>
+            <input type="email" placeholder="Email Address" value={signinForm.email} onChange={(e) => setSigninForm({...signinForm, email: e.target.value})} required style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box', transition: 'all 0.3s ease' }} onFocus={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.5)'; e.target.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.2)'; e.target.style.background = 'rgba(255,255,255,0.05)'; }} />
+            <input type="password" placeholder="Password" value={signinForm.password} onChange={(e) => setSigninForm({...signinForm, password: e.target.value})} required style={{ width: '100%', padding: '0.9rem', marginBottom: '2rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box', transition: 'all 0.3s ease' }} onFocus={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.5)'; e.target.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.2)'; e.target.style.background = 'rgba(255,255,255,0.05)'; }} />
+            <button type="submit" style={{ width: '100%', padding: '0.9rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', marginBottom: '1rem', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>Sign In</button>
           </form>
+
+          <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#aaa', marginTop: '1.5rem' }}>
+            New to Trades Ai Operator?{' '}
+            <button onClick={() => setCurrentPage('landing')} style={{ background: 'none', border: 'none', color: '#00d4ff', cursor: 'pointer', fontWeight: '600', textDecoration: 'underline' }}>Get your free test call & pricing</button>
+          </p>
         </div>
       </div>
     );
   }
 
+  // SIGNUP PAGE
+  if (currentPage === 'signup') {
+    return (
+      <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0512 0%, #15082a 35%, #1f0f3a 65%, #0f0520 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+        <div style={{ maxWidth: '400px', width: '100%', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', cursor: 'pointer', justifyContent: 'center' }} onClick={() => setCurrentPage('landing')}>
+            <img src="/logo.jpg" alt="Trades Ai Operator" style={{ height: '40px', width: 'auto', borderRadius: '8px' }} />
+            <h1 style={{ fontSize: '1.1rem', fontWeight: '700', margin: 0, color: '#fff' }}>Trades <span style={{ color: '#d4af37' }}>Ai</span> Operator</h1>
+          </div>
+        </div>
+
+        <div style={{ maxWidth: '400px', width: '100%', padding: '2.5rem', background: 'linear-gradient(135deg, rgba(50,25,80,0.35) 0%, rgba(30,15,60,0.35) 100%)', backdropFilter: 'blur(20px)', border: '1px solid rgba(150,120,200,0.2)', borderRadius: '16px', boxShadow: '0 25px 50px rgba(0,0,0,0.4)' }}>
+          <h2 style={{ textAlign: 'center', fontSize: '1.8rem', fontWeight: '700', color: '#fff', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Get Started</h2>
+          <p style={{ textAlign: 'center', color: '#999', fontSize: '0.9rem', marginBottom: '2rem' }}>Join UK trade businesses using Trades Ai Operator.</p>
+          
+          <form onSubmit={handleSignup}>
+            {[{ key: 'businessName', placeholder: 'Business Name', type: 'text' }, { key: 'email', placeholder: 'Email Address', type: 'email' }, { key: 'phone', placeholder: 'Phone Number', type: 'tel' }].map(field => (
+              <input key={field.key} type={field.type} placeholder={field.placeholder} value={signupForm[field.key]} onChange={(e) => setSignupForm({...signupForm, [field.key]: e.target.value})} required style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box', transition: 'all 0.3s ease' }} onFocus={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.5)'; e.target.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.2)'; e.target.style.background = 'rgba(255,255,255,0.05)'; }} />
+            ))}
+            <select value={signupForm.tradeType} onChange={(e) => setSignupForm({...signupForm, tradeType: e.target.value})} style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }}>
+              {['Plumbing', 'Electrical', 'HVAC', 'Roofing', 'Building', 'Gas Engineer', 'Handyman', 'Carpentry'].map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+            <input type="password" placeholder="Password" value={signupForm.password} onChange={(e) => setSignupForm({...signupForm, password: e.target.value})} required style={{ width: '100%', padding: '0.9rem', marginBottom: '2rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }} />
+            <button type="submit" style={{ width: '100%', padding: '0.9rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', marginBottom: '1rem', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>Create Account</button>
+          </form>
+
+          <p style={{ textAlign: 'center', fontSize: '0.85rem', color: '#aaa', marginTop: '1.5rem' }}>
+            Already have an account?{' '}
+            <button onClick={() => setCurrentPage('signin')} style={{ background: 'none', border: 'none', color: '#00d4ff', cursor: 'pointer', fontWeight: '600', textDecoration: 'underline' }}>Sign In</button>
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // LANDING PAGE (DEFAULT)
   return (
     <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #050209 0%, #0f0520 20%, #1a0f35 40%, #2d1550 60%, #1f0f3a 80%, #0a0512 100%)', color: '#fff', fontFamily: 'system-ui, -apple-system, sans-serif', overflowX: 'hidden', position: 'relative' }}>
       {/* Animated gradient orbs */}
@@ -144,14 +212,14 @@ const App = () => {
 
       {/* Sticky Header */}
       <header style={{ padding: '1rem 2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', margin: '0 auto', width: '100%', position: 'sticky', top: 0, zIndex: 50, background: isScrolled ? 'linear-gradient(180deg, rgba(10,5,20,0.95) 0%, rgba(5,2,15,0.85) 100%)' : 'transparent', backdropFilter: isScrolled ? 'blur(15px)' : 'none', transition: 'all 0.3s ease', borderBottom: isScrolled ? '1px solid rgba(100,180,255,0.15)' : 'none' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', cursor: 'pointer' }} onClick={() => setCurrentPage('landing')}>
           <img src="/logo.jpg" alt="Trades Ai Operator" style={{ height: '50px', width: 'auto', borderRadius: '10px', boxShadow: '0 8px 25px rgba(0,212,255,0.2)' }} />
           <div>
             <h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, letterSpacing: '-0.5px' }}>Trades <span style={{ color: '#d4af37', fontWeight: '800' }}>Ai</span> Operator</h1>
             <p style={{ fontSize: '0.65rem', color: '#888', margin: '0.25rem 0 0 0', letterSpacing: '0.5px' }}>24/7 AI RECEPTIONIST</p>
           </div>
         </div>
-        <button onClick={() => setPage('signup')} style={{ padding: '0.65rem 1.6rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 8px 20px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 12px 30px rgba(0,212,255,0.3)'; }} onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 8px 20px rgba(0,212,255,0.2)'; }}>Sign In</button>
+        <button onClick={() => setCurrentPage('signup')} style={{ padding: '0.65rem 1.6rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 8px 20px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 12px 30px rgba(0,212,255,0.3)'; }} onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 8px 20px rgba(0,212,255,0.2)'; }}>Get your free test call & pricing</button>
       </header>
 
       {/* Hero */}
@@ -339,9 +407,9 @@ const App = () => {
             <h3 style={{ fontSize: '1.3rem', fontWeight: '700', color: '#fff', marginBottom: '1.5rem' }}>Book Your Call</h3>
             <form onSubmit={handleBookingSubmit}>
               {[{ key: 'name', placeholder: 'Your Name', type: 'text' }, { key: 'email', placeholder: 'Email Address', type: 'email' }, { key: 'phone', placeholder: 'Phone Number', type: 'tel' }, { key: 'businessName', placeholder: 'Business Name', type: 'text' }].map(field => (
-                <input key={field.key} type={field.type} placeholder={field.placeholder} value={bookingFormData[field.key]} onChange={(e) => setBookingFormData({...bookingFormData, [field.key]: e.target.value})} required style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box', transition: 'all 0.3s ease' }} onFocus={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.5)'; e.target.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.2)'; e.target.style.background = 'rgba(255,255,255,0.05)'; }} />
+                <input key={field.key} type={field.type} placeholder={field.placeholder} value={bookingForm[field.key]} onChange={(e) => setBookingForm({...bookingForm, [field.key]: e.target.value})} required style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box', transition: 'all 0.3s ease' }} onFocus={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.5)'; e.target.style.background = 'rgba(255,255,255,0.08)'; }} onBlur={(e) => { e.target.style.borderColor = 'rgba(150,120,200,0.2)'; e.target.style.background = 'rgba(255,255,255,0.05)'; }} />
               ))}
-              <select value={bookingFormData.tradeType} onChange={(e) => setBookingFormData({...bookingFormData, tradeType: e.target.value})} style={{ width: '100%', padding: '0.9rem', marginBottom: '1.5rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }}>
+              <select value={bookingForm.tradeType} onChange={(e) => setBookingForm({...bookingForm, tradeType: e.target.value})} style={{ width: '100%', padding: '0.9rem', marginBottom: '1.5rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }}>
                 {['Plumbing', 'Electrical', 'HVAC', 'Roofing', 'Building', 'Gas Engineer', 'Handyman', 'Carpentry'].map(t => <option key={t} value={t}>{t}</option>)}
               </select>
               <button type="submit" style={{ width: '100%', padding: '0.9rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { e.target.style.transform = 'translateY(-2px)'; e.target.style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { e.target.style.transform = 'translateY(0)'; e.target.style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>Book Your Call</button>
@@ -361,6 +429,8 @@ const App = () => {
           <span>✅ Fully Insured</span>
           <span>•</span>
           <span>💷 Transparent Pricing</span>
+          <span>•</span>
+          <button onClick={() => setCurrentPage('signin')} style={{ background: 'none', border: 'none', color: '#00d4ff', cursor: 'pointer', fontWeight: '600', textDecoration: 'underline' }}>Already a customer? Sign In</button>
         </div>
         <p style={{ color: '#555', fontSize: '0.8rem' }}>© 2026 Trades Ai Operator. All rights reserved. | Designed for UK trade businesses only.</p>
       </section>
