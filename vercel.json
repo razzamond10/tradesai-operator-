@@ -3,23 +3,5 @@
   "devCommand": "next dev",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "outputDirectory": ".next",
-  "env": [
-    {
-      "key": "NEXT_PUBLIC_GOOGLE_SHEETS_ID",
-      "value": "1Fb4HKr_r7dtsLx8Hs7vDliPoHpwZ7Oe-YPEPtYZPXD0"
-    },
-    {
-      "key": "NEXT_PUBLIC_GOOGLE_SHEETS_API_KEY",
-      "value": "AIzaSyC309bAbLHX_C-R7kZPTdoNUilPauFfYo0"
-    },
-    {
-      "key": "NEXT_PUBLIC_MAKE_WEBHOOK_URL",
-      "value": "https://hook.eu1.make.com/gdqgv402ht0fgm48ctb4gvrkvwtwhdm2"
-    },
-    {
-      "key": "NEXT_PUBLIC_APP_URL",
-      "value": "https://clients.tradesaioperator.com"
-    }
-  ]
+  "outputDirectory": ".next"
 }
