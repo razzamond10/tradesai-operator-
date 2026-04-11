@@ -1,0 +1,145 @@
+═══════════════════════════════════════════════════════════════════════════════
+TRADESAI OPERATOR — HONEST ONBOARDING STATUS
+What You've ACTUALLY Done vs What's Still Pending (Verified from Session 27)
+═══════════════════════════════════════════════════════════════════════════════
+
+🟠 ONBOARDING AUTOMATION (9 Make.com Modules)
+
+WHAT YOU'VE ACTUALLY CONFIRMED DONE:
+
+✅ MODULE 1: Webhook Trigger
+   Status: DONE & TESTED (Session 27)
+   What: Landing page form submission fires webhook
+   Evidence: Session 27 handoff confirms "LIVE and TESTED"
+
+✅ MODULE 2: Google Sheets (Add Row)
+   Status: DONE & TESTED (Session 27)
+   What: Appends client details to Client Config tab
+   Evidence: Session 27 handoff confirms "LIVE and TESTED"
+   Maps: businessName, tradeType, ownerName, ownerPhone, email, etc.
+
+✅ MODULE 3: Google Sheets (Create Spreadsheet per Client)
+   Status: DONE & TESTED (Session 27)
+   What: Auto-clones master template sheet for each client
+   Evidence: Session 27 handoff confirms "LIVE and TESTED"
+   Output: {{3.spreadsheetId}} — unique sheet created per client
+   ✅ THIS IS "Auto-create Google Sheets per client" — YOU HAVE DONE THIS
+
+✅ MODULE 4: Google Calendar (Create Calendar per Client)
+   Status: DONE & TESTED (Session 27)
+   What: Auto-creates calendar for client's bookings
+   Evidence: Session 27 handoff confirms "LIVE and TESTED"
+   Output: {{4.id}} — unique calendar created per client
+
+✅ MODULE 5: Twilio (Provision Phone Number per Client)
+   Status: DONE & TESTED (Session 27)
+   What: Auto-provisions unique +447xxx UK number for each client
+   Evidence: Session 27 handoff confirms "LIVE and TESTED"
+   Output: {{5.phoneNumber}} — real phone number provisioned per client
+   ✅ THIS IS "Auto-create Twilio number per client" — YOU HAVE DONE THIS
+
+───────────────────────────────────────────────────────────────────────────────
+
+❌ NOT DONE (Still Pending):
+
+❌ MODULE 6: Retell AI Agent Creation
+   Status: NOT WRITTEN (Session 27 confirmed not built)
+   What: HTTP POST to Retell API creates agent per client
+   Blocking: Self-serve signup can't complete without this
+   Time to build: 1 hour
+   Evidence: Session 27 handoff says "NOT YET BUILT"
+
+❌ MODULE 7: Send Welcome Email
+   Status: NOT WRITTEN (Session 27 confirmed not built)
+   What: Email client their new phone number + setup instructions
+   Blocking: Customer doesn't know how to use it
+   Time to build: 30 minutes
+   Evidence: Session 27 handoff says "NOT YET BUILT"
+
+❌ MODULE 8: Webhook Response
+   Status: NOT WRITTEN (Session 27 confirmed not built)
+   What: Return 200 OK to indicate successful setup
+   Blocking: Landing page signup form hangs without this
+   Time to build: 15 minutes
+   Evidence: Session 27 handoff says "CRITICAL - NOT YET BUILT"
+
+❌ MODULE 9: SMS Notification (Optional)
+   Status: NOT WRITTEN (Session 27 marked as optional)
+   What: Text owner when new client is live
+   Blocking: Not critical (optional)
+   Time to build: 15 minutes
+   Evidence: Session 27 handoff says "OPTIONAL, NOT YET BUILT"
+
+───────────────────────────────────────────────────────────────────────────────
+
+HONEST SUMMARY:
+
+✅ SELF-SERVE SIGNUP LANDING PAGE: YES, you have this
+   - Landing page exists
+   - Form collects: name, email, phone, businessName, tradeType
+   - Form submits to Make.com webhook
+   - ✅ ACHIEVED & LIVE
+
+✅ SIGNUP FORM (BUSINESS DETAILS): YES, you have this
+   - 5-field form on landing page
+   - Captures all required data
+   - ✅ ACHIEVED & LIVE
+
+❌ FULLY AUTONOMOUS AI AGENT SETUP (Make.com 9 modules): NO, you don't have this
+   - Only 5 of 9 modules built
+   - Modules 6-8 missing (critical)
+   - Module 9 missing (optional)
+   - ❌ NOT ACHIEVED
+
+✅ AUTO-CREATE GOOGLE SHEETS PER CLIENT: YES, you have this
+   - This is Module 3 (Google Sheets - Create Spreadsheet)
+   - Confirmed working in Session 27
+   - Each client gets unique sheet
+   - ✅ YOU HAVE DONE THIS (via Module 3)
+
+✅ AUTO-CREATE TWILIO NUMBER PER CLIENT: YES, you have this
+   - This is Module 5 (Twilio - Make API Call)
+   - Confirmed working in Session 27
+   - Each client gets unique +447xxx UK number
+   - ✅ YOU HAVE DONE THIS (via Module 5)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+WHAT THIS MEANS:
+
+When customer fills out signup form:
+✅ Form submits (Module 1)
+✅ Data logged to Google Sheets (Module 2)
+✅ New Sheets document created for them (Module 3) ✅
+✅ New Calendar created for them (Module 4)
+✅ New Twilio number provisioned for them (Module 5) ✅
+❌ New Retell agent NOT created (Module 6 missing) ❌
+❌ Welcome email NOT sent (Module 7 missing) ❌
+❌ Response NOT returned (Module 8 missing) ❌
+
+RESULT: Customer data is captured and infrastructure (sheets/calendar/phone) is 
+auto-provisioned, but Retell agent creation and email notification are manual 
+workarounds until Modules 6-8 are built.
+
+═══════════════════════════════════════════════════════════════════════════════
+
+WHAT YOU NEED TO FINISH:
+
+TO REACH FULL AUTONOMOUS ONBOARDING (Modules 6-8):
+Time: ~2 hours
+What:
+  ├─ Module 6: Create Retell agent (1 hour)
+  ├─ Module 7: Send welcome email (30 mins)
+  └─ Module 8: Return response (15 mins)
+
+AFTER THESE 3 MODULES:
+✅ Customer can sign up completely automatically
+✅ Retell agent created immediately
+✅ Phone number provisioned immediately
+✅ Calendar created immediately
+✅ Sheets created immediately
+✅ Welcome email sent immediately
+✅ Form returns success response
+✅ All infrastructure ready for customer to use
+
+═══════════════════════════════════════════════════════════════════════════════
