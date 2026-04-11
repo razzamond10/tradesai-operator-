@@ -186,7 +186,7 @@ export default function Landing() {
             <span style={{ color: '#666', fontSize: '1.8rem', fontWeight: '300' }}>+</span>
             <div><p style={{ fontSize: '2.5rem', fontWeight: '800', margin: 0, color: '#00d4ff' }}>£447</p><p style={{ fontSize: '0.85rem', color: '#999', margin: '0.8rem 0 0 0' }}>per month</p></div>
           </div>
-          <p style={{ color: '#aaa', fontSize: '0.95rem', margin: '0 0 1.5rem 0' }}>24/7 AI receptionist • Voice configuration • Calendar integration • Auto-logging • SMS confirmations • Emergency detection • Smart lead scoring • More features monthly.</p>
+          <p style={{ color: '#aaa', fontSize: '0.95rem', margin: '0 0 1.5rem 0' }}>24/7 AI receptionist • Voice configuration • Calendar integration • Auto-logging • SMS confirmations • Emergency detection • Smart lead scoring • more features to come.</p>
           <p style={{ color: '#888', fontSize: '0.9rem', margin: 0, paddingTop: '1.5rem', borderTop: '1px solid rgba(0,180,255,0.15)' }}>No hidden fees • Full setup in under 48 hours • 12-month term</p>
         </div>
       </section>
