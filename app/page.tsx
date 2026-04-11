@@ -191,6 +191,93 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* PHASE 2: WHY US COMPARISON TABLE */}
+      <section style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 5, marginBottom: '3rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Why Trades AI Operator vs. The Alternatives</h3>
+          <p style={{ color: '#bbb', fontSize: '1rem' }}>See how we compare to what you're doing now (or considering)</p>
+        </div>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
+            <thead>
+              <tr style={{ background: 'rgba(0,180,255,0.1)' }}>
+                <th style={{ padding: '1rem', textAlign: 'left', fontWeight: '700', color: '#00d4ff', borderBottom: '2px solid rgba(0,180,255,0.3)' }}>Feature</th>
+                <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '700', color: '#00d4ff', borderBottom: '2px solid rgba(0,180,255,0.3)' }}>Trades AI</th>
+                <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '700', color: '#999', borderBottom: '2px solid rgba(0,180,255,0.3)' }}>Answering Service</th>
+                <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '700', color: '#999', borderBottom: '2px solid rgba(0,180,255,0.3)' }}>Generic AI</th>
+                <th style={{ padding: '1rem', textAlign: 'center', fontWeight: '700', color: '#999', borderBottom: '2px solid rgba(0,180,255,0.3)' }}>Missing Calls</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { feature: 'Monthly Cost', tradesAI: '£1,197 + £447/mo', answering: '£300–600/mo', chatbot: '£50–200/mo', missing: '£0 (costs £500+)' },
+                { feature: 'Answer Speed', tradesAI: '<2 seconds', answering: '30–60s', chatbot: 'Inconsistent', missing: 'Never' },
+                { feature: 'Booking Accuracy', tradesAI: '99%+', answering: '85%', chatbot: '60%', missing: '0%' },
+                { feature: 'Customer Experience', tradesAI: 'Your voice', answering: '3rd party', chatbot: 'Obviously AI', missing: 'Lost' },
+                { feature: 'Setup Time', tradesAI: '48 hours', answering: '5–7 days', chatbot: '30 mins', missing: 'N/A' }
+              ].map((row, idx) => (
+                <tr key={idx} style={{ borderBottom: '1px solid rgba(0,180,255,0.1)' }}>
+                  <td style={{ padding: '1rem', fontWeight: '600', color: '#fff' }}>{row.feature}</td>
+                  <td style={{ padding: '1rem', textAlign: 'center', color: '#00d4ff', fontWeight: '600' }}>{row.tradesAI}</td>
+                  <td style={{ padding: '1rem', textAlign: 'center', color: '#bbb' }}>{row.answering}</td>
+                  <td style={{ padding: '1rem', textAlign: 'center', color: '#bbb' }}>{row.chatbot}</td>
+                  <td style={{ padding: '1rem', textAlign: 'center', color: '#999' }}>{row.missing}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      {/* PHASE 2: SECURITY & COMPLIANCE */}
+      <section style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 5, marginBottom: '3rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Security, Safety & Compliance</h3>
+          <p style={{ color: '#bbb', fontSize: '1rem' }}>Built to protect your customers and your business</p>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2rem' }}>
+          {[
+            { icon: '🔒', title: 'Enterprise-Grade Data Protection', items: ['All data encrypted in transit (TLS 1.2+)', 'UK data centers (GDPR compliant)', 'Zero logs: calls never recorded', 'GDPR, UK DPA 2018, PECR compliant'] },
+            { icon: '🚨', title: 'Emergency Protocols', items: ['Gas emergencies: Safety advice FIRST', 'Electrical: Proper guidance + SMS <30s', 'Flooding/water: Rapid escalation', 'Protocols reviewed by experts'] },
+            { icon: '✓', title: 'Business Continuity', items: ['99.9% uptime SLA', 'Redundant systems & failover', '24/7 monitoring and support', 'No single point of failure'] },
+            { icon: '📋', title: 'Compliance Certifications', items: ['✓ GDPR Compliant', '✓ UK DPA 2018 Compliant', '✓ PECR Compliant', '✓ Fully Insured'] }
+          ].map((section, idx) => (
+            <div key={idx} style={{ padding: '2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '12px' }}>
+              <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{section.icon}</div>
+              <h4 style={{ fontSize: '1.2rem', fontWeight: '800', color: '#00d4ff', margin: '0 0 1rem 0' }}>{section.title}</h4>
+              <ul style={{ fontSize: '0.9rem', color: '#bbb', margin: 0, paddingLeft: '1.5rem', lineHeight: '1.8' }}>
+                {section.items.map((item, iidx) => <li key={iidx}>{item}</li>)}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* PHASE 2: INTEGRATIONS */}
+      <section style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 5, marginBottom: '3rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Works With Your Existing Tools</h3>
+          <p style={{ color: '#bbb', fontSize: '1rem' }}>Seamless integration with your calendar, phone, and CRM</p>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+          {[
+            { category: 'Calendar & Scheduling', items: [{ name: 'Google Calendar', status: 'Live' }, { name: 'Microsoft Outlook', status: 'Coming' }, { name: 'Apple Calendar', status: 'Coming' }] },
+            { category: 'Communication', items: [{ name: 'Twilio (SMS, Voice, WhatsApp)', status: 'Live' }, { name: 'Google Voice', status: 'Compatible' }, { name: 'Slack', status: 'Coming' }] },
+            { category: 'Data & CRM', items: [{ name: 'Google Sheets', status: 'Live' }, { name: 'Zapier (1000+ apps)', status: 'Live' }, { name: 'Custom API', status: 'Available' }] }
+          ].map((group, idx) => (
+            <div key={idx} style={{ padding: '2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '12px' }}>
+              <h4 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#00d4ff', margin: '0 0 1.5rem 0' }}>{group.category}</h4>
+              {group.items.map((item, iidx) => (
+                <div key={iidx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem 0', borderBottom: iidx < group.items.length - 1 ? '1px solid rgba(0,180,255,0.1)' : 'none' }}>
+                  <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0 }}>{item.name}</p>
+                  <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.7rem', background: item.status === 'Live' ? 'rgba(0,180,255,0.2)' : item.status === 'Coming' ? 'rgba(180,175,55,0.2)' : 'rgba(100,100,100,0.2)', color: item.status === 'Live' ? '#00d4ff' : item.status === 'Coming' ? '#d4af37' : '#999', borderRadius: '4px', fontWeight: '600' }}>{item.status}</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section id="booking-section" style={{ padding: '4.5rem 2rem', maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.5px' }}>See Your AI Receptionist In Action</h2>
