@@ -266,10 +266,10 @@ export default function Landing() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
           {[
-            { category: 'Calendar & Scheduling', items: [{ name: 'Google Calendar', status: 'Live' }, { name: 'Microsoft Outlook', status: 'Coming' }, { name: 'Apple Calendar', status: 'Coming' }, { name: 'Calendly', status: 'Coming' }] },
-            { category: 'Communication', items: [{ name: 'Twilio (SMS, Voice, WhatsApp)', status: 'Live' }, { name: 'Google Voice', status: 'Compatible' }, { name: 'Slack', status: 'Coming' }, { name: 'Microsoft Teams', status: 'Coming' }] },
-            { category: 'Data & CRM', items: [{ name: 'Google Sheets', status: 'Live' }, { name: 'Zapier (1000+ apps)', status: 'Live' }, { name: 'Custom API', status: 'Available' }, { name: 'HubSpot', status: 'Coming' }] },
-            { category: 'Field Service & Trades', items: [{ name: 'Google Maps', status: 'Live' }, { name: 'Stripe (invoicing)', status: 'Coming' }, { name: 'Xero', status: 'Coming' }, { name: 'QuickBooks', status: 'Coming' }] }
+            { category: 'Calendar & Scheduling', items: [{ name: 'Google Calendar', status: 'Live' }, { name: 'Microsoft Outlook', status: 'Coming' }, { name: 'Apple Calendar', status: 'Coming' }] },
+            { category: 'Communication', items: [{ name: 'Twilio (SMS, Voice, WhatsApp)', status: 'Live' }, { name: 'Google Voice', status: 'Compatible' }] },
+            { category: 'Data & CRM', items: [{ name: 'Google Sheets', status: 'Live' }, { name: 'Zapier (1000+ apps)', status: 'Live' }, { name: 'Custom API', status: 'Available' }] },
+            { category: 'Field Service & Trades', items: [{ name: 'Google Maps', status: 'Live' }, { name: 'Stripe (invoicing)', status: 'Coming' }] }
           ].map((group, idx) => (
             <div key={idx} style={{ padding: '2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '12px' }}>
               <h4 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#00d4ff', margin: '0 0 1.5rem 0' }}>{group.category}</h4>
@@ -335,7 +335,7 @@ export default function Landing() {
         <div style={{ padding: '2.5rem', background: 'linear-gradient(135deg, rgba(0,150,100,0.15) 0%, rgba(0,180,150,0.1) 100%)', border: '2px solid rgba(0,180,150,0.3)', borderRadius: '12px' }}>
           <h3 style={{ fontSize: '1.6rem', fontWeight: '800', margin: '0 0 1rem 0', color: '#fff' }}>✓ One Week Risk-Free</h3>
           <p style={{ fontSize: '1rem', color: '#ddd', margin: '0 0 1.5rem 0', lineHeight: '1.7' }}>Try Trades AI Operator for <strong>7 days completely risk-free</strong>. If you're not satisfied, we'll refund your setup fee (£1,197) in full. No questions asked.</p>
-          <p style={{ fontSize: '0.9rem', color: '#bbb', margin: '0 0 1rem 0' }}>After day 7, you're locked into the 12-month term. Early cancellation incurs a £500 fee (covers onboarding + team allocation). After 30 days, the refund period ends—cancellation still requires the £500 early exit fee.</p>
+          <p style={{ fontSize: '0.9rem', color: '#bbb', margin: '0 0 1rem 0' }}><strong>After day 7:</strong> You're locked into the 12-month term. If you cancel at any point after day 7, a £500 early termination fee applies (covers onboarding + team allocation costs).</p>
           <p style={{ fontSize: '0.85rem', color: '#999', margin: 0, fontStyle: 'italic' }}>Most clients see results within the first 2 weeks. We're that confident.</p>
         </div>
       </section>
