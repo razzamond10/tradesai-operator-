@@ -142,7 +142,7 @@ export default function PrivacyPage() {
             <li><strong>Right to Lodge a Complaint:</strong> You can file a complaint with the UK Information Commissioner's Office (ICO).</li>
           </ul>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            To exercise any of these rights, contact us at legal@tradesaioperator.uk with your request. We will respond within 30 days or as required by law.
+            To exercise any of these rights, contact us at admin@tradesaioperator.uk with your request. We will respond within 30 days or as required by law.
           </p>
         </section>
 
@@ -159,7 +159,7 @@ export default function PrivacyPage() {
         <section style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>11. Children's Privacy</h2>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            The Service is not intended for individuals under 18 years of age. We do not knowingly collect personal data from children. If we become aware that a minor has provided personal data, we will delete it immediately. Parents or guardians who believe a child has provided data to us should contact us at legal@tradesaioperator.uk.
+            The Service is not intended for individuals under 18 years of age. We do not knowingly collect personal data from children. If we become aware that a minor has provided personal data, we will delete it immediately. Parents or guardians who believe a child has provided data to us should contact us at admin@tradesaioperator.uk.
           </p>
         </section>
 
@@ -179,7 +179,7 @@ export default function PrivacyPage() {
             The TradesAI Operator Service uses artificial intelligence (Claude Haiku by Anthropic) to process voice calls and customer interactions. The AI makes automated decisions about call handling, emergency detection, and lead scoring based on customer data and call patterns.
           </p>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            <strong>Your Rights:</strong> Under UK GDPR Article 22, you have the right to request human review of automated decisions that produce legal or similarly significant effects. If you wish to opt-out of AI processing for non-essential features (e.g., lead scoring), contact legal@tradesaioperator.uk.
+            <strong>Your Rights:</strong> Under UK GDPR Article 22, you have the right to request human review of automated decisions that produce legal or similarly significant effects. If you wish to opt-out of AI processing for non-essential features (e.g., lead scoring), contact admin@tradesaioperator.uk.
           </p>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
             <strong>AI Data Usage:</strong> Anthropic may use anonymised, aggregated conversation logs to improve the Claude Haiku model. We do not allow Anthropic to use your personally identifiable customer data for model training without explicit opt-in consent.
@@ -214,7 +214,7 @@ export default function PrivacyPage() {
           </p>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
             <strong>TradesAI Operator Ltd</strong><br />
-            Email: legal@tradesaioperator.uk<br />
+            Email: admin@tradesaioperator.uk<br />
             Web: https://tradesaioperator.com<br />
             <br />
             <strong>UK Information Commissioner's Office (ICO)</strong><br />

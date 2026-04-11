@@ -29,9 +29,9 @@ export default function TermsPage() {
 
         <section style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#ff4444' }}>3. Subscription Fees & Billing</h2>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Setup Fee</h3>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Setup Fee (Non-Refundable in All Circumstances)</h3>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            A one-time, non-refundable setup fee of £1,197.00 GBP is required upon subscription. This covers system configuration, voice customisation, integrations, phone provisioning, and onboarding. The setup fee is non-refundable under all circumstances, including early cancellation or service dissatisfaction.
+            A one-time setup fee of £1,197.00 GBP is required upon subscription. This fee covers bespoke system configuration, AI voice customisation, Google Calendar and Sheets integration, Twilio phone provisioning, API setup, and initial onboarding. The setup fee is non-refundable without exception, whether you cancel within the initial 7-day period, during your subscription, or upon termination for any reason (including service dissatisfaction or early cancellation).
           </p>
 
           <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Monthly Subscription</h3>
@@ -42,22 +42,19 @@ export default function TermsPage() {
 
         <section style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#ff4444' }}>4. Cancellation Policy - CRITICAL</h2>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>7-Day Cancellation Window</h3>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>7-Day Cooling-Off Right</h3>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            You may cancel within 7 calendar days of initial payment by emailing legal@tradesaioperator.uk. A cancellation request must include your business name and account email.
-          </p>
-
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Non-Refundable Cancellation Fee: £500</h3>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            <strong>If you cancel within the 7-day window, a non-refundable £500.00 cancellation fee applies.</strong> This fee covers our costs for bespoke system configuration, Twilio phone provisioning, Google Workspace integration, API setup, team onboarding time, and administrative processing.
-          </p>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            <strong>Fee Application:</strong> Your £1,197 setup fee is non-refundable. The £500 cancellation fee is deducted from any balance owed. You will receive an itemised statement within 5 business days.
+            You may cancel your subscription within 7 calendar days of initial payment without additional penalty by emailing admin@tradesaioperator.uk. Your cancellation request must include your business name and account email address. Upon cancellation within this 7-day window, you forfeit the one-time setup fee (£1,197.00) but incur no additional cancellation charges. All monthly subscription fees paid in advance (if any) within this period will be refunded.
           </p>
 
           <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>No Cancellation After Day 7</h3>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            After the 7-day window expires, you are locked into the full 12-month Initial Term with no refunds permitted. Early termination after day 7 is not allowed. All outstanding monthly fees for the remainder of the term become immediately due and payable.
+            After the 7-day cooling-off period expires, you are bound by the full 12-month Initial Term with no right of cancellation. Early termination after day 7 is not permitted under any circumstances. All remaining monthly fees for the full 12-month term (minus any payments already made) become immediately due and payable in full upon any attempted early termination. We will deduct outstanding fees from your registered payment method. No refunds are issued for partial-month usage or unused portions of the term.
+          </p>
+
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Renewal Terms (12-Month Cycles)</h3>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
+            Upon completion of the Initial 12-Month Term, your subscription automatically renews for successive 12-month periods at the then-current monthly rate, unless you provide written cancellation notice at least 30 days before the renewal date. You may cancel renewal subscriptions with 30 days' written notice, with no additional penalty beyond fulfilling the remainder of the current 12-month cycle.
           </p>
         </section>
 
@@ -130,7 +127,7 @@ export default function TermsPage() {
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>13. Contact</h2>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
             <strong>TradesAI Operator Ltd</strong><br />
-            Email: legal@tradesaioperator.uk<br />
+            Email: admin@tradesaioperator.uk<br />
             Web: https://tradesaioperator.com<br />
             Registered Office: Virtual UK Office, London
           </p>
@@ -174,7 +171,7 @@ export default function TermsPage() {
         <section style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>19. Notice & Communication</h2>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            Any legal notice, demand, or communication required under this Agreement must be sent in writing to the other party. For you to contact the Company, send written notice to: legal@tradesaioperator.uk. For the Company to contact you, we will use your registered email address or phone number on file. Notices are deemed received: (a) upon personal delivery, (b) 3 business days after email transmission if no bounce-back occurs, or (c) 5 business days after postal mail delivery.
+            Any legal notice, demand, or communication required under this Agreement must be sent in writing to the other party. For you to contact the Company, send written notice to: admin@tradesaioperator.uk. For the Company to contact you, we will use your registered email address or phone number on file. Notices are deemed received: (a) upon personal delivery, (b) 3 business days after email transmission if no bounce-back occurs, or (c) 5 business days after postal mail delivery.
           </p>
         </section>
 
