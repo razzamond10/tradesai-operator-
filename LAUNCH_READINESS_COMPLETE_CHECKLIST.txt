@@ -1,0 +1,519 @@
+═══════════════════════════════════════════════════════════════════════════════
+TRADESAI OPERATOR — LAUNCH READINESS CHECKLIST
+Complete Quality Assurance Plan (Tip-Top Launch)
+═══════════════════════════════════════════════════════════════════════════════
+
+# SECTION 1: MAKE.COM AUTOMATION (9 Modules) — Must All Work
+
+## Currently Working ✅
+
+✅ MODULE 1: Webhook Trigger
+   Status: Tested & working
+   What: Form submission fires webhook
+   Test: ✅ Pass (confirmed in Session 27)
+
+✅ MODULE 2: Google Sheets (Add Row)
+   Status: Tested & working
+   What: Logs client data to Client Config tab
+   Test: ✅ Pass (confirmed in Session 27)
+
+✅ MODULE 3: Google Sheets (Create Spreadsheet)
+   Status: Tested & working
+   What: Creates unique Sheets document per client
+   Test: ✅ Pass (confirmed in Session 27)
+
+✅ MODULE 4: Google Calendar (Create Calendar)
+   Status: Tested & working
+   What: Creates unique Calendar per client
+   Test: ✅ Pass (confirmed in Session 27)
+
+✅ MODULE 5: Twilio (Provision Phone Number)
+   Status: Tested & working
+   What: Provisions unique +447xxx number per client
+   Test: ✅ Pass (confirmed in Session 27)
+
+## Still Need to Build ❌
+
+❌ MODULE 6: Retell AI Agent Creation
+   What: HTTP POST creates unique Retell agent per client
+   Time: 1 hour
+   Critical: YES (customer has no receptionist without this)
+   Test needed: Fill form → Verify agent appears in Retell dashboard
+
+❌ MODULE 7: Send Welcome Email
+   What: Email customer their phone number + setup instructions
+   Time: 30 minutes
+   Critical: YES (customer needs to know how to use it)
+   Test needed: Fill form → Verify email arrives with correct phone number
+
+❌ MODULE 8: Webhook Response
+   What: Return 200 OK to indicate setup complete
+   Time: 15 minutes
+   Critical: YES (landing page form hangs without this)
+   Test needed: Fill form → Form returns success message
+
+❌ MODULE 9: SMS Notification (Optional but Nice)
+   What: Text owner when new client is live
+   Time: 15 minutes
+   Critical: NO (nice to have)
+   Test needed: Fill form → Owner receives SMS with client name
+
+## Module Testing Plan
+
+For each module:
+1. Build module in Make.com
+2. Test individually (check output)
+3. Verify data appears in correct place (Sheets, Calendar, Twilio, Retell, Gmail, SMS)
+4. Run end-to-end test (fill form → all modules fire → verify all outputs)
+
+───────────────────────────────────────────────────────────────────────────────
+
+# SECTION 2: CLIENT DASHBOARD (Complete CRM) — Must Be Fully Built
+
+## Currently Exists as HTML Mockup
+
+You have: HTML design file for dashboard
+You need: Working React/Next.js components connected to actual data
+
+## Dashboard Sections to Build
+
+### 🔴 CRITICAL FOR LAUNCH
+
+❌ 1. CLIENT LOGIN SYSTEM
+   What: Email/password login for customer
+   Components needed:
+   ├─ Login page (email field)
+   ├─ Password field (with validation)
+   ├─ "Forgot password" flow
+   ├─ Session management (JWT or localStorage)
+   └─ Redirect to dashboard after login
+   Time: 2-3 hours
+   Testing:
+   ├─ Login with valid credentials → access dashboard ✅
+   ├─ Login with invalid credentials → see error ✅
+   ├─ Refresh page → stay logged in ✅
+   ├─ Logout → redirected to login ✅
+   └─ Visit /dashboard without login → redirected to login ✅
+
+❌ 2. DASHBOARD OVERVIEW/SUMMARY
+   What: Show at-a-glance key metrics
+   Display:
+   ├─ Business name
+   ├─ Phone number (their AI receptionist's number)
+   ├─ Total leads this month
+   ├─ Total bookings this month
+   ├─ Monthly revenue
+   ├─ Next appointment coming up
+   └─ System status (online/offline)
+   Time: 1 hour
+   Data source: Google Sheets (pull in real-time)
+   Testing:
+   ├─ Data updates when new lead comes in ✅
+   ├─ Numbers are accurate ✅
+   └─ Shows correct business name & phone ✅
+
+### 🟡 HIGH PRIORITY FOR LAUNCH
+
+❌ 3. LEADS / INTERACTIONS LOG
+   What: All inbound calls & interactions
+   Display:
+   ├─ Date & time
+   ├─ Customer name & phone
+   ├─ Issue described
+   ├─ Lead score (hot/warm/cold)
+   ├─ Status (new/quoted/booked/closed)
+   └─ Action buttons (call, email, SMS)
+   Data source: Google Sheets (InteractionsLog tab)
+   Time: 2 hours
+   Testing:
+   ├─ Shows all interactions from Sheets ✅
+   ├─ Filters by status (new/quoted/booked) ✅
+   ├─ Search by customer name ✅
+   ├─ Sort by date ✅
+   ├─ Data refreshes every 30 seconds ✅
+   └─ Action buttons send SMS/email ✅
+
+❌ 4. BOOKINGS CALENDAR
+   What: View upcoming appointments
+   Display:
+   ├─ Calendar view (month/week/day)
+   ├─ Booking details (time, customer, issue)
+   ├─ Customer phone number
+   ├─ Calendar link to join
+   └─ Reschedule/cancel buttons
+   Data source: Google Calendar API (real bookings)
+   Time: 2 hours
+   Testing:
+   ├─ Shows all bookings from calendar ✅
+   ├─ Can reschedule appointments ✅
+   ├─ Can cancel appointments ✅
+   ├─ Calendar link works ✅
+   ├─ View switches between month/week/day ✅
+   └─ Timezone is correct (Europe/London) ✅
+
+❌ 5. REVENUE TRACKING
+   What: Financial summary
+   Display:
+   ├─ Total revenue this month
+   ├─ Total bookings this month
+   ├─ Average booking value
+   ├─ Revenue goal
+   ├─ % of goal achieved
+   └─ Chart showing revenue trend
+   Data source: Google Sheets (Bookings tab with pricing)
+   Time: 1.5 hours
+   Testing:
+   ├─ Total revenue is accurate ✅
+   ├─ Chart updates with new bookings ✅
+   ├─ Average booking value is correct ✅
+   ├─ Goal tracking works ✅
+   └─ Data refreshes in real-time ✅
+
+### 🟢 IMPORTANT BUT NOT BLOCKING
+
+❌ 6. SMS REPLY THREADS
+   What: View/reply to customer SMS messages
+   Display:
+   ├─ Conversation threads (customer → business → customer)
+   ├─ Message timestamps
+   ├─ Unread indicators
+   ├─ Reply box
+   └─ Send button
+   Data source: Twilio SMS logs (via Make.com or API)
+   Time: 2-3 hours
+   Testing:
+   ├─ Shows all SMS conversations ✅
+   ├─ Can send replies ✅
+   ├─ Messages appear in real-time ✅
+   ├─ Timestamps correct ✅
+   └─ SMS sends via Twilio ✅
+
+❌ 7. SETTINGS PANEL
+   What: Configure their receptionist
+   Options:
+   ├─ Business name (update)
+   ├─ Trade type (change)
+   ├─ Phone number (display, not changeable)
+   ├─ Google Calendar sync (on/off)
+   ├─ SMS notifications (on/off)
+   ├─ Availability hours
+   ├─ Holiday/closure dates
+   └─ API keys (if offering API access)
+   Data source: Google Sheets (Client Config tab)
+   Time: 1.5 hours
+   Testing:
+   ├─ Can update business name ✅
+   ├─ Can change trade type ✅
+   ├─ Changes save to Sheets ✅
+   ├─ Settings apply to receptionist ✅
+   └─ Toggle switches work ✅
+
+❌ 8. ACTIVITY FEED
+   What: System log of what happened
+   Display:
+   ├─ New call received
+   ├─ Lead captured
+   ├─ Booking confirmed
+   ├─ Emergency alert
+   ├─ SMS sent
+   ├─ Report generated
+   └─ Timestamps for each
+   Data source: Google Sheets (activity logs)
+   Time: 1 hour
+   Testing:
+   ├─ Shows all system events ✅
+   ├─ Updates in real-time ✅
+   ├─ Filters by event type ✅
+   └─ Timestamps accurate ✅
+
+❌ 9. MOBILE RESPONSIVE DESIGN
+   What: Dashboard works perfectly on mobile
+   Testing:
+   ├─ Test on iPhone (Safari)
+   ├─ Test on Android (Chrome)
+   ├─ Test on iPad (responsive view)
+   ├─ All buttons clickable
+   ├─ No text overflow
+   ├─ Navigation works on mobile
+   ├─ Forms are usable on mobile
+   ├─ Charts display properly
+   └─ Performance is good
+   Time: 1-2 hours (after desktop features done)
+
+───────────────────────────────────────────────────────────────────────────────
+
+# SECTION 3: INTEGRATION & CONNECTIONS — Must All Work
+
+❌ Client Login ↔ Google Sheets
+   Test: Login with customer email → See their data (not others' data)
+
+❌ Dashboard ↔ Google Sheets
+   Test: New interaction in Sheets → Appears in dashboard within 30s
+
+❌ Dashboard ↔ Google Calendar
+   Test: New booking in Calendar → Appears in dashboard calendar view
+
+❌ Dashboard ↔ Twilio
+   Test: New SMS in Twilio → Appears in SMS threads
+
+❌ Make.com ↔ Google Sheets
+   Test: New client signup → Data appears in Sheets
+
+❌ Make.com ↔ Google Calendar
+   Test: New client signup → Calendar created in Google Calendar
+
+❌ Make.com ↔ Twilio
+   Test: New client signup → Phone number provisioned in Twilio
+
+❌ Make.com ↔ Retell
+   Test: New client signup → Agent created in Retell
+
+❌ Landing page ↔ Make.com webhook
+   Test: Fill form → Webhook fires → All modules execute
+
+───────────────────────────────────────────────────────────────────────────────
+
+# SECTION 4: BACKEND VERIFICATION (Already Done, But Verify)
+
+✅ 24/7 AI Voice Receptionist
+   Verify:
+   ├─ Calls are answered automatically
+   ├─ Greeting uses customer's business name
+   ├─ Listens to customer issue correctly
+   ├─ Detects trade type correctly
+   ├─ No dropped calls or errors
+   └─ Quality audio (no cutting out)
+
+✅ Emergency Detection
+   Verify:
+   ├─ Detects: gas leak, burst pipe, electrical fire, roof collapse
+   ├─ Gives safety advice before asking for details
+   ├─ Owner receives SMS within 1 minute
+   ├─ Emergency marked as high priority in Sheets
+   └─ No false positives
+
+✅ Booking Automation
+   Verify:
+   ├─ Slot free → Creates booking in Calendar
+   ├─ SMS confirmation sent within 10 seconds
+   ├─ Calendar invite link works
+   ├─ No double bookings
+   ├─ Customer can reschedule via SMS
+   └─ Cancellation handled correctly
+
+✅ SMS Workflows
+   Verify:
+   ├─ Booking confirmation SMS arrives
+   ├─ 24-hour reminder SMS arrives
+   ├─ Follow-up chase SMS arrives
+   ├─ All contain correct customer name, date, time
+   └─ Links in SMS work
+
+───────────────────────────────────────────────────────────────────────────────
+
+# SECTION 5: QUALITY ASSURANCE & TESTING PLAN
+
+## Test 1: Full Customer Journey (Simulated)
+
+```
+STEP 1: Customer sees landing page
+  ✅ Landing page loads in <2 seconds
+  ✅ All 6 voices play without errors
+  ✅ Booking form visible & working
+
+STEP 2: Customer fills booking form
+  Input: Name, Email, Phone, Business, Trade Type
+  ✅ Form validation works (all fields required)
+  ✅ Email format validated
+  ✅ Phone format validated
+
+STEP 3: Form submitted
+  ✅ Module 1 fires (webhook received)
+  ✅ Module 2 fires (data logged to Sheets)
+  ✅ Module 3 fires (Sheets document created)
+  ✅ Module 4 fires (Calendar created)
+  ✅ Module 5 fires (Phone number provisioned in Twilio)
+  ✅ Module 6 fires (Retell agent created)
+  ✅ Module 7 fires (Email sent with phone number)
+  ✅ Module 8 fires (Response returned, form shows "success")
+  ✅ Module 9 fires (SMS sent to owner)
+
+STEP 4: Customer receives email
+  ✅ Email contains correct phone number
+  ✅ Email contains setup instructions
+  ✅ Email is professional & branded
+
+STEP 5: Customer logs into dashboard
+  ✅ Uses email from signup form
+  ✅ Dashboard loads
+  ✅ Shows their business name
+  ✅ Shows their phone number
+  ✅ Shows their trade type
+  ✅ Shows "System status: Online"
+
+STEP 6: Customer receives inbound call
+  ✅ Call is answered by AI receptionist
+  ✅ Greeting: "Hello, thanks for calling [Business Name]"
+  ✅ Receptionist listens to issue
+  ✅ Receptionist asks for booking (if slot available)
+
+STEP 7: Customer accepts booking
+  ✅ Booking appears in Google Calendar
+  ✅ SMS confirmation sent to customer
+  ✅ Booking appears in dashboard calendar
+  ✅ Lead appears in dashboard leads list
+
+STEP 8: Customer checks dashboard 24hrs later
+  ✅ Reminder SMS was sent
+  ✅ Booking still in calendar
+  ✅ Lead marked as "booked"
+  ✅ Revenue tracked correctly
+
+RESULT: ✅ FULL JOURNEY WORKS END-TO-END
+```
+
+## Test 2: Edge Cases & Error Handling
+
+```
+❌ What if customer name has special characters?
+   Test: Sign up with "O'Brien" → Should work
+
+❌ What if customer phone is international?
+   Test: Sign up with +1-555-1234 → Should work
+
+❌ What if calendar is full?
+   Test: All slots booked → Receptionist says "We're fully booked"
+
+❌ What if customer calls after hours?
+   Test: After-hours call → Should still be captured & logged
+
+❌ What if customer hangs up mid-call?
+   Test: Hang up during booking → Logged as "abandoned"
+
+❌ What if Make.com webhook fails?
+   Test: Temporarily disable Module 6 → Other modules still work
+
+❌ What if Google Sheets is down?
+   Test: Disable Google Sheets → Error logged, booking still captured
+
+❌ What if Twilio is down?
+   Test: Disable Twilio → SMS not sent, but booking still created
+
+RESULT: All errors handled gracefully, no crashes
+```
+
+## Test 3: Load Testing
+
+```
+❌ What if 10 customers sign up simultaneously?
+   Test: Rapid-fire form submissions → All processed correctly
+
+❌ What if customer receives 50 calls in a day?
+   Test: Dashboard still responsive, no data loss
+
+RESULT: System handles moderate load without degradation
+```
+
+───────────────────────────────────────────────────────────────────────────────
+
+# SECTION 6: BUILD TIMELINE & DEPENDENCIES
+
+## Build Order (Dependency Chain)
+
+Phase 1: Make.com Modules (2-3 hours)
+├─ Module 6 (1 hr) → Test
+├─ Module 7 (30 mins) → Test
+├─ Module 8 (15 mins) → Test
+├─ Module 9 (15 mins) → Test
+└─ End-to-end test (30 mins) ✅
+
+Phase 2: Dashboard Foundation (3-4 hours)
+├─ Client Login (2-3 hrs) → Test
+├─ Dashboard Overview (1 hr) → Test
+└─ Data connection to Sheets (30 mins) ✅
+
+Phase 3: Dashboard Features (6-8 hours)
+├─ Leads log (2 hrs) → Test
+├─ Bookings calendar (2 hrs) → Test
+├─ Revenue tracking (1.5 hrs) → Test
+├─ Settings panel (1.5 hrs) → Test
+├─ SMS threads (2-3 hrs) → Test
+└─ Activity feed (1 hr) → Test ✅
+
+Phase 4: Mobile & Polish (2-3 hours)
+├─ Mobile responsive (1-2 hrs) → Test
+├─ Performance optimization (30 mins) → Test
+├─ Bug fixes & refinement (30 mins) → Test
+└─ Final QA (1 hr) ✅
+
+TOTAL BUILD TIME: 14-18 hours
+TOTAL TEST TIME: 5-8 hours
+TOTAL: 19-26 hours
+
+───────────────────────────────────────────────────────────────────────────────
+
+# SECTION 7: LAUNCH CHECKLIST (Final Day)
+
+Before you take the first paying customer:
+
+Make.com Modules:
+  ☐ Module 6 tested & working
+  ☐ Module 7 tested & working
+  ☐ Module 8 tested & working
+  ☐ Module 9 tested & working
+  ☐ End-to-end test PASSED
+
+Dashboard Features:
+  ☐ Client login TESTED
+  ☐ Dashboard overview TESTED
+  ☐ Leads list TESTED
+  ☐ Bookings calendar TESTED
+  ☐ Revenue tracking TESTED
+  ☐ Settings panel TESTED
+  ☐ SMS threads TESTED
+  ☐ Activity feed TESTED
+  ☐ Mobile responsive TESTED
+
+Backend:
+  ☐ Voice receptionist TESTED
+  ☐ Emergency detection TESTED
+  ☐ Booking automation TESTED
+  ☐ SMS workflows TESTED
+  ☐ All integrations TESTED
+
+Security & Performance:
+  ☐ HTTPS everywhere ✅
+  ☐ No sensitive data in logs ✅
+  ☐ GDPR compliant ✅
+  ☐ Page load < 2 seconds ✅
+  ☐ Dashboard response < 500ms ✅
+
+Customer Experience:
+  ☐ Onboarding is smooth
+  ☐ Dashboard is intuitive
+  ☐ Error messages are helpful
+  ☐ Email is professional
+  ☐ Phone number works
+  ☐ All workflows complete successfully
+
+FINAL SIGN OFF:
+  ☐ You're confident in quality
+  ☐ You'd use this as your customer
+  ☐ Ready for paying customer #1
+
+═══════════════════════════════════════════════════════════════════════════════
+
+# ESTIMATED TIMELINE
+
+Phase 1-4 Build: 14-18 hours of development
+Phase 4 Testing: 5-8 hours of QA
+Final verification: 2-3 hours
+
+TOTAL: 21-29 hours
+
+Working full-time: 3-4 days
+Working part-time (4 hrs/day): 1 week
+
+Then: Ready to launch with excellence ✅
+
+═══════════════════════════════════════════════════════════════════════════════
