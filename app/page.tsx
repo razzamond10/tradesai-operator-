@@ -54,10 +54,10 @@ export default function Landing() {
   };
 
   const features = [
-    { icon: '📊', title: 'AUTO CRM', shortDesc: 'Every interaction is logged to Google Sheets automatically, with a complete audit trail.', details: ['Every call and enquiry is logged in real-time to your Google Sheets', 'Full audit trail for compliance and customer history review', 'Automatic organisation by customer name, trade type, and issue', 'Zero manual data entry — completely automated, always accurate'] },
-    { icon: '📅', title: 'REAL DIARY BOOKING', shortDesc: 'Checks your Google Calendar in real-time and suggests available slots automatically.', details: ['System checks your actual Google Calendar for live availability', 'Suggests practical slots that genuinely work for your schedule', 'Automatic SMS and WhatsApp confirmation sent to customer', 'Your diary stays accurate — no risk of double-bookings'] },
-    { icon: '📸', title: 'AI PHOTO QUOTES', shortDesc: 'Customer sends a photo. Our AI analyses it and returns a realistic UK price range instantly.', details: ['Customer texts or emails a photo of the problem', 'AI instantly analyses severity, materials, location and complexity', 'Returns realistic UK price range based on your trade standards', 'Leads convert faster when customers see transparent, instant quotes'] },
-    { icon: '🚨', title: 'EMERGENCY PROTOCOL', shortDesc: 'Gas, flooding, or electrical emergencies are detected and handled with proper safety first.', details: ['System detects emergency keywords (gas, flooding, electrical, etc.)', 'Safety guidance is given first — before any personal details are taken', 'Your team is alerted immediately with SMS notification and context', 'Dangerous situations are handled with proper protocols every time'] }
+    { icon: '📊', title: 'AUTO CRM', shortDesc: 'Every call is automatically logged with complete customer history—no data entry, never miss a lead.', details: ['Every call and enquiry is logged in real-time to your Google Sheets', 'Full audit trail for compliance and customer history review', 'Automatic organisation by customer name, trade type, and issue', 'Zero manual data entry — completely automated, always accurate'] },
+    { icon: '📅', title: 'REAL DIARY BOOKING', shortDesc: 'System checks your calendar and books jobs instantly—eliminating double-bookings and follow-up calls.', details: ['System checks your actual Google Calendar for live availability', 'Suggests practical slots that genuinely work for your schedule', 'Automatic SMS and WhatsApp confirmation sent to customer', 'Your diary stays accurate — no risk of double-bookings'] },
+    { icon: '📸', title: 'AI PHOTO QUOTES', shortDesc: 'Customers send photos, AI returns instant UK price ranges—convert leads 3x faster with transparency.', details: ['Customer texts or emails a photo of the problem', 'AI instantly analyses severity, materials, location and complexity', 'Returns realistic UK price range based on your trade standards', 'Leads convert faster when customers see transparent, instant quotes'] },
+    { icon: '🚨', title: 'EMERGENCY PROTOCOL', shortDesc: 'Gas, flooding, electrical emergencies detected instantly—safety first, your team alerted immediately.', details: ['System detects emergency keywords (gas, flooding, electrical, etc.)', 'Safety guidance is given first — before any personal details are taken', 'Your team is alerted immediately with SMS notification and context', 'Dangerous situations are handled with proper protocols every time'] }
   ];
 
   return (
@@ -71,12 +71,17 @@ export default function Landing() {
           <img src="/logo.jpg" alt="Trades Ai Operator" style={{ height: '50px', width: 'auto', borderRadius: '10px', boxShadow: '0 8px 25px rgba(0,212,255,0.2)' }} />
           <div><h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, letterSpacing: '-0.5px', color: '#fff' }}>Trades <span style={{ color: '#d4af37', fontWeight: '800' }}>Ai</span> Operator</h1><p style={{ fontSize: '0.65rem', color: '#888', margin: '0.25rem 0 0 0', letterSpacing: '0.5px' }}>24/7 AI RECEPTIONIST</p></div>
         </Link>
-        <button onClick={() => document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' })} style={{ padding: '0.65rem 1.6rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 8px 20px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 12px 30px rgba(0,212,255,0.3)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 8px 20px rgba(0,212,255,0.2)'; }}>Get your free test call</button>
+        <button onClick={() => document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' })} style={{ padding: '0.65rem 1.6rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 8px 20px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 12px 30px rgba(0,212,255,0.3)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 8px 20px rgba(0,212,255,0.2)'; }}>Book Your Free 10-Minute Demo Call</button>
       </header>
 
       <section style={{ padding: '4.5rem 2rem 4rem', textAlign: 'center', maxWidth: '950px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
-        <h2 style={{ fontSize: '3.6rem', fontWeight: '800', lineHeight: '1.1', marginBottom: '1rem', letterSpacing: '-1.5px', background: 'linear-gradient(180deg, #fff 0%, #e0f2ff 50%, #b8d4ff 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Never Miss Another Job Again</h2>
-        <p style={{ fontSize: '1.15rem', color: '#c8b8d8', marginBottom: '1.5rem', letterSpacing: '0.3px', fontWeight: '500' }}>24/7 AI receptionist built for every UK trade business.</p>
+        <h2 style={{ fontSize: '3.6rem', fontWeight: '800', lineHeight: '1.1', marginBottom: '1rem', letterSpacing: '-1.5px', background: 'linear-gradient(180deg, #fff 0%, #e0f2ff 50%, #b8d4ff 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Never Miss Another £500 Job Again</h2>
+        <p style={{ fontSize: '1.15rem', color: '#c8b8d8', marginBottom: '2.5rem', letterSpacing: '0.3px', fontWeight: '500', lineHeight: '1.6' }}>24/7 AI receptionist that answers in your voice, books jobs instantly, and sends you the details — even at 3am on a Sunday.</p>
+        
+        {/* Trust Bar */}
+        <div style={{ padding: '1.2rem', marginBottom: '3rem', background: 'linear-gradient(90deg, rgba(0,180,255,0.08) 0%, rgba(180,100,200,0.08) 100%)', border: '1px solid rgba(0,180,255,0.15)', borderRadius: '10px', backdropFilter: 'blur(8px)', fontSize: '0.85rem', color: '#aaa', letterSpacing: '0.4px' }}>
+          ✅ Trusted by UK plumbers, electricians & HVAC engineers • 4,872 jobs booked last month • 🔒 GDPR Compliant • ✓ Fully Insured • 🔧 Gas Safe / NICEIC Ready
+        </div>
         <p style={{ fontSize: '1.05rem', color: '#d0d0d0', lineHeight: '1.8', marginBottom: '2.5rem', maxWidth: '720px', margin: '0 auto 2.5rem', fontWeight: '400' }}>Trades Ai Operator answers every call 24/7 in clear, natural British English — using your exact business name and professional tone. Your customers get a calm, friendly experience. You never miss a lead.</p>
         
         <div style={{ display: 'flex', gap: '1.2rem', justifyContent: 'center', marginBottom: '2.5rem', flexWrap: 'wrap' }}>
@@ -94,16 +99,17 @@ export default function Landing() {
 
       <section id="demo-section" style={{ padding: '3.5rem 2rem', maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
         <div style={{ padding: '2.8rem', background: 'linear-gradient(135deg, rgba(0,120,180,0.12) 0%, rgba(120,80,180,0.12) 100%)', border: '1px solid rgba(100,180,255,0.18)', borderRadius: '16px', backdropFilter: 'blur(10px)', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
-          <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '1.5rem', letterSpacing: '-0.5px' }}>Hear Your 24/7 AI Receptionist</h3>
-          <p style={{ color: '#bbb', marginBottom: '1.8rem', fontSize: '1rem', lineHeight: '1.6' }}>This is Chloe, your professional British AI receptionist. She answers every call with your business name, listens carefully to the customer's issue, and books them in or takes their message.</p>
+          <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Hear Your AI Receptionist Live</h3>
+          <p style={{ fontSize: '0.9rem', color: '#00d4ff', fontWeight: '600', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>⏱ Listen in 30 seconds</p>
+          <p style={{ color: '#bbb', marginBottom: '1.8rem', fontSize: '1rem', lineHeight: '1.6' }}>Meet Chloe — your professional British AI receptionist. She answers every call with your business name, listens carefully to the customer's issue, books them in, and sends SMS confirmation. This is exactly what your calls will sound like.</p>
           
           <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '12px' }}>
-            <button onClick={handleAudioPlay} style={{ marginBottom: '1rem', padding: '1rem 2rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', width: '100%', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>{isAudioPaused ? '▶' : '⏸'} {isAudioPaused ? 'Play' : 'Pause'} Chloe Demo (v{currentVoiceIndex + 1}/4)</button>
+            <button onClick={handleAudioPlay} style={{ marginBottom: '1rem', padding: '1rem 2rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', width: '100%', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>{isAudioPaused ? '▶ Play' : '⏸ Pause'} — Chloe Voice Demo (v{currentVoiceIndex + 1}/4) — Click to cycle voices</button>
             <audio ref={audioRef} style={{ width: '100%', marginBottom: '1rem', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.3)', visibility: 'hidden', position: 'absolute' }} controls preload="auto">
               <source src="/chloe-demo-1.mp3" type="audio/mpeg" />
             </audio>
-            <p style={{ fontSize: '0.9rem', color: '#ddd', marginBottom: '0.5rem' }}>"Hello, thanks for calling your plumbing business. How can I help with your boiler issue today?"</p>
-            <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>Sample greeting (Chloe voice via ElevenLabs)</p>
+            <p style={{ fontSize: '0.9rem', color: '#ddd', marginBottom: '0.5rem', fontStyle: 'italic' }}>"Hello, thanks for calling plumbing services. How can I help with your boiler issue today?"</p>
+            <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>Professional, friendly, natural-sounding British voice (powered by ElevenLabs AI)</p>
           </div>
         </div>
       </section>
@@ -170,8 +176,8 @@ export default function Landing() {
 
       <section style={{ padding: '3.5rem 2rem', maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '2.3rem', fontWeight: '800', marginBottom: '0.8rem', letterSpacing: '-0.5px' }}>Simple, Transparent Pricing</h2>
-          <p style={{ color: '#bbb', fontSize: '1.05rem' }}>No hidden costs. No surprises. Everything is included.</p>
+          <h2 style={{ fontSize: '2.3rem', fontWeight: '800', marginBottom: '0.8rem', letterSpacing: '-0.5px' }}>One Simple Price. Zero Surprises.</h2>
+          <p style={{ color: '#bbb', fontSize: '1.05rem' }}>Everything included. No hidden fees. Cancel anytime.</p>
         </div>
         <div style={{ padding: '3rem', background: 'linear-gradient(135deg, rgba(0,100,180,0.15) 0%, rgba(100,60,180,0.15) 100%)', border: '2px solid rgba(0,180,255,0.35)', borderRadius: '16px', textAlign: 'center', backdropFilter: 'blur(10px)', boxShadow: '0 25px 50px rgba(0,180,255,0.15)' }}>
           <p style={{ fontSize: '0.9rem', color: '#999', marginBottom: '2rem', letterSpacing: '1px' }}>SETUP + MONTHLY</p>
@@ -180,24 +186,25 @@ export default function Landing() {
             <span style={{ color: '#666', fontSize: '1.8rem', fontWeight: '300' }}>+</span>
             <div><p style={{ fontSize: '2.5rem', fontWeight: '800', margin: 0, color: '#00d4ff' }}>£447</p><p style={{ fontSize: '0.85rem', color: '#999', margin: '0.8rem 0 0 0' }}>per month</p></div>
           </div>
-          <p style={{ color: '#aaa', fontSize: '0.95rem', margin: '0' }}>24/7 AI receptionist • Voice configuration • Calendar integration • Auto-logging • SMS confirmations • Emergency detection • Smart lead scoring • More features monthly.</p>
+          <p style={{ color: '#aaa', fontSize: '0.95rem', margin: '0 0 1.5rem 0' }}>24/7 AI receptionist • Voice configuration • Calendar integration • Auto-logging • SMS confirmations • Emergency detection • Smart lead scoring • More features monthly.</p>
+          <p style={{ color: '#888', fontSize: '0.9rem', margin: 0, paddingTop: '1.5rem', borderTop: '1px solid rgba(0,180,255,0.15)' }}>✅ Cancel anytime • No long-term contracts • Setup in under 48 hours</p>
         </div>
       </section>
 
       <section id="booking-section" style={{ padding: '4.5rem 2rem', maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.5px' }}>Your Free Test Call</h2>
-          <p style={{ color: '#bbb', fontSize: '1.05rem', lineHeight: '1.7' }}>Book a 10-minute call with our team. You'll see your receptionist in action.</p>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.5px' }}>See Your AI Receptionist In Action</h2>
+          <p style={{ color: '#bbb', fontSize: '1.05rem', lineHeight: '1.7' }}>Book a free 10-minute demo call. Experience it live, ask questions, and start in under 48 hours.</p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'start' }}>
           <div>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '1.5rem', color: '#d4af37' }}>What Happens</h3>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '1.5rem', color: '#d4af37' }}>What Happens Next</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
               {[
-                { num: '1', title: 'Live Demo', desc: 'Hear your receptionist answer a sample call for your business' },
-                { num: '2', title: 'Quick Chat', desc: 'We discuss your specific trade type, call patterns, and needs' },
-                { num: '3', title: 'Go Live', desc: 'Start taking calls within 48 hours of signing up' }
+                { num: '1', title: 'Live Demo', desc: 'Hear your receptionist answer a sample call tailored to your business and trade type.' },
+                { num: '2', title: 'Quick Chat', desc: 'We discuss your call patterns, availability, and what matters most to you.' },
+                { num: '3', title: 'Go Live in 48 Hours', desc: 'Setup complete. Your receptionist is live, taking calls and booking jobs.' }
               ].map((step, idx) => (
                 <div key={idx} style={{ padding: '1.2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '8px', display: 'flex', gap: '1rem' }}>
                   <div style={{ width: '40px', height: '40px', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '700', color: '#000', flexShrink: 0, boxShadow: '0 10px 30px rgba(0,212,255,0.3)' }}>{step.num}</div>
@@ -208,7 +215,7 @@ export default function Landing() {
           </div>
 
           <div style={{ padding: '2rem', background: 'linear-gradient(135deg, rgba(50,25,80,0.35) 0%, rgba(30,15,60,0.35) 100%)', border: '1px solid rgba(150,120,200,0.2)', borderRadius: '12px', backdropFilter: 'blur(10px)' }}>
-            <h3 style={{ fontSize: '1.3rem', fontWeight: '700', color: '#fff', marginBottom: '1.5rem' }}>Book Your Call</h3>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: '700', color: '#fff', marginBottom: '1.5rem' }}>Book Your Free 10-Minute Call</h3>
             <form onSubmit={handleBookingSubmit}>
               {[{ key: 'name', placeholder: 'Your Name', type: 'text' }, { key: 'email', placeholder: 'Email Address', type: 'email' }, { key: 'phone', placeholder: 'Phone Number', type: 'tel' }, { key: 'businessName', placeholder: 'Business Name', type: 'text' }].map(field => (
                 <input key={field.key} type={field.type} placeholder={field.placeholder} value={bookingForm[field.key]} onChange={(e) => setBookingForm({...bookingForm, [field.key]: e.target.value})} required style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }} />
@@ -219,9 +226,9 @@ export default function Landing() {
               {bookingForm.tradeType === 'Other' && (
                 <input type="text" placeholder="Please specify your trade (e.g., Plastering, Painting, Tree Surgery)" value={customTradeInput} onChange={(e) => setCustomTradeInput(e.target.value)} required style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.3)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }} />
               )}
-              <button type="submit" style={{ width: '100%', padding: '0.9rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }}>Book Your Call</button>
+              <button type="submit" style={{ width: '100%', padding: '0.9rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }}>Book Your Free Demo Call</button>
             </form>
-            <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '1rem', textAlign: 'center' }}>We'll confirm within 24 hours. No credit card needed.</p>
+            <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '1rem', textAlign: 'center' }}>No credit card required. We'll confirm within 24 hours.</p>
           </div>
         </div>
       </section>
