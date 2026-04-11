@@ -42,14 +42,14 @@ export default function TermsPage() {
 
         <section style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#ff4444' }}>4. Cancellation Policy & Refund Terms - CRITICAL</h2>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>7-Day Refund Period (Risk-Free Trial)</h3>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>14-Day Refund Period (Risk-Free Trial)</h3>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            You may cancel your subscription within 7 calendar days of initial payment and receive a full refund of your monthly subscription fees (£447.00) by emailing admin@tradesaioperator.uk with your business name and account email. <strong>The one-time setup fee (£1,197.00) is non-refundable in all circumstances</strong>. This 7-day window is your risk-free trial period to test the Service.
+            You may cancel your subscription within 14 calendar days of initial payment and receive a full refund of your monthly subscription fees (£447.00) by emailing admin@tradesaioperator.uk with your business name and account email. <strong>The one-time setup fee (£1,197.00) is non-refundable in all circumstances</strong>. This 14-day window is your risk-free trial period to test the Service.
           </p>
 
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Cancellation After Day 7: £500 Early Termination Fee</h3>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Cancellation After Day 14: £500 Early Termination Fee</h3>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            After the 7-day refund period expires, you are committed to a 12-month Initial Term. If you request cancellation at any point after day 7 and before the end of month 1, a £500 early termination fee applies (in addition to your remaining subscription obligations). This fee covers our onboarding, system provisioning, and team allocation costs. Your remaining monthly fees for the full 12-month term become immediately due and payable in full.
+            After the 14-day refund period expires, you are committed to a 12-month Initial Term. If you request cancellation at any point after day 14 and before the end of month 1, a £500 early termination fee applies (in addition to your remaining subscription obligations). This fee covers our onboarding, system provisioning, and team allocation costs. Your remaining monthly fees for the full 12-month term become immediately due and payable in full.
           </p>
 
           <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Cancellation After Month 1: Non-Refundable Commitment</h3>

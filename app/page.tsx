@@ -333,10 +333,10 @@ export default function Landing() {
       {/* PHASE 3: RISK REVERSAL */}
       <section style={{ padding: '3rem 2rem', maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 5, marginBottom: '3rem' }}>
         <div style={{ padding: '2.5rem', background: 'linear-gradient(135deg, rgba(0,150,100,0.15) 0%, rgba(0,180,150,0.1) 100%)', border: '2px solid rgba(0,180,150,0.3)', borderRadius: '12px' }}>
-          <h3 style={{ fontSize: '1.6rem', fontWeight: '800', margin: '0 0 1rem 0', color: '#fff' }}>✓ One Week Risk-Free</h3>
-          <p style={{ fontSize: '1rem', color: '#ddd', margin: '0 0 1.5rem 0', lineHeight: '1.7' }}>Try Trades AI Operator for <strong>7 days completely risk-free</strong>. If you're not satisfied, we'll refund your setup fee (£1,197) in full. No questions asked.</p>
-          <p style={{ fontSize: '0.9rem', color: '#bbb', margin: '0 0 1rem 0' }}><strong>After day 7:</strong> You're locked into the 12-month term. If you cancel at any point after day 7, a £500 early termination fee applies (covers onboarding + team allocation costs).</p>
-          <p style={{ fontSize: '0.85rem', color: '#999', margin: 0, fontStyle: 'italic' }}>Most clients see results within the first 2 weeks. We're that confident.</p>
+          <h3 style={{ fontSize: '1.6rem', fontWeight: '800', margin: '0 0 1rem 0', color: '#fff' }}>✓ Two Week Risk-Free</h3>
+          <p style={{ fontSize: '1rem', color: '#ddd', margin: '0 0 1.5rem 0', lineHeight: '1.7' }}>Try Trades AI Operator for <strong>14 days completely risk-free</strong>. If you're not satisfied, we'll refund your setup fee (£1,197) in full. No questions asked.</p>
+          <p style={{ fontSize: '0.9rem', color: '#bbb', margin: '0 0 1rem 0' }}><strong>After day 14:</strong> You're locked into the 12-month term. If you cancel at any point after day 14, a £500 early termination fee applies (covers onboarding + team allocation costs).</p>
+          <p style={{ fontSize: '0.85rem', color: '#999', margin: 0, fontStyle: 'italic' }}>Most clients see results within the first 2 weeks. That's why we give you the full 14 days to experience it. We're that confident.</p>
         </div>
       </section>
 
