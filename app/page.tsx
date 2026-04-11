@@ -84,7 +84,7 @@ export default function Landing() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.2rem', maxWidth: '600px', margin: '0 auto', fontSize: '0.85rem', color: '#aaa', marginTop: '2.5rem' }}>
           <div style={{ padding: '1.1rem', background: 'linear-gradient(135deg, rgba(0,100,180,0.1) 0%, rgba(100,60,180,0.1) 100%)', border: '1px solid rgba(100,180,220,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.8rem', backdropFilter: 'blur(10px)' }}><span style={{ fontSize: '1.4rem' }}>🔒</span> <span>Secure & GDPR Compliant</span></div>
           <div style={{ padding: '1.1rem', background: 'linear-gradient(135deg, rgba(0,100,180,0.1) 0%, rgba(100,60,180,0.1) 100%)', border: '1px solid rgba(100,180,220,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.8rem', backdropFilter: 'blur(10px)' }}><span style={{ fontSize: '1.4rem' }}>🇬🇧</span> <span>UK-Based & Fully Insured</span></div>
-          <div style={{ padding: '1.1rem', background: 'linear-gradient(135deg, rgba(0,100,180,0.1) 0%, rgba(100,60,180,0.1) 100%)', border: '1px solid rgba(100,180,220,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.8rem', backdropFilter: 'blur(10px)' }}><span style={{ fontSize: '1.4rem' }}>✅</span> <span>Gas Safe / NICEIC Compliant</span></div>
+          <div style={{ padding: '1.1rem', background: 'linear-gradient(135deg, rgba(0,100,180,0.1) 0%, rgba(100,60,180,0.1) 100%)', border: '1px solid rgba(100,180,220,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.8rem', backdropFilter: 'blur(10px)' }}><span style={{ fontSize: '1.4rem' }}>✅</span> <span>Global Compliance & Cert Management</span></div>
           <div style={{ padding: '1.1rem', background: 'linear-gradient(135deg, rgba(0,100,180,0.1) 0%, rgba(100,60,180,0.1) 100%)', border: '1px solid rgba(100,180,220,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.8rem', backdropFilter: 'blur(10px)' }}><span style={{ fontSize: '1.4rem' }}>💷</span> <span>Transparent Pricing & Guarantee</span></div>
         </div>
       </section>
@@ -177,7 +177,7 @@ export default function Landing() {
             <span style={{ color: '#666', fontSize: '1.8rem', fontWeight: '300' }}>+</span>
             <div><p style={{ fontSize: '2.5rem', fontWeight: '800', margin: 0, color: '#00d4ff' }}>£447</p><p style={{ fontSize: '0.85rem', color: '#999', margin: '0.8rem 0 0 0' }}>per month</p></div>
           </div>
-          <p style={{ color: '#aaa', fontSize: '0.95rem', margin: '0' }}>Setup includes your voice configuration and calendar integration.</p>
+          <p style={{ color: '#aaa', fontSize: '0.95rem', margin: '0' }}>24/7 AI receptionist • Voice configuration • Calendar integration • Auto-logging • SMS confirmations • Emergency detection • Smart lead scoring • More features monthly.</p>
         </div>
       </section>
 
@@ -230,7 +230,7 @@ export default function Landing() {
           <span>•</span>
           <span>💷 Transparent Pricing</span>
         </div>
-        <p style={{ color: '#555', fontSize: '0.8rem' }}>© 2026 Trades Ai Operator. All rights reserved. | Designed for UK trade businesses only.</p>
+        <p style={{ color: '#555', fontSize: '0.8rem' }}>© 2026 Trades Ai Operator. All rights reserved. | <a href="/terms" style={{ color: '#00d4ff', textDecoration: 'none' }}>Terms & Conditions</a> | <a href="/privacy" style={{ color: '#00d4ff', textDecoration: 'none' }}>Privacy</a> | Designed for UK trade businesses only.</p>
       </section>
 
       <style>{`@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } } @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }`}</style>
