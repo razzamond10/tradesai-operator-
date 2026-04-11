@@ -1,0 +1,380 @@
+═══════════════════════════════════════════════════════════════════════════════
+TRADESAI OPERATOR — UPDATED LAUNCH READINESS CHECKLIST
+Complete with All Items (No Shortcuts, Tip-Top Quality)
+═══════════════════════════════════════════════════════════════════════════════
+
+# UPDATED BUILD TIMELINE
+
+## Phase 1: Make.com Modules (2-3 hours)
+❌ Module 6: Retell agent creation (1 hr)
+❌ Module 7: Welcome email (30 mins)
+❌ Module 8: Webhook response (15 mins)
+❌ Module 9: SMS notification (15 mins)
++ End-to-end testing (30 mins)
+
+## Phase 2: Bug Fixes & Technical Debt (2.5-3 hours) ← NEW
+❌ Upsell node bug fix (elderly personas) (30 mins)
+❌ Slot-taken detection rebuild (2 hours)
++ Testing (30 mins)
+
+## Phase 3: Missed Call Overflow (1-2 hours) ← NEW
+❌ Twilio Studio SIP overflow configuration (1-2 hrs)
++ Testing (30 mins)
+
+## Phase 4: Custom Domain Setup (20 mins) ← NEW
+❌ tradesaioperator.uk DNS → Vercel (10 mins)
+❌ clients.tradesaioperator.com DNS setup (10 mins)
++ Verification (5 mins)
+
+## Phase 5: Dashboard Foundation (3-4 hours)
+❌ Client login system (2-3 hrs)
+❌ Dashboard overview (1 hr)
++ Data connection to Sheets (30 mins)
+
+## Phase 6: Dashboard Features (6-8 hours)
+❌ Leads log (2 hrs)
+❌ Bookings calendar (2 hrs)
+❌ Revenue tracking (1.5 hrs)
+❌ Settings panel (1.5 hrs)
+❌ SMS threads (2-3 hrs)
+❌ Activity feed (1 hr)
+
+## Phase 7: Mobile & Polish (2-3 hours)
+❌ Mobile responsive design (1-2 hrs)
+❌ Performance optimization (30 mins)
+
+## Phase 8: Testing & QA (5-8 hours)
+❌ Full customer journey test
+❌ Edge case testing
+❌ Load testing
+❌ Mobile testing
+❌ Domain testing (all URLs work)
+❌ Final verification
+
+## Phase 9: First Customer Onboarding Preparation (1-2 hours) ← NEW
+❌ Document manual onboarding process
+❌ Create onboarding checklist for yourself
+❌ Prepare welcome email template
+❌ Set up customer support channel (email/Slack)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+# DETAILED BREAKDOWN OF NEW ITEMS
+
+## PHASE 2: BUG FIXES & TECHNICAL DEBT (2.5-3 hours)
+
+### Upsell Node Bug (Elderly Personas) — 30 minutes
+
+Current Issue: Patricia Henley (elderly persona) incorrectly receives upsell offer
+Global prompt RULE 6 blocks upsells for vulnerable/elderly, but upsell node still fires
+
+Action Required:
+1. Open Retell dashboard
+2. Find Upsell Offer node
+3. Inspect embedded fine-tuning examples
+4. Remove or update the example causing false positive
+5. Re-test with Patricia Henley persona via Apidog (235 simulator)
+6. Verify: ✅ Patricia NO LONGER gets upsell
+
+Expected Result: All 5/5 emergency personas pass (currently 4/5)
+
+### Slot-Taken Detection Rebuild — 2 hours
+
+Current Issue: Slot-taken detection was disabled (side effect of duplicate-logging fix)
+This means: If all slots are full, system doesn't properly tell customer
+
+Action Required:
+1. Review the original slot-detection logic
+2. Rebuild in Make.com router
+3. Test with Apidog:
+   - Slot free → Correct routing ✅
+   - Slot taken → Correct routing ✅
+   - Slot taken → Customer told "We're fully booked" ✅
+4. Run 235 simulator again (should still be 235/235 pass)
+
+Expected Result: System correctly routes both slot free AND slot taken
+
+Testing:
+├─ Full calendar → Customer hears "We're fully booked" ✅
+├─ Open slot → Customer gets booking ✅
+├─ 235 simulator → Still 235/235 pass ✅
+└─ No regression in other workflows ✅
+
+───────────────────────────────────────────────────────────────────────────────
+
+## PHASE 3: MISSED CALL OVERFLOW (1-2 hours)
+
+### What This Does
+If an inbound call doesn't connect to Retell agent (network issue, agent down, etc), 
+it overflows to a backup handler (you, SMS notification, or voicemail)
+
+Current Status: Partially built in Twilio Studio, needs completion
+
+Action Required:
+1. Open Twilio Studio
+2. Find "Missed Call Overflow" flow
+3. Configure SIP Endpoint widget:
+   - Remove Caller ID field (has persistent clearing bug)
+   - Replace with TwiML Redirect widget
+   - Point to TwiML Bin with proper forwarding
+4. Set fallback phone number (your personal number initially)
+5. Test:
+   ├─ Normal call to AI receptionist → Works ✅
+   ├─ Manually hang up Retell agent → Overflows ✅
+   ├─ Owner receives call/SMS ✅
+   └─ Call logged in system ✅
+
+Expected Result: No missed calls. All calls are either answered by AI or overflow to you.
+
+Testing:
+├─ Call system → AI answers ✅
+├─ Simulate Retell down → Overflow triggers ✅
+├─ Owner notified ✅
+├─ Call properly logged ✅
+└─ Voice quality is good ✅
+
+───────────────────────────────────────────────────────────────────────────────
+
+## PHASE 4: CUSTOM DOMAIN SETUP (20 minutes)
+
+### Domain 1: tradesaioperator.uk (Main Business Domain)
+
+Current: Using vercel.app subdomain
+Goal: Use custom domain for professionalism
+
+Action Required:
+1. Go to Vercel Project Settings
+2. Navigate to "Domains"
+3. Add tradesaioperator.uk
+4. Get Vercel nameservers (or CNAME records)
+5. Go to domain registrar (where you bought domain)
+6. Update DNS to point to Vercel
+7. Verify DNS propagates (can take up to 24 hours, usually 5 mins)
+8. Test: Visit https://tradesaioperator.uk in browser
+   ├─ Landing page loads ✅
+   ├─ All resources load ✅
+   ├─ HTTPS works ✅
+   ├─ Forms submit ✅
+   └─ No mixed content warnings ✅
+
+### Domain 2: clients.tradesaioperator.com (Dashboard Domain)
+
+Current: Landing page at one domain, dashboard at another
+Goal: Dashboard at clients.tradesaioperator.com for clarity
+
+Action Required:
+1. Create subdomain: clients.tradesaioperator.com
+2. Point to same Vercel project (or separate project)
+3. In Vercel, add subdomain as alternate domain
+4. Configure routing: /dashboard uses clients subdomain
+5. Test: Visit https://clients.tradesaioperator.com
+   ├─ Redirects to login ✅
+   ├─ Login works ✅
+   ├─ Dashboard loads ✅
+   └─ All links stay on subdomain ✅
+
+Testing All Domains:
+├─ tradesaioperator.uk → Landing page ✅
+├─ tradesaioperator.uk/signup → Form works ✅
+├─ clients.tradesaioperator.com → Login required ✅
+├─ clients.tradesaioperator.com/dashboard → Dashboard loads ✅
+├─ All HTTPS ✅
+├─ No 404 errors ✅
+├─ No mixed content warnings ✅
+└─ DNS records are clean ✅
+
+───────────────────────────────────────────────────────────────────────────────
+
+## PHASE 9: FIRST CUSTOMER ONBOARDING PROCESS (1-2 hours)
+
+### Why This Matters
+Until Make.com Modules 6-8 are 100% bulletproof, you'll manually handle some aspects 
+of first customer setup. Need a documented process.
+
+### Manual Onboarding Checklist (What YOU Do)
+
+When customer signs up:
+```
+☐ Check email for signup confirmation
+☐ Verify all customer details are in Google Sheets
+☐ Verify Retell agent was created automatically
+☐ If NOT created: Create manually in Retell dashboard
+  ├─ Agent name: [Business Name] AI Receptionist
+  ├─ Model: claude-haiku-4.5-sonnet
+  ├─ Voice: custom_voice_45948606e29a6b033b2486ae6d
+  └─ Webhook: https://hook.eu1.make.com/gdqgv402ht0fgm48ctb4gvrkvwtwhdm2
+☐ Verify phone number was provisioned in Twilio
+  ├─ If NOT provisioned: Buy manually in Twilio dashboard
+  └─ Set voice webhook to Retell
+☐ Verify Calendar was created
+  ├─ If NOT: Create manually in Google Calendar
+  └─ Share with customer if needed
+☐ Send welcome email to customer (if auto-send failed)
+  ├─ Include: Their phone number
+  ├─ Include: Setup instructions
+  ├─ Include: Your support email/phone
+  └─ Include: Link to dashboard (clients.tradesaioperator.com)
+☐ Test the system
+  ├─ Call the number yourself
+  ├─ Verify AI receptionist answers
+  ├─ Book a test appointment
+  ├─ Verify booking appears in calendar
+  ├─ Verify SMS confirmation sent
+  └─ Verify everything in dashboard
+☐ Send onboarding email to customer:
+  ├─ "Your system is now live!"
+  ├─ "Test call your number: [number]"
+  ├─ "Log in to dashboard: clients.tradesaioperator.com"
+  ├─ "Here's how to use it [link to guides]"
+  └─ "Contact me if anything is wrong"
+☐ Schedule follow-up call with customer
+  ├─ When: 24 hours after setup
+  ├─ Purpose: Make sure everything works, answer questions
+  └─ Goal: Customer is confident & happy
+```
+
+### Supporting Documents to Create
+
+1. CUSTOMER ONBOARDING EMAIL TEMPLATE
+   From: admin@tradesaioperator.uk
+   Subject: Your TradesAI Operator is Now Live! 🎉
+   
+   Content:
+   ├─ Welcome message (personalized business name)
+   ├─ Your dedicated phone number: [number]
+   ├─ Instructions: "Call your own number to test"
+   ├─ Dashboard login: clients.tradesaioperator.com
+   ├─ Login credentials: [email] / [password]
+   ├─ How it works: [link to video when ready]
+   ├─ Support: [your email/phone]
+   └─ Next steps: "I'll call you in 24 hours"
+
+2. CUSTOMER SUPPORT CONTACT INFO
+   ├─ Email: support@tradesaioperator.uk or admin@tradesaioperator.uk
+   ├─ Phone: Your personal number (initially)
+   ├─ Slack/Discord: (optional, for real-time)
+   ├─ Response time: 2 hours during business hours
+   └─ Emergency: Same day, within 4 hours
+
+3. TROUBLESHOOTING GUIDE (For Yourself)
+   ├─ Customer says: "Call not answered"
+     └─ Action: Check Retell agent status in dashboard
+   ├─ Customer says: "SMS not received"
+     └─ Action: Check Twilio SMS logs
+   ├─ Customer says: "Booking didn't go through"
+     └─ Action: Check Google Calendar, Make.com logs
+   ├─ Customer says: "Dashboard won't load"
+     └─ Action: Check browser cache, verify domain DNS
+   └─ Customer says: "I don't understand how to use it"
+     └─ Action: Schedule 15-min call, show them dashboard
+
+### Customer Success Metrics to Track
+
+For each customer, keep simple notes:
+```
+Customer #1: [Business Name]
+├─ Signup Date: [date]
+├─ Setup completed: [Y/N] Date: [date]
+├─ First call received: [Y/N] Date/time: [date]
+├─ First booking made: [Y/N] Date/time: [date]
+├─ Issues encountered: [list]
+├─ Resolved date: [date]
+├─ Customer satisfaction: [1-10]
+└─ Notes: [anything important]
+```
+
+═══════════════════════════════════════════════════════════════════════════════
+
+# UPDATED TOTAL TIMELINE
+
+Phase 1 (Modules): 2-3 hours
+Phase 2 (Bug fixes): 2.5-3 hours ← NEW
+Phase 3 (Overflow): 1-2 hours ← NEW
+Phase 4 (Domains): 20 minutes ← NEW
+Phase 5 (Dashboard foundation): 3-4 hours
+Phase 6 (Dashboard features): 6-8 hours
+Phase 7 (Mobile & polish): 2-3 hours
+Phase 8 (Testing & QA): 5-8 hours
+Phase 9 (Onboarding prep): 1-2 hours ← NEW
+
+TOTAL BUILD TIME: 26-36 hours
+TOTAL TEST TIME: 5-8 hours
+TOTAL: 31-44 hours
+
+───────────────────────────────────────────────────────────────────────────────
+
+## REVISED TIMELINE
+
+Full-time developer: 4-6 days
+Part-time (4 hrs/day): 1.5-2 weeks
+With rigorous testing: 2-3 weeks
+
+═══════════════════════════════════════════════════════════════════════════════
+
+# FINAL LAUNCH CHECKLIST
+
+Before Customer #1 Pays:
+
+Make.com & Retell:
+  ☐ Module 6 tested & working
+  ☐ Module 7 tested & working
+  ☐ Module 8 tested & working
+  ☐ Module 9 tested & working
+  ☐ End-to-end test PASSED
+
+Bug Fixes:
+  ☐ Upsell node bug fixed (Patricia test PASSED)
+  ☐ Slot-taken detection rebuilt (tested)
+  ☐ Apidog: 235/235 still passing
+  ☐ Missed call overflow configured (tested)
+  ☐ Twilio fallback working
+
+Domains:
+  ☐ tradesaioperator.uk points to Vercel
+  ☐ clients.tradesaioperator.com configured
+  ☐ HTTPS working on both
+  ☐ DNS verified
+
+Dashboard Features:
+  ☐ Client login TESTED
+  ☐ Dashboard overview TESTED
+  ☐ Leads list TESTED
+  ☐ Bookings calendar TESTED
+  ☐ Revenue tracking TESTED
+  ☐ Settings panel TESTED
+  ☐ SMS threads TESTED
+  ☐ Activity feed TESTED
+  ☐ Mobile responsive TESTED
+
+Backend:
+  ☐ Voice receptionist TESTED
+  ☐ Emergency detection TESTED
+  ☐ Booking automation TESTED
+  ☐ SMS workflows TESTED
+  ☐ All integrations TESTED
+
+Onboarding Prep:
+  ☐ Manual onboarding checklist created
+  ☐ Welcome email template created
+  ☐ Support contact info documented
+  ☐ Troubleshooting guide ready
+  ☐ Customer success tracking sheet created
+
+Final Checks:
+  ☐ All domains working ✅
+  ☐ All features responsive ✅
+  ☐ No errors in console ✅
+  ☐ GDPR compliant ✅
+  ☐ HTTPS everywhere ✅
+  ☐ Performance good ✅
+  ☐ You're confident ✅
+  ☐ Ready to support customer ✅
+
+SIGN OFF:
+  ☐ System is production-ready
+  ☐ You're prepared to onboard customer #1
+  ☐ All support materials ready
+  ☐ Domains live & working
+  ☐ Launch with confidence
+
+═══════════════════════════════════════════════════════════════════════════════
