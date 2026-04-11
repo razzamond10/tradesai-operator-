@@ -10,6 +10,8 @@ export default function Landing() {
   const expandedRef = useRef(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [bookingForm, setBookingForm] = useState({ name: '', email: '', phone: '', businessName: '', tradeType: 'Plumbing' });
+  const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0);
+  const [isAudioPaused, setIsAudioPaused] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -26,8 +28,19 @@ export default function Landing() {
   }, [expandedFeature]);
 
   const handleAudioPlay = () => {
-    if (audioRef.current) {
+    if (!audioRef.current) return;
+    
+    if (isAudioPaused) {
+      // Play next voice and cycle to next index
+      const nextIndex = (currentVoiceIndex + 1) % 4;
+      setCurrentVoiceIndex(nextIndex);
+      audioRef.current.src = `/chloe-demo-${nextIndex + 1}.mp3`;
       audioRef.current.play().catch(err => console.log('Audio play error:', err));
+      setIsAudioPaused(false);
+    } else {
+      // Pause current voice
+      audioRef.current.pause();
+      setIsAudioPaused(true);
     }
   };
 
@@ -82,9 +95,9 @@ export default function Landing() {
           <p style={{ color: '#bbb', marginBottom: '1.8rem', fontSize: '1rem', lineHeight: '1.6' }}>This is Chloe, your professional British AI receptionist. She answers every call with your business name, listens carefully to the customer's issue, and books them in or takes their message.</p>
           
           <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '12px' }}>
-            <button onClick={handleAudioPlay} style={{ marginBottom: '1rem', padding: '1rem 2rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', width: '100%', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>▶ Play Chloe Demo (ElevenLabs)</button>
+            <button onClick={handleAudioPlay} style={{ marginBottom: '1rem', padding: '1rem 2rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', width: '100%', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>{isAudioPaused ? '▶' : '⏸'} {isAudioPaused ? 'Play' : 'Pause'} Chloe Demo (v{currentVoiceIndex + 1}/4)</button>
             <audio ref={audioRef} style={{ width: '100%', marginBottom: '1rem', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.3)', visibility: 'hidden', position: 'absolute' }} controls preload="auto">
-              <source src="/chloe-demo.mp3" type="audio/mpeg" />
+              <source src="/chloe-demo-1.mp3" type="audio/mpeg" />
             </audio>
             <p style={{ fontSize: '0.9rem', color: '#ddd', marginBottom: '0.5rem' }}>"Hello, thanks for calling your plumbing business. How can I help with your boiler issue today?"</p>
             <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>Sample greeting (Chloe voice via ElevenLabs)</p>
