@@ -13,6 +13,10 @@ export default function Landing() {
   const [customTradeInput, setCustomTradeInput] = useState('');
   const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0);
   const [isAudioPaused, setIsAudioPaused] = useState(true);
+  
+  const voiceNames = ['Casey', 'Chloe', 'Juliet', 'Natalie', 'Sebastian', 'Sterling'];
+  const voiceFiles = ['Casey.mp3', 'Chloe_1.mp3', 'Juliet_.mp3', 'Natalie.mp3', 'Sebastian.mp3', 'Sterling_.mp3'];
+  const currentVoiceName = voiceNames[currentVoiceIndex];
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -33,9 +37,10 @@ export default function Landing() {
     
     if (isAudioPaused) {
       // Play next voice and cycle to next index
-      const nextIndex = (currentVoiceIndex + 1) % 4;
+      const nextIndex = (currentVoiceIndex + 1) % 6;
       setCurrentVoiceIndex(nextIndex);
-      audioRef.current.src = `/chloe-demo-${nextIndex + 1}.mp3`;
+      audioRef.current.src = `/voices/${voiceFiles[nextIndex]}`;
+      audioRef.current.load();
       audioRef.current.play().catch(err => console.log('Audio play error:', err));
       setIsAudioPaused(false);
     } else {
@@ -101,16 +106,23 @@ export default function Landing() {
         <div style={{ padding: '2.8rem', background: 'linear-gradient(135deg, rgba(0,120,180,0.12) 0%, rgba(120,80,180,0.12) 100%)', border: '1px solid rgba(100,180,255,0.18)', borderRadius: '16px', backdropFilter: 'blur(10px)', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
           <h3 style={{ fontSize: '1.5rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Hear Your AI Receptionist Live</h3>
           <p style={{ fontSize: '0.9rem', color: '#00d4ff', fontWeight: '600', marginBottom: '1.5rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>⏱ Listen in 30 seconds</p>
-          <p style={{ color: '#bbb', marginBottom: '0.8rem', fontSize: '1rem', lineHeight: '1.6' }}>Meet Chloe — your professional British AI receptionist. She answers every call with your business name, listens carefully to the customer's issue, books them in, and sends SMS confirmation. This is exactly what your calls will sound like.</p>
+          <p style={{ color: '#bbb', marginBottom: '0.8rem', fontSize: '1rem', lineHeight: '1.6' }}>Your AI receptionist answers every call with your business name, listens carefully to the customer's issue, books them in, and sends SMS confirmation. Choose from 6 professional voices below.</p>
           <p style={{ color: '#999', marginBottom: '1.8rem', fontSize: '0.85rem', fontStyle: 'italic' }}>Voice fully customizable to match your brand and preferences</p>
           
           <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '12px' }}>
-            <button onClick={handleAudioPlay} style={{ marginBottom: '1rem', padding: '1rem 2rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', width: '100%', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>{isAudioPaused ? '▶ Play' : '⏸ Pause'} — Chloe Voice Demo (v{currentVoiceIndex + 1}/4) — Click to cycle voices</button>
+            <button onClick={handleAudioPlay} style={{ marginBottom: '1.5rem', padding: '1rem 2rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', width: '100%', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>{isAudioPaused ? '▶ Play' : '⏸ Pause'} — {currentVoiceName} Voice Demo — Click to cycle</button>
             <audio ref={audioRef} style={{ width: '100%', marginBottom: '1rem', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.3)', visibility: 'hidden', position: 'absolute' }} controls preload="auto">
-              <source src="/chloe-demo-1.mp3" type="audio/mpeg" />
+              <source src={`/voices/${voiceFiles[currentVoiceIndex]}`} type="audio/mpeg" />
             </audio>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
+              {voiceNames.map((name, idx) => (
+                <button key={idx} onClick={() => { setCurrentVoiceIndex(idx); setIsAudioPaused(true); audioRef.current?.pause(); audioRef.current?.load(); }} style={{ padding: '0.75rem 1rem', background: currentVoiceIndex === idx ? 'rgba(0,212,255,0.25)' : 'rgba(100,150,200,0.08)', border: currentVoiceIndex === idx ? '2px solid rgba(0,212,255,0.5)' : '1px solid rgba(100,150,200,0.15)', borderRadius: '8px', color: currentVoiceIndex === idx ? '#00d4ff' : '#bbb', fontWeight: currentVoiceIndex === idx ? '600' : '400', fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.3s ease' }} onMouseEnter={(e) => { if (currentVoiceIndex !== idx) { (e.target as HTMLElement).style.background = 'rgba(100,150,200,0.15)'; (e.target as HTMLElement).style.color = '#ddd'; } }} onMouseLeave={(e) => { if (currentVoiceIndex !== idx) { (e.target as HTMLElement).style.background = 'rgba(100,150,200,0.08)'; (e.target as HTMLElement).style.color = '#bbb'; } }}>{name}</button>
+              ))}
+            </div>
+            
             <p style={{ fontSize: '0.9rem', color: '#ddd', marginBottom: '0.5rem', fontStyle: 'italic' }}>"Hello, thanks for calling plumbing services. How can I help with your boiler issue today?"</p>
-            <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>Professional, friendly, natural-sounding British voice (powered by ElevenLabs AI)</p>
+            <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>Professional, friendly, natural-sounding British voices (powered by ElevenLabs AI)</p>
           </div>
         </div>
       </section>
