@@ -184,7 +184,7 @@ export default function Landing() {
       <section id="booking-section" style={{ padding: '4.5rem 2rem', maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.5px' }}>Your Free Test Call</h2>
-          <p style={{ color: '#bbb', fontSize: '1.05rem', lineHeight: '1.7' }}>Book a 10-minute call with our team. You'll see your receptionist in action and get personalised pricing for your trade.</p>
+          <p style={{ color: '#bbb', fontSize: '1.05rem', lineHeight: '1.7' }}>Book a 10-minute call with our team. You'll see your receptionist in action.</p>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'start' }}>
