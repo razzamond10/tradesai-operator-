@@ -177,7 +177,7 @@ export default function Landing() {
             <span style={{ color: '#666', fontSize: '1.8rem', fontWeight: '300' }}>+</span>
             <div><p style={{ fontSize: '2.5rem', fontWeight: '800', margin: 0, color: '#00d4ff' }}>£447</p><p style={{ fontSize: '0.85rem', color: '#999', margin: '0.8rem 0 0 0' }}>per month</p></div>
           </div>
-          <p style={{ color: '#aaa', fontSize: '0.95rem', margin: '0' }}>Setup includes your voice configuration and calendar integration. No contracts. Cancel anytime.</p>
+          <p style={{ color: '#aaa', fontSize: '0.95rem', margin: '0' }}>Setup includes your voice configuration and calendar integration.</p>
         </div>
       </section>
 
