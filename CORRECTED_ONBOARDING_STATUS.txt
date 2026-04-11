@@ -1,0 +1,148 @@
+═══════════════════════════════════════════════════════════════════════════════
+TRADESAI OPERATOR — ACTUAL ONBOARDING AUTOMATION STATUS
+Corrected Breakdown (What's Really Done vs Pending)
+═══════════════════════════════════════════════════════════════════════════════
+
+🟠 ONBOARDING AUTOMATION (9 Modules)
+
+| # | Feature | Status | Notes |
+|---|---------|--------|-------|
+| 1 | Self-serve signup landing page | ⚠️ PARTIAL | Landing page EXISTS with booking form, but NOT a dedicated /signup page |
+| 2 | Signup form (business details) | ✅ ACHIEVED | 5-field form on landing page (Name, Email, Phone, Business, Trade) collects data |
+| 3 | Module 1: Webhook trigger | ✅ LIVE | Form submits to Make.com webhook (k4cbwwuukurklhiu6b9dj1cm86avwx8c) |
+| 4 | Module 3: Auto-create Google Sheets | ✅ LIVE | Clones template sheet per client (tested, confirmed working) |
+| 5 | Module 4: Auto-create Google Calendar | ✅ LIVE | Creates calendar per client (tested, confirmed working) |
+| 6 | Module 5: Auto-provision Twilio | ✅ LIVE | Provisions +447xxx phone number per client (tested, confirmed working) |
+| 7 | Module 6: Create Retell agent | ❌ NOT BUILT | HTTP POST to Retell API (next to build) |
+| 8 | Module 7: Send welcome email | ❌ NOT BUILT | Email client with phone number (next to build) |
+| 9 | Module 8: Webhook response | ❌ NOT BUILT | Return 200 OK (CRITICAL - without this signup hangs) |
+| 10 | Module 9: SMS notification | ❌ NOT BUILT | Text owner when client live (optional) |
+
+───────────────────────────────────────────────────────────────────────────────
+
+WHAT'S ACTUALLY TRUE:
+
+✅ TRULY COMPLETE:
+- Signup form exists (5 fields on landing page)
+- Form collects: name, email, phone, business name, trade type
+- Form submits to Make.com webhook
+- Webhook triggers Modules 1, 3, 4, 5 (ALL WORKING)
+  └─ Google Sheets cloned ✅
+  └─ Google Calendar created ✅
+  └─ Twilio phone provisioned ✅
+
+❌ ACTUALLY NOT DONE:
+- Module 6: Retell agent creation (NOT WRITTEN)
+- Module 7: Welcome email (NOT WRITTEN)
+- Module 8: Webhook response (NOT WRITTEN)
+- Module 9: SMS notification (NOT WRITTEN)
+
+⚠️ PARTIAL:
+- "Self-serve signup landing page" — you HAVE a landing page with a form, but it's the HOME page, not a dedicated /signup page
+
+═══════════════════════════════════════════════════════════════════════════════
+
+HONEST STATUS:
+
+What's working NOW:
+✅ Landing page at https://tradesai-app-s26-live.vercel.app
+✅ Booking form collects business details
+✅ Form submits to Make.com
+✅ Modules 1, 3, 4, 5 fire and create resources:
+   ✅ Google Sheets created
+   ✅ Google Calendar created
+   ✅ Twilio number provisioned
+
+What BREAKS it:
+❌ Module 6 (Retell agent creation) not built
+   → Clients get phone & calendar but NO Retell agent to answer calls
+   
+❌ Module 8 (Webhook response) not built
+   → Client signup form hangs (no 200 OK sent back)
+
+WORKAROUND FOR FIRST CUSTOMER:
+- Customer fills form
+- Modules 1, 3, 4, 5 fire (sheets, calendar, phone created)
+- Modules 6, 8 missing means:
+  └─ You manually create Retell agent + send response
+  └─ Takes 5 minutes per client (not scalable)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+WHAT YOU NEED TO BUILD (NOT OPTIONAL):
+
+⏳ Module 6: Create Retell Agent
+   What: HTTP POST to https://api.retell.ai/v2/create-agent
+   Body: { agent_name, model: claude-haiku, voice_id, webhook_url }
+   Result: Client gets Retell agent
+   Time: 1 hour
+   Status: CRITICAL (without this, no voice receptionist for client)
+
+⏳ Module 8: Return Webhook Response
+   What: Send 200 OK back to landing page
+   Body: JSON with agentId, phoneNumber, sheetId, calendarId
+   Result: Client signup completes, sees "Setup complete"
+   Time: 15 minutes
+   Status: CRITICAL (without this, form hangs)
+
+⏳ Module 7: Send Welcome Email
+   What: Email client their new phone number + setup instructions
+   Time: 30 minutes
+   Status: GOOD-TO-HAVE (nice but not blocking)
+
+⏳ Module 9: SMS Notification
+   What: Text owner "Customer is live on {{phone}}"
+   Time: 15 minutes
+   Status: OPTIONAL (nice to have)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+CURRENT FLOW (What Actually Happens):
+
+1. Customer lands on https://tradesai-app-s26-live.vercel.app
+2. Customer fills booking form (name, email, phone, business, trade)
+3. Customer clicks "Book Demo"
+4. Form submits to Make.com webhook
+   ├─ Module 1: Webhook received ✅
+   ├─ Module 3: Sheets cloned ✅
+   ├─ Module 4: Calendar created ✅
+   ├─ Module 5: Twilio number provisioned ✅
+   ├─ Module 6: MISSING ❌ (no Retell agent created)
+   ├─ Module 7: MISSING ❌ (no email sent)
+   ├─ Module 8: MISSING ❌ (no 200 OK, form hangs)
+   └─ Module 9: MISSING ❌ (no SMS to owner)
+5. Customer sees... nothing (form hangs waiting for Module 8 response)
+6. YOU manually:
+   └─ Create Retell agent (5 mins)
+   └─ Send response (so form completes)
+   └─ Send welcome email (5 mins)
+   └─ Send SMS to owner (1 min)
+   = 12 mins per client (manual)
+
+WITH MODULES 6-8 BUILT:
+5. Customer sees "Your AI Receptionist is live! Phone: +447xxx"
+6. Everything automated, customer can start using immediately
+   = 0 mins manual (fully automated)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+CORRECTED ONBOARDING STATUS:
+
+| Item | Status |
+|------|--------|
+| Landing page | ⚠️ Exists, but partial |
+| Signup form | ✅ Complete (5 fields) |
+| Module 1: Webhook | ✅ LIVE |
+| Module 3: Sheets | ✅ LIVE |
+| Module 4: Calendar | ✅ LIVE |
+| Module 5: Twilio | ✅ LIVE |
+| Module 6: Retell | ❌ NOT BUILT (CRITICAL) |
+| Module 7: Email | ❌ NOT BUILT |
+| Module 8: Response | ❌ NOT BUILT (CRITICAL) |
+| Module 9: SMS | ❌ NOT BUILT (optional) |
+
+PROGRESS: 5/9 MODULES (56%)
+
+TO MAKE FULLY SELF-SERVE: 2 hours of work (Modules 6 + 8)
+
+═══════════════════════════════════════════════════════════════════════════════
