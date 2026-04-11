@@ -177,7 +177,7 @@ export default function Landing() {
       <section style={{ padding: '3.5rem 2rem', maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
         <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
           <h2 style={{ fontSize: '2.3rem', fontWeight: '800', marginBottom: '0.8rem', letterSpacing: '-0.5px' }}>One Simple Price. Zero Surprises.</h2>
-          <p style={{ color: '#bbb', fontSize: '1.05rem' }}>Everything included. No hidden fees. Cancel anytime.</p>
+          <p style={{ color: '#bbb', fontSize: '1.05rem' }}>Everything included. No hidden fees. Full transparency.</p>
         </div>
         <div style={{ padding: '3rem', background: 'linear-gradient(135deg, rgba(0,100,180,0.15) 0%, rgba(100,60,180,0.15) 100%)', border: '2px solid rgba(0,180,255,0.35)', borderRadius: '16px', textAlign: 'center', backdropFilter: 'blur(10px)', boxShadow: '0 25px 50px rgba(0,180,255,0.15)' }}>
           <p style={{ fontSize: '0.9rem', color: '#999', marginBottom: '2rem', letterSpacing: '1px' }}>SETUP + MONTHLY</p>
@@ -187,7 +187,7 @@ export default function Landing() {
             <div><p style={{ fontSize: '2.5rem', fontWeight: '800', margin: 0, color: '#00d4ff' }}>£447</p><p style={{ fontSize: '0.85rem', color: '#999', margin: '0.8rem 0 0 0' }}>per month</p></div>
           </div>
           <p style={{ color: '#aaa', fontSize: '0.95rem', margin: '0 0 1.5rem 0' }}>24/7 AI receptionist • Voice configuration • Calendar integration • Auto-logging • SMS confirmations • Emergency detection • Smart lead scoring • More features monthly.</p>
-          <p style={{ color: '#888', fontSize: '0.9rem', margin: 0, paddingTop: '1.5rem', borderTop: '1px solid rgba(0,180,255,0.15)' }}>✅ Cancel anytime • No long-term contracts • Setup in under 48 hours</p>
+          <p style={{ color: '#888', fontSize: '0.9rem', margin: 0, paddingTop: '1.5rem', borderTop: '1px solid rgba(0,180,255,0.15)' }}>No hidden fees • Full setup in under 48 hours • 12-month term</p>
         </div>
       </section>
 
