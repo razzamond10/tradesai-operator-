@@ -10,6 +10,7 @@ export default function Landing() {
   const expandedRef = useRef(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [bookingForm, setBookingForm] = useState({ name: '', email: '', phone: '', businessName: '', tradeType: 'Plumbing' });
+  const [customTradeInput, setCustomTradeInput] = useState('');
   const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0);
   const [isAudioPaused, setIsAudioPaused] = useState(true);
 
@@ -46,8 +47,10 @@ export default function Landing() {
 
   const handleBookingSubmit = (e) => {
     e.preventDefault();
-    alert(`Thanks ${bookingForm.name}! We'll confirm your free test call within 24 hours.\n\nEmail: ${bookingForm.email}\nPhone: ${bookingForm.phone}`);
+    const finalTrade = bookingForm.tradeType === 'Other' ? customTradeInput : bookingForm.tradeType;
+    alert(`Thanks ${bookingForm.name}! We'll confirm your free test call within 24 hours.\n\nEmail: ${bookingForm.email}\nPhone: ${bookingForm.phone}\nTrade: ${finalTrade}`);
     setBookingForm({ name: '', email: '', phone: '', businessName: '', tradeType: 'Plumbing' });
+    setCustomTradeInput('');
   };
 
   const features = [
@@ -211,8 +214,11 @@ export default function Landing() {
                 <input key={field.key} type={field.type} placeholder={field.placeholder} value={bookingForm[field.key]} onChange={(e) => setBookingForm({...bookingForm, [field.key]: e.target.value})} required style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }} />
               ))}
               <select value={bookingForm.tradeType} onChange={(e) => setBookingForm({...bookingForm, tradeType: e.target.value})} style={{ width: '100%', padding: '0.9rem', marginBottom: '1.5rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.2)', background: 'rgba(255,255,255,0.05)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }}>
-                {['Plumbing', 'Electrical', 'HVAC', 'Roofing', 'Building', 'Gas Engineer', 'Handyman', 'Carpentry'].map(t => <option key={t} value={t}>{t}</option>)}
+                {['Plumbing', 'Electrical', 'HVAC', 'Roofing', 'Building', 'Gas Engineer', 'Handyman', 'Carpentry', 'Other'].map(t => <option key={t} value={t}>{t}</option>)}
               </select>
+              {bookingForm.tradeType === 'Other' && (
+                <input type="text" placeholder="Please specify your trade (e.g., Plastering, Painting, Tree Surgery)" value={customTradeInput} onChange={(e) => setCustomTradeInput(e.target.value)} required style={{ width: '100%', padding: '0.9rem', marginBottom: '1rem', borderRadius: '8px', border: '1px solid rgba(150,120,200,0.3)', background: 'rgba(255,255,255,0.08)', color: '#fff', fontSize: '0.95rem', boxSizing: 'border-box' }} />
+              )}
               <button type="submit" style={{ width: '100%', padding: '0.9rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }}>Book Your Call</button>
             </form>
             <p style={{ fontSize: '0.75rem', color: '#888', marginTop: '1rem', textAlign: 'center' }}>We'll confirm within 24 hours. No credit card needed.</p>
