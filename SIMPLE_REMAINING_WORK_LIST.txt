@@ -1,0 +1,150 @@
+═══════════════════════════════════════════════════════════════════════════════
+TRADESAI OPERATOR — SIMPLE REMAINING WORK LIST
+Everything Left to Do (Good-to-Haves + Nice-to-Haves)
+═══════════════════════════════════════════════════════════════════════════════
+
+# GOOD-TO-HAVES (Should Do Before/With First Customer) — 8 Items
+
+TIER 1: DO THIS WEEK (3 hours)
+────────────────────────────────────────────────────────────────────────────
+
+❌ 1. Make.com Module 6: Retell Agent Creation
+   Time: 1 hour
+   What: HTTP POST to create Retell agent per client
+   Impact: CRITICAL (enables self-serve signup)
+
+❌ 2. Make.com Module 7: Welcome Email
+   Time: 30 minutes
+   What: Email client with phone number + setup instructions
+   Impact: HIGH (customer onboarding)
+
+❌ 3. Make.com Module 8: Webhook Response
+   Time: 15 minutes
+   What: Return 200 OK on successful setup
+   Impact: CRITICAL (signup won't hang)
+
+❌ 4. Make.com Module 9: SMS Notification (Optional)
+   Time: 15 minutes
+   What: Text owner when client is live
+   Impact: MEDIUM (nice confirmation)
+
+❌ 5. End-to-End Testing
+   Time: 30 minutes
+   What: Test full signup flow (form → modules → verify)
+   Impact: HIGH (catch bugs before customer)
+
+❌ 6. Deploy Client Dashboard
+   Time: 5 minutes
+   What: Verify /dashboard route is live on Vercel
+   Impact: MEDIUM (code written, just deploy)
+
+TIER 2: DO BEFORE SCALING (After First Customer)
+────────────────────────────────────────────────────────────────────────────
+
+❌ 7. Collect Real Customer Testimonials
+   Time: 15 minutes per customer (do after customer 1-3)
+   What: Get headshots + quotes from paying customers
+   Impact: HIGH (replace placeholders)
+
+⏳ 8. How It Works Video (In Making)
+   Time: 5 minutes (when Ryan provides)
+   What: Integrate 60-90 second demo video into landing page
+   Impact: MEDIUM (builds confidence)
+
+───────────────────────────────────────────────────────────────────────────
+GOOD-TO-HAVES SUMMARY: 8 items | 2 DONE ✅ | 6 LEFT ❌
+
+═══════════════════════════════════════════════════════════════════════════════
+
+# NICE-TO-HAVES (Would Be Nice, Non-Blocking) — 7 Items Remaining
+
+⏳ 1. Trade-Specific Landing Pages
+   Time: 2 hours (build after 3+ customers)
+   What: Separate Plumbing, Electrical, HVAC, Roofing variants
+   Impact: +0.2 conversion per variant
+   Status: After MVP validated
+
+⏳ 2. Google Analytics 4 Tracking
+   Time: 30 minutes
+   What: Track landing page views, conversion rate, scroll depth
+   Impact: LOW (nice for optimization)
+   Status: Anytime
+
+⏳ 3. Live Chat Widget (Intercom/Crisp)
+   Time: 1 hour
+   What: Show live support availability
+   Impact: LOW (nice for support)
+   Status: When team staffed
+
+⏳ 4. SMS Reply Thread UI
+   Time: 3+ hours
+   What: Dashboard interface to view/reply to customer SMS
+   Impact: MEDIUM (nice for customer interaction)
+   Status: Post-MVP
+
+⏳ 5. Real-Time Notifications
+   Time: 2+ hours
+   What: WebSocket notifications for new calls, bookings, emergencies
+   Impact: MEDIUM (nice for dashboard)
+   Status: Post-MVP
+
+⏳ 6. Mobile App (iOS/Android)
+   Time: 40+ hours
+   What: Native app for trades owners
+   Impact: LOW (future scaling)
+   Status: Year 2+
+
+⏳ 7. Advanced Analytics Dashboard
+   Time: 3+ hours
+   What: Detailed performance metrics and reporting
+   Impact: LOW (nice to have)
+   Status: Post-MVP
+
+───────────────────────────────────────────────────────────────────────────
+NICE-TO-HAVES SUMMARY: 7 items remaining (10 already done ✅ this session)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+# EVERYTHING LEFT TO DO (Consolidated)
+
+IMMEDIATE (This Week) — 3 Hours
+────────────────────────────────────────────────────────────────────────────
+❌ Module 6: Retell agent creation (1 hr)
+❌ Module 7: Welcome email (30 mins)
+❌ Module 8: Webhook response (15 mins)
+❌ Module 9: SMS notification (15 mins) — OPTIONAL
+❌ End-to-end test (30 mins)
+❌ Deploy dashboard (5 mins)
+
+BEFORE SCALING — After 1st Customer
+────────────────────────────────────────────────────────────────────────────
+❌ Collect real customer testimonials (15 mins × N customers)
+⏳ How It Works video integration (5 mins when ready)
+❌ Trade-specific landing variants (2 hrs after 3+ customers)
+
+NICE-TO-HAVES / OPTIMIZATION — Post-MVP
+────────────────────────────────────────────────────────────────────────────
+⏳ Google Analytics 4 (30 mins anytime)
+⏳ Live chat widget (1 hr when team ready)
+⏳ SMS reply threads (3+ hrs post-MVP)
+⏳ Real-time notifications (2+ hrs post-MVP)
+⏳ Advanced analytics (3+ hrs post-MVP)
+⏳ Mobile app (40+ hrs year 2)
+
+═══════════════════════════════════════════════════════════════════════════════
+
+# QUICK REFERENCE
+
+TO LAUNCH & ACQUIRE FIRST CUSTOMER:
+✅ Critical haves: DONE (except Module 6)
+⏳ Good-to-haves: 3 hours of module building
+⏳ Nice-to-haves: Already mostly done (10/15)
+
+TO REACH 100% MVP:
+⏳ Finish 3 hours of work (Modules 6-8 + test)
+⏳ Deploy dashboard (5 mins)
+✅ Done
+
+TOTAL REMAINING WORK TO 100%: ~3.5 hours
+
+═══════════════════════════════════════════════════════════════════════════════
