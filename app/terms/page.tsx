@@ -93,7 +93,7 @@ export default function TermsPage() {
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
             <strong>AI Limitations:</strong> While the AI is highly accurate, it is not infallible. The AI may occasionally misunderstand accents, technical terminology, or complex requests. You are responsible for reviewing critical interactions and verifying emergency protocols.
           </p>
-          <p style={{ lineHeight: '1.8', marginmarginBottom: '1rem' }}>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
             <strong>Voice Quality:</strong> Voice is provided by ElevenLabs custom voice technology. Call quality depends on internet connectivity and phone network reliability. We do not guarantee perfect audio in all conditions.
           </p>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
