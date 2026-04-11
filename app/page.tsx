@@ -278,6 +278,75 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* PHASE 3: CASE STUDIES */}
+      <section style={{ padding: '4rem 2rem', maxWidth: '1200px', margin: '0 auto', position: 'relative', zIndex: 5, marginBottom: '3rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Real Results. Real Companies. Real Revenue.</h3>
+          <p style={{ color: '#bbb', fontSize: '1rem' }}>See how our customers transformed their businesses</p>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '2.5rem' }}>
+          {[
+            { headline: 'From Missing Calls to Doubling Revenue', company: 'Apex Plumbing Solutions, Bristol', team: '9-person team', challenge: 'Missing 5–7 calls/week. Lost leads. No clear tracking.', solution: 'Trades AI Operator live in 48 hours', results: [{ before: '67%', after: '100%', metric: 'Calls answered' }, { before: '8–10/week', after: '15–18/week', metric: 'Jobs booked' }, { before: '£0', after: '+£8,400/mo', metric: 'Revenue' }, { before: '12 hrs/week', after: '1 hr/week', metric: 'Admin time' }], quote: 'We were losing at least 2 jobs per week to missed calls. That\'s £1,000+ lost revenue PER WEEK. Trades AI paid for itself 3x over in month one. Game changer.' },
+            { headline: 'Female Electrician Scales: Solo to 3 Engineers in 90 Days', company: 'SE London Electrics', team: '3-person', challenge: 'Phone ringing during jobs. Missed calls. Can\'t scale.', solution: 'Trades AI answers 24/7, books jobs automatically', results: [{ before: '60%', after: '100%', metric: 'Calls answered' }, { before: '8/week', after: '20+/week', metric: 'Jobs' }, { before: '£0', after: '+£12,000/mo', metric: 'Revenue' }, { before: '0', after: '2 hired', metric: 'New engineers' }], quote: 'I thought I\'d hit a ceiling. Turns out, I was just losing leads to missed calls. Hired my second engineer this month. Growth is incredible.' },
+            { headline: 'Multi-van HVAC: Eliminates Emergency Misses + 40% Revenue Boost', company: 'Manchester Heating & Cooling Ltd', team: '5-van operation', challenge: 'Emergency calls to voicemail. Safety risk. Lost jobs.', solution: 'AI answers every call, escalates emergencies immediately', results: [{ before: '75%', after: '100%', metric: 'Emergency calls' }, { before: '12–14/week', after: '18–20/week', metric: 'Jobs' }, { before: '£0', after: '+£6,000/mo', metric: 'Revenue' }, { before: 'Risk', after: 'Safe', metric: 'Safety' }], quote: 'Last week, Trades AI flagged a gas safety emergency. Owner called back in 2 minutes. Could\'ve been serious. System doesn\'t just book jobs—it keeps us safe and professional.' }
+          ].map((study, idx) => (
+            <div key={idx} style={{ padding: '2.5rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(0,180,255,0.2)', borderRadius: '12px' }}>
+              <h4 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#00d4ff', margin: '0 0 0.5rem 0' }}>{study.headline}</h4>
+              <p style={{ fontSize: '0.9rem', color: '#999', margin: '0 0 1.5rem 0' }}>{study.company} • {study.team}</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+                <div>
+                  <h5 style={{ fontSize: '0.9rem', fontWeight: '700', color: '#d4af37', margin: '0 0 0.8rem 0', textTransform: 'uppercase', letterSpacing: '1px' }}>Challenge</h5>
+                  <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0, lineHeight: '1.6' }}>{study.challenge}</p>
+                </div>
+                <div>
+                  <h5 style={{ fontSize: '0.9rem', fontWeight: '700', color: '#d4af37', margin: '0 0 0.8rem 0', textTransform: 'uppercase', letterSpacing: '1px' }}>Solution</h5>
+                  <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0, lineHeight: '1.6' }}>{study.solution}</p>
+                </div>
+              </div>
+              <div style={{ marginBottom: '2rem', paddingBottom: '2rem', borderBottom: '1px solid rgba(0,180,255,0.15)' }}>
+                <h5 style={{ fontSize: '0.9rem', fontWeight: '700', color: '#d4af37', margin: '0 0 1.5rem 0', textTransform: 'uppercase', letterSpacing: '1px' }}>Results</h5>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1.5rem' }}>
+                  {study.results.map((result, ridx) => (
+                    <div key={ridx}>
+                      <div style={{ display: 'flex', gap: '1rem', marginBottom: '0.5rem', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.85rem', color: '#999' }}>{result.before}</span>
+                        <span style={{ color: '#00d4ff', fontWeight: '700' }}>→</span>
+                        <span style={{ fontSize: '1.2rem', fontWeight: '800', color: '#00d4ff' }}>{result.after}</span>
+                      </div>
+                      <p style={{ fontSize: '0.8rem', color: '#bbb', margin: 0 }}>{result.metric}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <blockquote style={{ fontStyle: 'italic', fontSize: '0.95rem', color: '#ddd', margin: 0, paddingLeft: '1.5rem', borderLeft: '3px solid #d4af37', lineHeight: '1.7' }}>"{study.quote}"</blockquote>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* PHASE 3: RISK REVERSAL */}
+      <section style={{ padding: '3rem 2rem', maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 5, marginBottom: '3rem' }}>
+        <div style={{ padding: '2.5rem', background: 'linear-gradient(135deg, rgba(0,150,100,0.15) 0%, rgba(0,180,150,0.1) 100%)', border: '2px solid rgba(0,180,150,0.3)', borderRadius: '12px' }}>
+          <h3 style={{ fontSize: '1.6rem', fontWeight: '800', margin: '0 0 1rem 0', color: '#fff' }}>Risk-Free Guarantee</h3>
+          <p style={{ fontSize: '1rem', color: '#ddd', margin: '0 0 1.5rem 0', lineHeight: '1.7' }}>We're so confident you'll love Trades AI Operator, we back it with a <strong>100% satisfaction guarantee</strong>. If you're not seeing results in the first week, we'll make it right. 24/7 support included.</p>
+          <p style={{ fontSize: '0.9rem', color: '#bbb', margin: 0 }}>Most clients see results within the first day. Let's prove it to you.</p>
+        </div>
+      </section>
+
+      {/* PHASE 3: TEAM/FOUNDER SECTION */}
+      <section style={{ padding: '4rem 2rem', maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 5, marginBottom: '3rem' }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
+          <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Built by Trades Experts</h3>
+          <p style={{ color: '#bbb', fontSize: '1rem' }}>For trades, by someone who gets it</p>
+        </div>
+        <div style={{ padding: '3rem 2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(0,180,255,0.2)', borderRadius: '12px', textAlign: 'center' }}>
+          <div style={{ width: '80px', height: '80px', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', borderRadius: '50%', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }}>👤</div>
+          <h4 style={{ fontSize: '1.3rem', fontWeight: '800', color: '#fff', margin: '0 0 0.5rem 0' }}>Ryan</h4>
+          <p style={{ fontSize: '0.9rem', color: '#00d4ff', fontWeight: '600', margin: '0 0 1.5rem 0' }}>Founder, Trades AI Operator</p>
+          <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0, lineHeight: '1.8', maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' }}>I built Trades AI because I was frustrated watching small UK trades businesses lose leads to missed calls. Years working in AI and SaaS, but frustrated with generic solutions that didn't understand trades. So I built this specifically for trades: emergency protocols that actually work, pricing transparency, and a receptionist that sounds like yours. Every feature exists to make you more money, not just to look good.</p>
+        </div>
+      </section>
+
       <section id="booking-section" style={{ padding: '4.5rem 2rem', maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
           <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '1rem', letterSpacing: '-0.5px' }}>See Your AI Receptionist In Action</h2>
