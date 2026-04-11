@@ -41,20 +41,25 @@ export default function TermsPage() {
         </section>
 
         <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#ff4444' }}>4. Cancellation Policy - CRITICAL</h2>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>7-Day Cooling-Off Right</h3>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#ff4444' }}>4. Cancellation Policy & Refund Terms - CRITICAL</h2>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>7-Day Refund Period (Risk-Free Trial)</h3>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            You may cancel your subscription within 7 calendar days of initial payment without additional penalty by emailing admin@tradesaioperator.uk. Your cancellation request must include your business name and account email address. Upon cancellation within this 7-day window, you forfeit the one-time setup fee (£1,197.00) but incur no additional cancellation charges. All monthly subscription fees paid in advance (if any) within this period will be refunded.
+            You may cancel your subscription within 7 calendar days of initial payment and receive a full refund of your monthly subscription fees (£447.00) by emailing admin@tradesaioperator.uk with your business name and account email. <strong>The one-time setup fee (£1,197.00) is non-refundable in all circumstances</strong>. This 7-day window is your risk-free trial period to test the Service.
           </p>
 
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>No Cancellation After Day 7</h3>
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Cancellation After Day 7: £500 Early Termination Fee</h3>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            After the 7-day cooling-off period expires, you are bound by the full 12-month Initial Term with no right of cancellation. Early termination after day 7 is not permitted under any circumstances. All remaining monthly fees for the full 12-month term (minus any payments already made) become immediately due and payable in full upon any attempted early termination. We will deduct outstanding fees from your registered payment method. No refunds are issued for partial-month usage or unused portions of the term.
+            After the 7-day refund period expires, you are committed to a 12-month Initial Term. If you request cancellation at any point after day 7 and before the end of month 1, a £500 early termination fee applies (in addition to your remaining subscription obligations). This fee covers our onboarding, system provisioning, and team allocation costs. Your remaining monthly fees for the full 12-month term become immediately due and payable in full.
+          </p>
+
+          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Cancellation After Month 1: Non-Refundable Commitment</h3>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
+            After 30 days from initial payment, the service becomes non-refundable. You remain bound by the full 12-month Initial Term. Any attempted early termination after month 1 will result in all remaining 12-month fees becoming immediately due. No partial refunds or credits are issued for unused portions of the subscription.
           </p>
 
           <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Renewal Terms (12-Month Cycles)</h3>
           <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            Upon completion of the Initial 12-Month Term, your subscription automatically renews for successive 12-month periods at the then-current monthly rate, unless you provide written cancellation notice at least 30 days before the renewal date. You may cancel renewal subscriptions with 30 days' written notice, with no additional penalty beyond fulfilling the remainder of the current 12-month cycle.
+            Upon completion of the Initial 12-Month Term, your subscription automatically renews for successive 12-month periods at the then-current monthly rate, unless you provide written cancellation notice at least 30 days before the renewal date. Renewal subscriptions may be cancelled with 30 days' written notice, with all remaining fees for the current 12-month cycle due and payable.
           </p>
         </section>
 

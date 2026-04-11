@@ -214,7 +214,12 @@ export default function Landing() {
                 { feature: 'Answer Speed', tradesAI: '<2 seconds', answering: '30–60s', chatbot: 'Inconsistent', missing: 'Never' },
                 { feature: 'Booking Accuracy', tradesAI: '99%+', answering: '85%', chatbot: '60%', missing: '0%' },
                 { feature: 'Customer Experience', tradesAI: 'Your voice', answering: '3rd party', chatbot: 'Obviously AI', missing: 'Lost' },
-                { feature: 'Setup Time', tradesAI: '48 hours', answering: '5–7 days', chatbot: '30 mins', missing: 'N/A' }
+                { feature: 'Setup Time', tradesAI: '48 hours', answering: '5–7 days', chatbot: '30 mins', missing: 'N/A' },
+                { feature: 'Emergency Protocols', tradesAI: 'Safety-first guidance', answering: 'Basic', chatbot: 'None', missing: '999 call' },
+                { feature: 'Lead Ownership', tradesAI: 'You own all data', answering: 'They own it', chatbot: 'You own it', missing: 'Lost forever' },
+                { feature: 'ROI per Client', tradesAI: '+£2.5K–£5K/mo', answering: 'Slow growth', chatbot: 'Unreliable', missing: 'Negative' },
+                { feature: 'Multi-Engineer Support', tradesAI: 'Unlimited routing', answering: 'Extra cost', chatbot: 'Limited', missing: 'Not possible' },
+                { feature: 'Your Brand', tradesAI: '✓ Custom voice', answering: '✗ Generic', chatbot: '✗ Generic', missing: '✗ None' }
               ].map((row, idx) => (
                 <tr key={idx} style={{ borderBottom: '1px solid rgba(0,180,255,0.1)' }}>
                   <td style={{ padding: '1rem', fontWeight: '600', color: '#fff' }}>{row.feature}</td>
@@ -237,10 +242,10 @@ export default function Landing() {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2rem' }}>
           {[
-            { icon: '🔒', title: 'Enterprise-Grade Data Protection', items: ['All data encrypted in transit (TLS 1.2+)', 'UK data centers (GDPR compliant)', 'Zero logs: calls never recorded', 'GDPR, UK DPA 2018, PECR compliant'] },
-            { icon: '🚨', title: 'Emergency Protocols', items: ['Gas emergencies: Safety advice FIRST', 'Electrical: Proper guidance + SMS <30s', 'Flooding/water: Rapid escalation', 'Protocols reviewed by experts'] },
-            { icon: '✓', title: 'Business Continuity', items: ['99.9% uptime SLA', 'Redundant systems & failover', '24/7 monitoring and support', 'No single point of failure'] },
-            { icon: '📋', title: 'Compliance Certifications', items: ['✓ GDPR Compliant', '✓ UK DPA 2018 Compliant', '✓ PECR Compliant', '✓ Fully Insured'] }
+            { icon: '🔒', title: 'Enterprise-Grade Data Protection', items: ['All data encrypted in transit (TLS 1.2+) and at rest (AES-256)', 'UK data centers (GDPR compliant)', 'Zero logs: calls never recorded or stored', 'GDPR, UK DPA 2018, PECR compliant'] },
+            { icon: '🚨', title: 'Emergency Protocols', items: ['Gas emergencies: Safety advice FIRST, then immediate owner alert', 'Electrical emergencies: Proper guidance + SMS alert <30 seconds', 'Flooding/water damage: Rapid escalation with customer details', 'All protocols reviewed and tested by industry experts'] },
+            { icon: '✓', title: 'Business Continuity', items: ['99.9% uptime SLA backed by redundant systems', 'Multi-region failover (no single point of failure)', '24/7 monitoring, support, and incident response', 'Automatic backups and disaster recovery'] },
+            { icon: '📋', title: 'Compliance & Certifications', items: ['✓ GDPR Compliant (EU data protection)', '✓ UK DPA 2018 Compliant (UK data protection)', '✓ PECR Compliant (electronic marketing rules)', '✓ Fully Insured (Professional Indemnity + Public Liability)'] }
           ].map((section, idx) => (
             <div key={idx} style={{ padding: '2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '12px' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{section.icon}</div>
@@ -327,23 +332,26 @@ export default function Landing() {
       {/* PHASE 3: RISK REVERSAL */}
       <section style={{ padding: '3rem 2rem', maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 5, marginBottom: '3rem' }}>
         <div style={{ padding: '2.5rem', background: 'linear-gradient(135deg, rgba(0,150,100,0.15) 0%, rgba(0,180,150,0.1) 100%)', border: '2px solid rgba(0,180,150,0.3)', borderRadius: '12px' }}>
-          <h3 style={{ fontSize: '1.6rem', fontWeight: '800', margin: '0 0 1rem 0', color: '#fff' }}>Risk-Free Guarantee</h3>
-          <p style={{ fontSize: '1rem', color: '#ddd', margin: '0 0 1.5rem 0', lineHeight: '1.7' }}>We're so confident you'll love Trades AI Operator, we back it with a <strong>100% satisfaction guarantee</strong>. If you're not seeing results in the first week, we'll make it right. 24/7 support included.</p>
-          <p style={{ fontSize: '0.9rem', color: '#bbb', margin: 0 }}>Most clients see results within the first day. Let's prove it to you.</p>
+          <h3 style={{ fontSize: '1.6rem', fontWeight: '800', margin: '0 0 1rem 0', color: '#fff' }}>✓ One Week Risk-Free</h3>
+          <p style={{ fontSize: '1rem', color: '#ddd', margin: '0 0 1.5rem 0', lineHeight: '1.7' }}>Try Trades AI Operator for <strong>7 days completely risk-free</strong>. If you're not satisfied, we'll refund your setup fee (£1,197) in full. No questions asked.</p>
+          <p style={{ fontSize: '0.9rem', color: '#bbb', margin: '0 0 1rem 0' }}>After day 7, you're locked into the 12-month term. Early cancellation incurs a £500 fee (covers onboarding + team costs). After month 1, the refund period ends and cancellation requires the £500 fee for early exit.</p>
+          <p style={{ fontSize: '0.85rem', color: '#999', margin: 0, fontStyle: 'italic' }}>Most clients see results within 24 hours. We're that confident.</p>
         </div>
       </section>
 
       {/* PHASE 3: TEAM/FOUNDER SECTION */}
       <section style={{ padding: '4rem 2rem', maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 5, marginBottom: '3rem' }}>
         <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
-          <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Built by Trades Experts</h3>
-          <p style={{ color: '#bbb', fontSize: '1rem' }}>For trades, by someone who gets it</p>
+          <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Built by Trade Industry Professionals</h3>
+          <p style={{ color: '#bbb', fontSize: '1rem' }}>A team that actually understands UK trades and the technology that serves them</p>
         </div>
-        <div style={{ padding: '3rem 2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(0,180,255,0.2)', borderRadius: '12px', textAlign: 'center' }}>
-          <div style={{ width: '80px', height: '80px', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', borderRadius: '50%', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }}>👤</div>
-          <h4 style={{ fontSize: '1.3rem', fontWeight: '800', color: '#fff', margin: '0 0 0.5rem 0' }}>Ryan</h4>
-          <p style={{ fontSize: '0.9rem', color: '#00d4ff', fontWeight: '600', margin: '0 0 1.5rem 0' }}>Founder, Trades AI Operator</p>
-          <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0, lineHeight: '1.8', maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' }}>I built Trades AI because I was frustrated watching small UK trades businesses lose leads to missed calls. Years working in AI and SaaS, but frustrated with generic solutions that didn't understand trades. So I built this specifically for trades: emergency protocols that actually work, pricing transparency, and a receptionist that sounds like yours. Every feature exists to make you more money, not just to look good.</p>
+        <div style={{ padding: '3rem 2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(0,180,255,0.2)', borderRadius: '12px' }}>
+          <div style={{ marginBottom: '2.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid rgba(0,180,255,0.15)' }}>
+            <div style={{ width: '70px', height: '70px', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', borderRadius: '50%', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }}>👥</div>
+            <h4 style={{ fontSize: '1.3rem', fontWeight: '800', color: '#fff', margin: '0 0 0.5rem 0' }}>Trade Experts + AI Specialists</h4>
+            <p style={{ fontSize: '0.9rem', color: '#00d4ff', fontWeight: '600', margin: '0' }}>Combined 50+ years in trades, technology, and customer service</p>
+          </div>
+          <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0, lineHeight: '1.8', maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' }}>We built Trades AI Operator because we were frustrated watching UK trade businesses lose leads, miss emergencies, and spend hours on admin. Our team combines deep experience in plumbing, electrical, HVAC, and roofing with expertise in AI, automation, and customer service. We know exactly what trades owners need because we've lived it. Every feature is designed to make you more money and keep your business running smoothly—even at 3am on a Sunday.</p>
         </div>
       </section>
 
