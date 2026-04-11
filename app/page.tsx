@@ -36,11 +36,8 @@ export default function Landing() {
     if (!audioRef.current) return;
     
     if (isAudioPaused) {
-      // Play next voice and cycle to next index
-      const nextIndex = (currentVoiceIndex + 1) % 6;
-      setCurrentVoiceIndex(nextIndex);
-      audioRef.current.src = `/voices/${voiceFiles[nextIndex]}`;
-      audioRef.current.load();
+      // Play the currently selected voice
+      audioRef.current.currentTime = 0;
       audioRef.current.play().catch(err => console.log('Audio play error:', err));
       setIsAudioPaused(false);
     } else {
