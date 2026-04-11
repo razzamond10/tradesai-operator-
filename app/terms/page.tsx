@@ -136,6 +136,62 @@ export default function TermsPage() {
           </p>
         </section>
 
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>14. Severability</h2>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
+            If any provision of this Agreement is found to be invalid, unenforceable, or illegal by a court of competent jurisdiction, that provision shall be severed from this Agreement and the remaining provisions shall continue in full force and effect. The parties shall negotiate in good faith to replace the severed provision with a valid provision that achieves the original economic and legal intent.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>15. Entire Agreement</h2>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
+            This Agreement, including all referenced documentation and schedules, constitutes the entire agreement between you and the Company regarding the Service and supersedes all prior negotiations, representations, and agreements, whether written or oral. No additional terms, conditions, or representations shall be effective unless expressly agreed in writing and signed by both parties.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>16. Assignment & Transfer</h2>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
+            You may not assign, transfer, sublicense, or delegate any rights or obligations under this Agreement without the Company's prior written consent. Any attempted assignment without consent is void. The Company may assign this Agreement to any successor, affiliate, or third party in connection with a merger, acquisition, or sale of assets, with written notice to you.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>17. Force Majeure</h2>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
+            Neither party shall be liable for failure to perform its obligations under this Agreement if such failure results from circumstances beyond its reasonable control, including natural disasters, war, terrorism, pandemics, government actions, or infrastructure failures of third-party providers (Google, Twilio, Anthropic, ElevenLabs). The affected party shall notify the other party of the force majeure event and use reasonable efforts to resume performance.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>18. No Third-Party Beneficiaries</h2>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
+            This Agreement is for the sole benefit of you and the Company. No third party, including your customers, employees, or partners, has any rights or claims under this Agreement, except as expressly stated herein.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>19. Notice & Communication</h2>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
+            Any legal notice, demand, or communication required under this Agreement must be sent in writing to the other party. For you to contact the Company, send written notice to: legal@tradesaioperator.uk. For the Company to contact you, we will use your registered email address or phone number on file. Notices are deemed received: (a) upon personal delivery, (b) 3 business days after email transmission if no bounce-back occurs, or (c) 5 business days after postal mail delivery.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>20. Waiver</h2>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
+            The failure of either party to enforce any provision of this Agreement does not constitute a waiver of that provision or any other provision. A waiver must be in writing and signed by the party granting the waiver. No single or partial exercise of a right shall preclude any further exercise of that right or the exercise of any other right under this Agreement.
+          </p>
+        </section>
+
+        <section style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>21. Survival</h2>
+          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
+            The following provisions survive termination or expiration of this Agreement: Subscription Fees (unpaid fees remain due), Limitation of Liability, Indemnification, Intellectual Property, Governing Law, Dispute Resolution, and any provision that by its nature is intended to survive termination. All other provisions terminate upon the end of your subscription, except as required by law.
+          </p>
+        </section>
+
         <div style={{ borderTop: '1px solid rgba(100,180,220,0.2)', paddingTop: '2rem', marginTop: '3rem', textAlign: 'center', color: '#666', fontSize: '0.85rem' }}>
           <p><strong>NOTICE:</strong> By signing up for TradesAI Operator, you acknowledge that you have read and agree to be bound by all terms contained herein. These are binding legal terms. Preliminary version effective April 11, 2026.</p>
         </div>
