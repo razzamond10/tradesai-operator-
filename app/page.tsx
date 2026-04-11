@@ -110,16 +110,20 @@ export default function Landing() {
           <p style={{ color: '#999', marginBottom: '1.8rem', fontSize: '0.85rem', fontStyle: 'italic' }}>Voice fully customizable to match your brand and preferences</p>
           
           <div style={{ padding: '1.5rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '12px' }}>
-            <button onClick={handleAudioPlay} style={{ marginBottom: '1.5rem', padding: '1rem 2rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', width: '100%', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>{isAudioPaused ? '▶ Play' : '⏸ Pause'} — {currentVoiceName} Voice Demo — Click to cycle</button>
+            <button onClick={handleAudioPlay} style={{ marginBottom: '1.5rem', padding: '1rem 2rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontWeight: '700', fontSize: '1rem', cursor: 'pointer', width: '100%', transition: 'all 0.3s ease', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 15px 40px rgba(0,212,255,0.35)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 10px 30px rgba(0,212,255,0.2)'; }}>{isAudioPaused ? '▶ Play' : '⏸ Pause'} — {currentVoiceName} Voice Demo</button>
+            
+            <div style={{ marginBottom: '1.5rem' }}>
+              <p style={{ fontSize: '0.85rem', color: '#999', marginBottom: '0.75rem', fontWeight: '500' }}>Choose your voice:</p>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+                {voiceNames.map((name, idx) => (
+                  <button key={idx} onClick={() => { setCurrentVoiceIndex(idx); setIsAudioPaused(true); audioRef.current?.pause(); audioRef.current?.load(); }} style={{ padding: '0.75rem 1rem', background: currentVoiceIndex === idx ? 'rgba(0,212,255,0.3)' : 'rgba(100,150,200,0.1)', border: currentVoiceIndex === idx ? '2px solid rgba(0,212,255,0.6)' : '1px solid rgba(100,150,200,0.2)', borderRadius: '8px', color: currentVoiceIndex === idx ? '#00d4ff' : '#ccc', fontWeight: currentVoiceIndex === idx ? '700' : '500', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s ease' }} onMouseEnter={(e) => { if (currentVoiceIndex !== idx) { (e.target as HTMLElement).style.background = 'rgba(100,150,200,0.2)'; (e.target as HTMLElement).style.color = '#ddd'; } }} onMouseLeave={(e) => { if (currentVoiceIndex !== idx) { (e.target as HTMLElement).style.background = 'rgba(100,150,200,0.1)'; (e.target as HTMLElement).style.color = '#ccc'; } }}>{name}</button>
+                ))}
+              </div>
+            </div>
+            
             <audio ref={audioRef} style={{ width: '100%', marginBottom: '1rem', borderRadius: '8px', backgroundColor: 'rgba(0,0,0,0.3)', visibility: 'hidden', position: 'absolute' }} controls preload="auto">
               <source src={`/voices/${voiceFiles[currentVoiceIndex]}`} type="audio/mpeg" />
             </audio>
-            
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
-              {voiceNames.map((name, idx) => (
-                <button key={idx} onClick={() => { setCurrentVoiceIndex(idx); setIsAudioPaused(true); audioRef.current?.pause(); audioRef.current?.load(); }} style={{ padding: '0.75rem 1rem', background: currentVoiceIndex === idx ? 'rgba(0,212,255,0.25)' : 'rgba(100,150,200,0.08)', border: currentVoiceIndex === idx ? '2px solid rgba(0,212,255,0.5)' : '1px solid rgba(100,150,200,0.15)', borderRadius: '8px', color: currentVoiceIndex === idx ? '#00d4ff' : '#bbb', fontWeight: currentVoiceIndex === idx ? '600' : '400', fontSize: '0.9rem', cursor: 'pointer', transition: 'all 0.3s ease' }} onMouseEnter={(e) => { if (currentVoiceIndex !== idx) { (e.target as HTMLElement).style.background = 'rgba(100,150,200,0.15)'; (e.target as HTMLElement).style.color = '#ddd'; } }} onMouseLeave={(e) => { if (currentVoiceIndex !== idx) { (e.target as HTMLElement).style.background = 'rgba(100,150,200,0.08)'; (e.target as HTMLElement).style.color = '#bbb'; } }}>{name}</button>
-              ))}
-            </div>
             
             <p style={{ fontSize: '0.9rem', color: '#ddd', marginBottom: '0.5rem', fontStyle: 'italic' }}>"Hello, thanks for calling plumbing services. How can I help with your boiler issue today?"</p>
             <p style={{ fontSize: '0.8rem', color: '#888', margin: 0 }}>Professional, friendly, natural-sounding British voices (powered by ElevenLabs AI)</p>
