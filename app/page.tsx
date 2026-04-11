@@ -346,13 +346,21 @@ export default function Landing() {
           <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Built by Trade Industry Professionals</h3>
           <p style={{ color: '#bbb', fontSize: '1rem' }}>A team that actually understands UK trades and the technology that serves them</p>
         </div>
-        <div style={{ padding: '3rem 2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(0,180,255,0.2)', borderRadius: '12px' }}>
-          <div style={{ marginBottom: '2.5rem', paddingBottom: '2.5rem', borderBottom: '1px solid rgba(0,180,255,0.15)' }}>
-            <div style={{ width: '70px', height: '70px', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', borderRadius: '50%', margin: '0 auto 1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }}>👥</div>
-            <h4 style={{ fontSize: '1.3rem', fontWeight: '800', color: '#fff', margin: '0 0 0.5rem 0' }}>Trade Experts + AI Specialists</h4>
-            <p style={{ fontSize: '0.9rem', color: '#00d4ff', fontWeight: '600', margin: '0' }}>Combined 50+ years in trades, technology, and customer service</p>
+        <div style={{ padding: '3.5rem 3rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(0,180,255,0.2)', borderRadius: '12px', textAlign: 'center' }}>
+          <div style={{ width: '70px', height: '70px', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', borderRadius: '50%', margin: '0 auto 2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.8rem', boxShadow: '0 10px 30px rgba(0,212,255,0.2)' }}>👥</div>
+          
+          <h4 style={{ fontSize: '1.4rem', fontWeight: '800', color: '#fff', margin: '0 0 0.5rem 0' }}>Trade Experts + AI Specialists</h4>
+          <p style={{ fontSize: '0.95rem', color: '#00d4ff', fontWeight: '600', margin: '0 0 2rem 0' }}>Combined 50+ years in trades, technology, and customer service</p>
+          
+          <div style={{ maxWidth: '650px', marginLeft: 'auto', marginRight: 'auto', textAlign: 'left' }}>
+            <p style={{ fontSize: '0.95rem', color: '#ddd', margin: '0 0 1.5rem 0', lineHeight: '1.8' }}>We built Trades AI Operator because we were frustrated watching UK trade businesses lose leads, miss emergencies, and waste hours on admin work.</p>
+            
+            <div style={{ background: 'rgba(0,180,255,0.08)', border: '1px solid rgba(0,180,255,0.2)', borderRadius: '8px', padding: '1.5rem', marginBottom: '1.5rem' }}>
+              <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0, lineHeight: '1.8' }}>Our team combines deep experience in <strong style={{ color: '#00d4ff' }}>plumbing, electrical, HVAC, and roofing</strong> with genuine expertise in AI, automation, and customer service. We know exactly what trades owners need—because we've lived it.</p>
+            </div>
+            
+            <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0, lineHeight: '1.8' }}>Every feature exists to <strong style={{ color: '#00d4ff' }}>make you more money</strong> and keep your business running smoothly—even at 3am on a Sunday.</p>
           </div>
-          <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0, lineHeight: '1.8', maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' }}>We built Trades AI Operator because we were frustrated watching UK trade businesses lose leads, miss emergencies, and spend hours on admin. Our team combines deep experience in plumbing, electrical, HVAC, and roofing with expertise in AI, automation, and customer service. We know exactly what trades owners need because we've lived it. Every feature is designed to make you more money and keep your business running smoothly—even at 3am on a Sunday.</p>
         </div>
       </section>
 
