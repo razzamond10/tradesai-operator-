@@ -2,8 +2,17 @@ import { google } from 'googleapis';
 
 function getAuth() {
   const keyRaw = process.env.GOOGLE_SERVICE_KEY || '';
-  // Vercel stores the key as a JSON string or as escaped newlines
-  let privateKey = keyRaw.replace(/\\n/g, '\n');
+
+  // Vercel stores private keys with literal \n — restore real newlines.
+  // Also handle keys pasted with spaces instead of newlines.
+  let privateKey = keyRaw
+    .replace(/\\n/g, '\n')   // escaped newlines → real newlines
+    .replace(/\r\n/g, '\n'); // normalise CRLF
+
+  // If the key came through as a JSON-encoded string (double-escaped), decode it
+  if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
+    try { privateKey = JSON.parse(privateKey); } catch {}
+  }
 
   return new google.auth.GoogleAuth({
     credentials: {
@@ -36,9 +45,10 @@ export interface ClientConfig {
 }
 
 export async function getClientConfigs(): Promise<ClientConfig[]> {
+  // Tab is named "Client Config" (with space) in the master sheet
   const rows = await readSheet(
     process.env.MASTER_SHEET_ID!,
-    'ClientConfig!A2:I'
+    "'Client Config'!A2:I"
   );
   return rows.map((r) => ({
     businessName: r[0] || '',

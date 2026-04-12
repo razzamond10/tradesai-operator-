@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PortalShell from '@/components/PortalShell';
+import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
 
 interface ClientConfig {
@@ -40,21 +41,15 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
 
   return (
     <PortalShell role={user.role} name={user.name}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <h1 style={{ color: '#1A0A3C', fontSize: '1.6rem', fontWeight: '800', margin: '0 0 0.25rem' }}>All Clients</h1>
-          <p style={{ color: '#888', margin: 0, fontSize: '0.875rem' }}>Pulled live from ClientConfig tab · {clients.length} total</p>
-        </div>
+      <Topbar breadcrumb="Admin" page="All Clients" sub={`${clients.length} clients`} />
+      <div style={{ padding: '18px 22px', flex: 1, overflowY: 'auto' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
+        <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '13px', fontWeight: 800, color: '#1A0A3C' }}>Clients — live from Google Sheets</div>
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search clients…"
-          style={{
-            padding: '0.6rem 1rem', borderRadius: '10px', border: '1px solid rgba(0,0,0,0.12)',
-            fontSize: '0.875rem', outline: 'none', width: '240px',
-            background: '#fff', color: '#1A0A3C',
-          }}
+          style={{ padding: '6px 12px', borderRadius: '6px', border: '1px solid #D8D0F0', fontSize: '12px', outline: 'none', width: '220px', background: '#fff', color: '#1A0A3C' }}
         />
       </div>
 
@@ -126,12 +121,13 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
             </button>
           ))}
           {filtered.length === 0 && !loading && (
-            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem', color: '#aaa' }}>
+            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem', color: '#7468A0', fontSize: '12px' }}>
               No clients found
             </div>
           )}
         </div>
       )}
+      </div>
     </PortalShell>
   );
 }
