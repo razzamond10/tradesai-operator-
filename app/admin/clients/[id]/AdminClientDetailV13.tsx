@@ -1,7 +1,6 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import PortalShell from '@/components/PortalShell';
+import AdminClientShell from '@/components/AdminClientShell';
 import Topbar from '@/components/Topbar';
 import ActivityLineChart from '@/components/charts/ActivityLineChart';
 import DonutChart from '@/components/charts/DonutChart';
@@ -144,7 +143,6 @@ function HourBarChart({ interactions }: { interactions: any[] }) {
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayload; clientId: string }) {
-  const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -221,22 +219,19 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
   };
 
   return (
-    <PortalShell role={user.role} name={user.name}>
+    <AdminClientShell
+      clientId={clientId}
+      clientName={data?.config?.businessName}
+      tradeType={data?.config?.tradeType}
+      adminName={user.name}
+    >
       <Topbar
-        breadcrumb="Admin / Clients"
-        page={data?.config?.businessName || 'Client Dashboard'}
-        sub={data?.config?.tradeType}
+        breadcrumb={data?.config?.businessName || 'Client'}
+        page="Dashboard"
+        sub="Full overview — live from Google Sheets"
       />
 
       <div style={{ padding: '18px 22px', flex: 1, overflowY: 'auto' }}>
-
-        {/* Back link */}
-        <button
-          onClick={() => router.push('/admin')}
-          style={{ background: 'none', border: 'none', color: 'var(--a2)', cursor: 'pointer', fontSize: '11px', fontWeight: 700, padding: '0 0 14px', display: 'flex', alignItems: 'center', gap: '4px', fontFamily: '"Inter",sans-serif' }}
-        >
-          ← Back to All Clients
-        </button>
 
         {error && (
           <div style={{ padding: '10px 14px', background: 'var(--a4b)', border: '1px solid #F5C0C8', borderRadius: '8px', color: 'var(--a4)', fontSize: '12px', marginBottom: '14px' }}>
@@ -619,6 +614,6 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
         </div>
         <style>{`@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
       </div>
-    </PortalShell>
+    </AdminClientShell>
   );
 }
