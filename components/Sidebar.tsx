@@ -36,11 +36,52 @@ const clientNavSections = [
 ];
 
 const adminNavSections = [
-  { label: 'Main', items: [{ label: 'All Clients', icon: '👥', href: '/admin' }] },
+  {
+    label: 'Overview',
+    items: [
+      { label: 'Command Centre', icon: '⊞', href: '/admin' },
+      { label: 'Analytics', icon: '📊', href: '/admin/analytics' },
+    ],
+  },
+  {
+    label: 'Operations',
+    items: [
+      { label: 'Job Schedule', icon: '📅', href: '/admin/schedule' },
+      { label: 'Lead Pipeline', icon: '📋', href: '/admin/pipeline' },
+      { label: 'Emergencies', icon: '🚨', href: '/admin/emergencies' },
+      { label: 'Communications', icon: '💬', href: '/admin/comms' },
+    ],
+  },
+  {
+    label: 'Revenue',
+    items: [
+      { label: 'Revenue Tracker', icon: '💰', href: '/admin/revenue' },
+      { label: 'Forecasting', icon: '📈', href: '/admin/forecast' },
+      { label: 'Reviews & Ratings', icon: '⭐', href: '/admin/reviews' },
+    ],
+  },
+  {
+    label: 'Settings',
+    items: [
+      { label: 'Configuration', icon: '⚙️', href: '/admin/config' },
+      { label: 'Clients', icon: '👥', href: '/admin/clients' },
+    ],
+  },
 ];
 
 const vaNavSections = [
-  { label: 'Main', items: [{ label: 'Clients', icon: '👥', href: '/va' }] },
+  {
+    label: 'Overview',
+    items: [
+      { label: 'Command Centre', icon: '⊞', href: '/va' },
+    ],
+  },
+  {
+    label: 'Settings',
+    items: [
+      { label: 'Clients', icon: '👥', href: '/va' },
+    ],
+  },
 ];
 
 export default function Sidebar({ role, name }: SidebarProps) {
