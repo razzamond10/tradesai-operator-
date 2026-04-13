@@ -12,10 +12,16 @@ export async function GET(req: NextRequest) {
   }
 
   const sheetId = process.env.MASTER_SHEET_ID;
+  const saRaw = process.env.GOOGLE_SERVICE_ACCOUNT || '';
   console.log('[clients] MASTER_SHEET_ID:', sheetId);
-  console.log('[clients] GOOGLE_SERVICE_EMAIL:', process.env.GOOGLE_SERVICE_EMAIL);
-  const keyRaw = process.env.GOOGLE_SERVICE_KEY || '';
-  console.log('[clients] GOOGLE_SERVICE_KEY length:', keyRaw.length, '| starts with:', keyRaw.slice(0, 30));
+  console.log('[clients] GOOGLE_SERVICE_ACCOUNT length:', saRaw.length, '| starts with:', saRaw.slice(0, 40));
+  try {
+    const parsed = JSON.parse(saRaw);
+    console.log('[clients] SA client_email:', parsed.client_email);
+    console.log('[clients] SA private_key starts with:', (parsed.private_key || '').slice(0, 40));
+  } catch (e) {
+    console.error('[clients] GOOGLE_SERVICE_ACCOUNT is not valid JSON:', (e as Error).message);
+  }
 
   // Step 1 — confirm service account can access the spreadsheet at all
   try {

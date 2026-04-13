@@ -1,24 +1,18 @@
 import { google } from 'googleapis';
 
 function getAuth() {
-  const keyRaw = process.env.GOOGLE_SERVICE_KEY || '';
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT || '';
+  if (!raw) throw new Error('GOOGLE_SERVICE_ACCOUNT env var is not set');
 
-  // Vercel stores private keys with literal \n — restore real newlines.
-  // Also handle keys pasted with spaces instead of newlines.
-  let privateKey = keyRaw
-    .replace(/\\n/g, '\n')   // escaped newlines → real newlines
-    .replace(/\r\n/g, '\n'); // normalise CRLF
-
-  // If the key came through as a JSON-encoded string (double-escaped), decode it
-  if (privateKey.startsWith('"') && privateKey.endsWith('"')) {
-    try { privateKey = JSON.parse(privateKey); } catch {}
+  let credentials: any;
+  try {
+    credentials = JSON.parse(raw);
+  } catch (e) {
+    throw new Error(`GOOGLE_SERVICE_ACCOUNT is not valid JSON: ${(e as Error).message}`);
   }
 
   return new google.auth.GoogleAuth({
-    credentials: {
-      client_email: process.env.GOOGLE_SERVICE_EMAIL,
-      private_key: privateKey,
-    },
+    credentials,
     scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
   });
 }
