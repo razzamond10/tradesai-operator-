@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/auth';
-import { getClientConfigs } from '@/lib/sheets';
+import { getClientConfigs, getSpreadsheetMeta } from '@/lib/sheets';
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('tradesai_token')?.value;
@@ -11,11 +11,41 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
+  const sheetId = process.env.MASTER_SHEET_ID;
+  console.log('[clients] MASTER_SHEET_ID:', sheetId);
+  console.log('[clients] GOOGLE_SERVICE_EMAIL:', process.env.GOOGLE_SERVICE_EMAIL);
+  const keyRaw = process.env.GOOGLE_SERVICE_KEY || '';
+  console.log('[clients] GOOGLE_SERVICE_KEY length:', keyRaw.length, '| starts with:', keyRaw.slice(0, 30));
+
+  // Step 1 — confirm service account can access the spreadsheet at all
+  try {
+    const meta = await getSpreadsheetMeta(sheetId!);
+    const sheetNames = meta.sheets?.map((s: any) => s.properties?.title) ?? [];
+    console.log('[clients] Spreadsheet title:', meta.properties?.title);
+    console.log('[clients] Available tab names:', JSON.stringify(sheetNames));
+  } catch (metaErr: any) {
+    console.error('[clients] METADATA FETCH FAILED:', metaErr?.message ?? metaErr);
+    console.error('[clients] Meta error code:', metaErr?.code);
+    console.error('[clients] Meta error status:', metaErr?.status);
+    return NextResponse.json(
+      { error: 'Cannot access spreadsheet — check service account permissions', detail: metaErr?.message },
+      { status: 500 }
+    );
+  }
+
+  // Step 2 — read the ClientConfig tab
   try {
     const clients = await getClientConfigs();
+    console.log('[clients] Rows returned:', clients.length);
     return NextResponse.json({ clients });
-  } catch (err) {
-    console.error('Sheets error:', err);
-    return NextResponse.json({ error: 'Failed to load clients' }, { status: 500 });
+  } catch (err: any) {
+    console.error('[clients] getClientConfigs FAILED:', err?.message ?? err);
+    console.error('[clients] Error code:', err?.code);
+    console.error('[clients] Error status:', err?.status);
+    console.error('[clients] Full error:', JSON.stringify(err, Object.getOwnPropertyNames(err)));
+    return NextResponse.json(
+      { error: 'Failed to read Client Config tab', detail: err?.message },
+      { status: 500 }
+    );
   }
 }

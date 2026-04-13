@@ -23,6 +23,16 @@ function getAuth() {
   });
 }
 
+export async function getSpreadsheetMeta(spreadsheetId: string) {
+  const auth = getAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  const res = await sheets.spreadsheets.get({
+    spreadsheetId,
+    fields: 'properties.title,sheets.properties.title',
+  });
+  return res.data;
+}
+
 export async function readSheet(
   spreadsheetId: string,
   range: string
