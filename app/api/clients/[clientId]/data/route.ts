@@ -25,12 +25,30 @@ export async function GET(
 
   try {
     const config = await getClientConfig(params.clientId);
-    if (!config) return NextResponse.json({ error: 'Client not found' }, { status: 404 });
+    if (!config) return NextResponse.json({ error: `Client "${params.clientId}" not found in master sheet` }, { status: 404 });
 
+    const sheetId = config.sheetId;
+
+    if (!sheetId) {
+      // Config exists but no sheet linked yet — return config with empty data
+      const kpis = computeKPIs([], []);
+      return NextResponse.json({ config, kpis, interactions: [], bookings: [], emergencies: [] });
+    }
+
+    // Fetch each tab independently so a missing tab doesn't crash the whole request
     const [interactions, bookings, emergencies] = await Promise.all([
-      getInteractions(config.sheetId),
-      getBookings(config.sheetId),
-      getEmergencies(config.sheetId),
+      getInteractions(sheetId).catch((e) => {
+        console.warn(`[data] InteractionsLog unavailable for ${sheetId}:`, e?.message);
+        return [];
+      }),
+      getBookings(sheetId).catch((e) => {
+        console.warn(`[data] Bookings unavailable for ${sheetId}:`, e?.message);
+        return [];
+      }),
+      getEmergencies(sheetId).catch((e) => {
+        console.warn(`[data] Emergencies unavailable for ${sheetId}:`, e?.message);
+        return [];
+      }),
     ]);
 
     const kpis = computeKPIs(interactions, bookings);
@@ -38,12 +56,15 @@ export async function GET(
     return NextResponse.json({
       config,
       kpis,
-      interactions: interactions.slice(0, 50),
-      bookings: bookings.slice(0, 50),
-      emergencies: emergencies.slice(0, 20),
+      interactions: interactions.slice(0, 100),
+      bookings: bookings.slice(0, 100),
+      emergencies: emergencies.slice(0, 50),
     });
-  } catch (err) {
-    console.error('Client data error:', err);
-    return NextResponse.json({ error: 'Failed to load data' }, { status: 500 });
+  } catch (err: any) {
+    console.error('[data] Fatal error:', err?.message ?? err);
+    return NextResponse.json(
+      { error: err?.message ?? 'Failed to load client data' },
+      { status: 500 }
+    );
   }
 }
