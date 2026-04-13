@@ -48,12 +48,29 @@ export interface ClientConfig {
   clientId: string;
 }
 
+/** Strip leading emoji / non-ASCII characters from a tab name for comparison */
+function normaliseTabName(name: string): string {
+  return name.replace(/^[\p{Emoji}\p{So}\s]+/u, '').trim().toLowerCase();
+}
+
+/** Find the exact tab title whose normalised form includes the search string */
+async function resolveTabName(spreadsheetId: string, search: string): Promise<string> {
+  const meta = await getSpreadsheetMeta(spreadsheetId);
+  const tabs: string[] = (meta.sheets ?? []).map((s: any) => s.properties?.title ?? '');
+  const needle = search.toLowerCase();
+  const match = tabs.find((t) => normaliseTabName(t).includes(needle));
+  if (!match) {
+    throw new Error(
+      `Tab matching "${search}" not found. Available tabs: ${tabs.map((t) => `"${t}"`).join(', ')}`
+    );
+  }
+  return match;
+}
+
 export async function getClientConfigs(): Promise<ClientConfig[]> {
-  // Tab is named "Client Config" (with space) in the master sheet
-  const rows = await readSheet(
-    process.env.MASTER_SHEET_ID!,
-    "'Client Config'!A2:I"
-  );
+  const spreadsheetId = process.env.MASTER_SHEET_ID!;
+  const tabName = await resolveTabName(spreadsheetId, 'client config');
+  const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:I`);
   return rows.map((r) => ({
     businessName: r[0] || '',
     tradeType: r[1] || '',
