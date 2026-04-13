@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PortalShell from '@/components/PortalShell';
+import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
 
 interface ClientConfig {
@@ -11,6 +12,21 @@ interface ClientConfig {
   phone: string;
   clientId: string;
   twilioNumber: string;
+}
+
+const TRADE_COLORS: Record<string, string> = {
+  plumbing: '#3D1FA8',
+  'gas & heating': '#C01830',
+  electrical: '#9A6200',
+  roofing: '#0A7455',
+  building: '#6B3FD0',
+  drainage: '#3D1FA8',
+  hvac: '#0A7455',
+  locksmith: '#C9A84C',
+};
+
+function tradeColor(t: string) {
+  return TRADE_COLORS[(t || '').toLowerCase()] || '#3D1FA8';
 }
 
 export default function VAClient({ user }: { user: JWTPayload }) {
@@ -23,94 +39,139 @@ export default function VAClient({ user }: { user: JWTPayload }) {
   useEffect(() => {
     fetch('/api/clients')
       .then((r) => r.json())
-      .then((d) => {
-        if (d.error) setError(d.error);
-        else setClients(d.clients || []);
-      })
+      .then((d) => { if (d.error) setError(d.error); else setClients(d.clients || []); })
       .catch(() => setError('Failed to load clients'))
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = clients.filter((c) =>
-    !search ||
-    c.businessName.toLowerCase().includes(search.toLowerCase()) ||
-    c.tradeType.toLowerCase().includes(search.toLowerCase()) ||
-    c.contactName.toLowerCase().includes(search.toLowerCase())
+  const filtered = clients.filter(
+    (c) =>
+      !search ||
+      c.businessName.toLowerCase().includes(search.toLowerCase()) ||
+      c.tradeType.toLowerCase().includes(search.toLowerCase()) ||
+      c.contactName.toLowerCase().includes(search.toLowerCase()),
   );
+
+  const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
     <PortalShell role={user.role} name={user.name}>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
-            <h1 style={{ color: '#1A0A3C', fontSize: '1.6rem', fontWeight: '800', margin: 0 }}>Client Overview</h1>
-            <span style={{ padding: '0.2rem 0.6rem', borderRadius: '20px', background: 'rgba(100,100,200,0.1)', color: '#6366f1', fontSize: '0.7rem', fontWeight: '700', letterSpacing: '0.5px' }}>
-              READ-ONLY
-            </span>
+      <Topbar breadcrumb="VA Portal" page="Client Overview" sub="Read-only view" />
+      <div style={{ padding: '18px 22px', flex: 1, overflowY: 'auto' }}>
+
+        {/* READ-ONLY banner */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px', padding: '8px 14px', borderRadius: '8px', background: '#EDE8FF', border: '1px solid rgba(61,31,168,0.15)' }}>
+          <span style={{ fontSize: '13px' }}>👁</span>
+          <div style={{ fontSize: '11px', fontWeight: 600, color: '#3D1FA8' }}>
+            VA View — Read-only. You can view all client dashboards but cannot modify data or billing.
           </div>
-          <p style={{ color: '#888', margin: 0, fontSize: '0.875rem' }}>{clients.length} clients · VA view</p>
+          <span style={{ marginLeft: 'auto', fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '8px', background: 'rgba(61,31,168,0.12)', color: '#3D1FA8' }}>READ-ONLY</span>
         </div>
-        <input
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search clients…"
-          style={{
-            padding: '0.6rem 1rem', borderRadius: '10px', border: '1px solid rgba(0,0,0,0.12)',
-            fontSize: '0.875rem', outline: 'none', width: '240px', background: '#fff', color: '#1A0A3C',
-          }}
-        />
-      </div>
 
-      {error && (
-        <div style={{ padding: '1rem', background: 'rgba(220,50,50,0.08)', border: '1px solid rgba(220,50,50,0.2)', borderRadius: '12px', color: '#cc3333', marginBottom: '1.5rem' }}>{error}</div>
-      )}
-
-      {loading ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
-          {[1,2,3,4].map((i) => <div key={i} style={{ height: '140px', borderRadius: '16px', background: 'rgba(0,0,0,0.06)' }} />)}
+        {/* Header row */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <div>
+            <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '11px', fontWeight: 700, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '.8px' }}>
+              Clients
+            </div>
+            <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>{today}</div>
+          </div>
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search clients…"
+            style={{ padding: '6px 12px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '12px', outline: 'none', width: '220px', background: '#fff', color: 'var(--ink)', fontFamily: '"Inter",sans-serif' }}
+          />
         </div>
-      ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '1rem' }}>
-          {filtered.map((client) => (
-            <button
-              key={client.clientId}
-              onClick={() => router.push(`/va/client/${client.clientId}`)}
-              style={{
-                background: '#fff', borderRadius: '16px', padding: '1.4rem',
-                border: '1px solid rgba(0,0,0,0.06)', boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
-                textAlign: 'left', cursor: 'pointer', transition: 'all 0.15s', display: 'block', width: '100%',
-              }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(99,102,241,0.4)';
-                (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 20px rgba(99,102,241,0.1)';
-                (e.currentTarget as HTMLElement).style.transform = 'translateY(-2px)';
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLElement).style.borderColor = 'rgba(0,0,0,0.06)';
-                (e.currentTarget as HTMLElement).style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)';
-                (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
-                <div>
-                  <h3 style={{ color: '#1A0A3C', margin: '0 0 0.2rem', fontSize: '1rem', fontWeight: '700' }}>
-                    {client.businessName || 'Unnamed'}
-                  </h3>
-                  <span style={{ display: 'inline-block', padding: '0.2rem 0.6rem', borderRadius: '20px', background: 'rgba(201,168,76,0.1)', color: '#C9A84C', fontSize: '0.7rem', fontWeight: '600' }}>
-                    {client.tradeType || 'Trade'}
-                  </span>
-                </div>
-                <span style={{ fontSize: '1.5rem' }}>→</span>
+
+        {/* Stats row */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginBottom: '18px' }}>
+          {[
+            { label: 'Total Clients', val: loading ? '—' : clients.length, stripe: 'var(--a1)' },
+            { label: 'AI Lines Active', val: loading ? '—' : clients.filter(c=>c.twilioNumber).length, stripe: 'var(--a3)' },
+            { label: 'Trade Types', val: loading ? '—' : new Set(clients.map(c=>c.tradeType).filter(Boolean)).size, stripe: 'var(--a2)' },
+          ].map((s) => (
+            <div key={s.label} style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', overflow: 'hidden' }}>
+              <div style={{ height: '3px', background: s.stripe }} />
+              <div style={{ padding: '12px 14px' }}>
+                <div style={{ fontSize: '10px', fontWeight: 600, color: 'var(--muted)', marginBottom: '4px' }}>{s.label}</div>
+                <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '24px', fontWeight: 900, color: 'var(--ink)' }}>{s.val}</div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                <div style={{ fontSize: '0.8rem', color: '#666' }}><span style={{ color: '#aaa' }}>Contact: </span>{client.contactName || '—'}</div>
-                <div style={{ fontSize: '0.8rem', color: '#666' }}><span style={{ color: '#aaa' }}>Phone: </span>{client.phone || '—'}</div>
-              </div>
-            </button>
+            </div>
           ))}
-          {filtered.length === 0 && <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem', color: '#aaa' }}>No clients found</div>}
         </div>
-      )}
+
+        {error && (
+          <div style={{ padding: '10px 14px', background: 'var(--a4b)', border: '1px solid #F5C0C8', borderRadius: '8px', color: 'var(--a4)', fontSize: '12px', marginBottom: '14px' }}>
+            ⚠ {error}
+          </div>
+        )}
+
+        {loading ? (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
+            {[1,2,3,4,5,6].map((i) => <div key={i} style={{ height: '130px', borderRadius: '10px', background: 'rgba(0,0,0,0.05)', animation: 'shimmer 1.5s ease-in-out infinite' }} />)}
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '10px' }}>
+            {filtered.map((client) => {
+              const color = tradeColor(client.tradeType);
+              const initials = (client.businessName || 'XX').slice(0, 2).toUpperCase();
+              return (
+                <button
+                  key={client.clientId}
+                  onClick={() => router.push(`/va/clients/${client.clientId}`)}
+                  style={{ background: '#fff', borderRadius: '10px', padding: '0', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', textAlign: 'left', cursor: 'pointer', transition: 'all .15s', display: 'block', width: '100%', overflow: 'hidden' }}
+                  onMouseEnter={(e) => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'rgba(61,31,168,0.3)'; el.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={(e) => { const el = e.currentTarget as HTMLElement; el.style.borderColor = 'var(--divider)'; el.style.transform = 'translateY(0)'; }}
+                >
+                  <div style={{ height: '3px', background: color }} />
+                  <div style={{ padding: '14px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '8px', flexShrink: 0, background: `${color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: '"Inter Tight",sans-serif', fontSize: '12px', fontWeight: 800, color }}>
+                        {initials}
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '13px', fontWeight: 700, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {client.businessName || 'Unnamed Client'}
+                        </div>
+                        <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '10px', background: `${color}18`, color, display: 'inline-block', marginTop: '2px' }}>
+                          {client.tradeType || 'Trade'}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '14px', color: 'var(--faint)' }}>›</span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', paddingTop: '10px', borderTop: '1px solid var(--slate)' }}>
+                      <div style={{ fontSize: '10.5px', display: 'flex', gap: '6px' }}>
+                        <span style={{ color: 'var(--muted)', minWidth: '52px' }}>Contact</span>
+                        <span style={{ fontWeight: 600, color: 'var(--ink)' }}>{client.contactName || '—'}</span>
+                      </div>
+                      <div style={{ fontSize: '10.5px', display: 'flex', gap: '6px' }}>
+                        <span style={{ color: 'var(--muted)', minWidth: '52px' }}>Phone</span>
+                        <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink)' }}>{client.phone || '—'}</span>
+                      </div>
+                      {client.twilioNumber && (
+                        <div style={{ fontSize: '10.5px', display: 'flex', gap: '6px' }}>
+                          <span style={{ color: 'var(--muted)', minWidth: '52px' }}>AI Line</span>
+                          <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--a3)', fontWeight: 600 }}>{client.twilioNumber}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+            {filtered.length === 0 && (
+              <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '3rem', color: 'var(--muted)', fontSize: '12px' }}>No clients found</div>
+            )}
+          </div>
+        )}
+
+        <div style={{ marginTop: '28px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: '10px', color: 'var(--faint)' }}>Powered by <strong>TradesAI Operator</strong></div>
+          <div style={{ fontSize: '10px', color: 'var(--faint)', fontFamily: '"IBM Plex Mono",monospace' }}>{new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
+        </div>
+        <style>{`@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
+      </div>
     </PortalShell>
   );
 }

@@ -17,6 +17,16 @@ function getAuth() {
   });
 }
 
+function getWriteAuth() {
+  const raw = process.env.GOOGLE_SERVICE_ACCOUNT || '';
+  if (!raw) throw new Error('GOOGLE_SERVICE_ACCOUNT env var is not set');
+  const credentials = JSON.parse(raw);
+  return new google.auth.GoogleAuth({
+    credentials,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
+}
+
 export async function getSpreadsheetMeta(spreadsheetId: string) {
   const auth = getAuth();
   const sheets = google.sheets({ version: 'v4', auth });
@@ -185,4 +195,80 @@ export function computeKPIs(
   ).length;
 
   return { callsToday, bookingsToday, revenue, hotLeads };
+}
+
+// ── Write helpers ─────────────────────────────────────────────────────────────
+
+/** Append a row to InteractionsLog. Requires editor access on the sheet. */
+export async function logInteraction(
+  sheetId: string,
+  row: {
+    timestamp: string;
+    callerName: string;
+    phone: string;
+    intent: string;
+    outcome: string;
+    notes: string;
+  }
+): Promise<void> {
+  const auth = getWriteAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: 'InteractionsLog!A:F',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: [[
+        row.timestamp,
+        row.callerName,
+        row.phone,
+        row.intent,
+        row.outcome,
+        row.notes,
+      ]],
+    },
+  });
+}
+
+/** Append a row to the Bookings tab. */
+export async function logBooking(
+  sheetId: string,
+  row: {
+    timestamp: string;
+    customerName: string;
+    phone: string;
+    jobType: string;
+    scheduledDate: string;
+    status: string;
+    value: string;
+  }
+): Promise<void> {
+  const auth = getWriteAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: sheetId,
+    range: 'Bookings!A:G',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: [[
+        row.timestamp,
+        row.customerName,
+        row.phone,
+        row.jobType,
+        row.scheduledDate,
+        row.status,
+        row.value,
+      ]],
+    },
+  });
+}
+
+/** Find a client config by their Twilio number. */
+export async function getClientByTwilioNumber(twilioNumber: string): Promise<ClientConfig | null> {
+  const configs = await getClientConfigs();
+  return configs.find((c) =>
+    c.twilioNumber === twilioNumber ||
+    c.twilioNumber === twilioNumber.replace('+44', '0') ||
+    ('+44' + c.twilioNumber.replace(/^0/, '')) === twilioNumber
+  ) || null;
 }
