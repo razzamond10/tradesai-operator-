@@ -98,7 +98,7 @@ export default function DashboardClient({ user }: { user: JWTPayload }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [period, setPeriod] = useState('today');
-  const [chartMode, setChartMode] = useState('today');
+  const [chartMode, setChartMode] = useState<'today' | 'week' | 'month'>('today');
 
   const load = useCallback(() => {
     setLoading(true);
@@ -227,7 +227,7 @@ export default function DashboardClient({ user }: { user: JWTPayload }) {
                 </div>
               </div>
               <div className="ctabs">
-                {['today','week','month'].map(m => (
+                {(['today','week','month'] as const).map(m => (
                   <button key={m} className={`ctab${chartMode === m ? ' on' : ''}`} onClick={() => setChartMode(m)}>
                     {m.charAt(0).toUpperCase() + m.slice(1)}
                   </button>

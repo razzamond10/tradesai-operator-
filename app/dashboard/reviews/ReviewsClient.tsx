@@ -29,7 +29,7 @@ export default function ReviewsClient({ user }: { user: JWTPayload }) {
     : 'N/A';
 
   return (
-    <PortalShell role={user.role} name={user.name} clientId={user.clientId}>
+    <PortalShell role={user.role} name={user.name} >
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ color: '#1A0A3C', fontSize: '1.6rem', fontWeight: '800', margin: '0 0 0.25rem' }}>Reviews & Feedback</h1>
         <p style={{ color: '#888', margin: 0, fontSize: '0.875rem' }}>Customer sentiment from interaction notes</p>
