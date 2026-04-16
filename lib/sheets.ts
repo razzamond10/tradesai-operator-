@@ -56,8 +56,14 @@ export interface ClientConfig {
   sheetId: string;      // col F — client data sheet ID
   botpressId: string;   // col G — Botpress bot ID
   makeWebhookUrl: string; // col H — Make.com webhook URL
-  twilioNumber: string; // col I — Twilio phone number (also used as clientId)
-  clientId: string;     // col I — same as twilioNumber; used for routing
+  twilioNumber: string; // col I — Twilio phone number
+  slug: string;         // URL-safe key derived from businessName
+  clientId: string;     // twilioNumber if present, else slug — used for routing
+}
+
+/** Generate a URL-safe slug from a business name, e.g. "Ryan's Plumbing Services" → "ryans-plumbing-services" */
+function toSlug(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
 /** Strip leading emoji / non-ASCII characters from a tab name for comparison */
@@ -83,25 +89,37 @@ export async function getClientConfigs(): Promise<ClientConfig[]> {
   const spreadsheetId = process.env.MASTER_SHEET_ID!;
   const tabName = await resolveTabName(spreadsheetId, 'client config');
   const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:I`);
-  return rows.map((r) => ({
-    businessName: r[0] || '',
-    tradeType: r[1] || '',
-    contactName: r[2] || '',
-    phone: r[3] || '',
-    calendarId: r[4] || '',
-    sheetId: r[5] || '',
-    botpressId: r[6] || '',
-    makeWebhookUrl: r[7] || '',
-    twilioNumber: r[8] || '',
-    clientId: r[8] || '',
-  }));
+  return rows.map((r) => {
+    const businessName = r[0] || '';
+    const twilioNumber = r[8] || '';
+    const slug = toSlug(businessName);
+    return {
+      businessName,
+      tradeType: r[1] || '',
+      contactName: r[2] || '',
+      phone: r[3] || '',
+      calendarId: r[4] || '',
+      sheetId: r[5] || '',
+      botpressId: r[6] || '',
+      makeWebhookUrl: r[7] || '',
+      twilioNumber,
+      slug,
+      clientId: twilioNumber || slug,
+    };
+  });
 }
 
 export async function getClientConfig(
-  clientId: string
+  id: string
 ): Promise<ClientConfig | null> {
   const configs = await getClientConfigs();
-  return configs.find((c) => c.clientId === clientId) || null;
+  const normalId = id.toLowerCase();
+  return configs.find((c) =>
+    c.clientId === id ||
+    c.twilioNumber === id ||
+    c.slug === normalId ||
+    toSlug(c.businessName) === normalId
+  ) || null;
 }
 
 // ── InteractionsLog ──────────────────────────────────────────────────────────

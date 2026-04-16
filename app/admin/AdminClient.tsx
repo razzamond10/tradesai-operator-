@@ -8,8 +8,9 @@ interface ClientConfig {
   tradeType: string;
   contactName: string;
   phone: string;
-  clientId: string;
   twilioNumber: string;
+  slug: string;
+  clientId: string; // twilioNumber if present, else slug
 }
 
 const TRADE_COLORS: Record<string, string> = {
