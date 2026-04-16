@@ -137,8 +137,8 @@ function HourBarChart({ interactions }: { interactions: any[] }) {
 
     console.log('[HourBarChart] hours', hours.reduce((s, v) => s + v, 0), 'total calls mapped to hours');
 
-    import('chart.js').then(({ Chart, CategoryScale, LinearScale, BarElement, Tooltip }) => {
-      Chart.register(CategoryScale, LinearScale, BarElement, Tooltip);
+    import('chart.js').then(({ Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip }) => {
+      Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
       if (!canvasRef.current) { console.warn('[HourBarChart] canvas not ready'); return; }
       chartRef.current = new Chart(canvasRef.current, {

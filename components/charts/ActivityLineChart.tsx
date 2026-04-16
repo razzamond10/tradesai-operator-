@@ -91,8 +91,8 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
 
     console.log('[ActivityLineChart] computed', { mode, labels, callData, bookingData });
 
-    import('chart.js').then(({ Chart, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend }) => {
-      Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
+    import('chart.js').then(({ Chart, LineController, PointElement, LineElement, CategoryScale, LinearScale, Filler, Tooltip, Legend }) => {
+      Chart.register(LineController, PointElement, LineElement, CategoryScale, LinearScale, Filler, Tooltip, Legend);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
       if (!canvasRef.current) { console.warn('[ActivityLineChart] canvas not ready'); return; }
 

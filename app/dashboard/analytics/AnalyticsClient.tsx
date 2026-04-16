@@ -41,8 +41,8 @@ function TrendChart({ interactions, bookings }: { interactions: any[]; bookings:
     const callData = days.map(d => interactions.filter(i => (i.timestamp || '').startsWith(d)).length);
     const bookingData = days.map(d => bookings.filter(b => (b.timestamp || '').startsWith(d)).length);
 
-    import('chart.js').then(({ Chart, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend }) => {
-      Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
+    import('chart.js').then(({ Chart, LineController, PointElement, LineElement, CategoryScale, LinearScale, Filler, Tooltip, Legend }) => {
+      Chart.register(LineController, PointElement, LineElement, CategoryScale, LinearScale, Filler, Tooltip, Legend);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
       if (!canvasRef.current) return;
       chartRef.current = new Chart(canvasRef.current, {
@@ -83,8 +83,8 @@ function DowChart({ interactions }: { interactions: any[] }) {
       if (!isNaN(d.getTime())) counts[d.getDay()]++;
     });
 
-    import('chart.js').then(({ Chart, CategoryScale, LinearScale, BarElement, Tooltip }) => {
-      Chart.register(CategoryScale, LinearScale, BarElement, Tooltip);
+    import('chart.js').then(({ Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip }) => {
+      Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
       if (!canvasRef.current) return;
       chartRef.current = new Chart(canvasRef.current, {

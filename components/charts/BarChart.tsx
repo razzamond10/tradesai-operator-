@@ -40,8 +40,8 @@ export default function BarChart({ bookings }: { bookings: any[] }) {
 
     console.log('[BarChart] computed', { useCount, labels, data });
 
-    import('chart.js').then(({ Chart, CategoryScale, LinearScale, BarElement, Tooltip }) => {
-      Chart.register(CategoryScale, LinearScale, BarElement, Tooltip);
+    import('chart.js').then(({ Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip }) => {
+      Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
       if (!canvasRef.current) { console.warn('[BarChart] canvas not ready'); return; }
 

@@ -47,8 +47,8 @@ function RevTrendChart({ bookings }: { bookings: any[] }) {
       bookings.filter(b => (b.timestamp || '').startsWith(d)).reduce((s, b) => s + parseValue(b.value), 0)
     );
 
-    import('chart.js').then(({ Chart, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip }) => {
-      Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip);
+    import('chart.js').then(({ Chart, LineController, PointElement, LineElement, CategoryScale, LinearScale, Filler, Tooltip }) => {
+      Chart.register(LineController, PointElement, LineElement, CategoryScale, LinearScale, Filler, Tooltip);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
       if (!canvasRef.current) return;
       chartRef.current = new Chart(canvasRef.current, {

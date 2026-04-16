@@ -79,8 +79,8 @@ function HourBarChart({ interactions }: { interactions: any[] }) {
       if (!isNaN(h) && h >= 0 && h < 24) hours[h]++;
     });
     const labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
-    import('chart.js').then(({ Chart, CategoryScale, LinearScale, BarElement, Tooltip }) => {
-      Chart.register(CategoryScale, LinearScale, BarElement, Tooltip);
+    import('chart.js').then(({ Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip }) => {
+      Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
       if (!canvasRef.current) return;
       chartRef.current = new Chart(canvasRef.current, {
