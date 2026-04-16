@@ -115,7 +115,8 @@ export interface Interaction {
 }
 
 export async function getInteractions(sheetId: string): Promise<Interaction[]> {
-  const rows = await readSheet(sheetId, 'InteractionsLog!A2:F');
+  const tabName = await resolveTabName(sheetId, 'interactionslog');
+  const rows = await readSheet(sheetId, `'${tabName}'!A2:F`);
   return rows.map((r) => ({
     timestamp: r[0] || '',
     callerName: r[1] || '',
@@ -138,7 +139,8 @@ export interface Booking {
 }
 
 export async function getBookings(sheetId: string): Promise<Booking[]> {
-  const rows = await readSheet(sheetId, 'Bookings!A2:G');
+  const tabName = await resolveTabName(sheetId, 'bookings');
+  const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
   return rows.map((r) => ({
     timestamp: r[0] || '',
     customerName: r[1] || '',
@@ -161,7 +163,8 @@ export interface Emergency {
 }
 
 export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
-  const rows = await readSheet(sheetId, 'Emergencies!A2:F');
+  const tabName = await resolveTabName(sheetId, 'emergencies');
+  const rows = await readSheet(sheetId, `'${tabName}'!A2:F`);
   return rows.map((r) => ({
     timestamp: r[0] || '',
     callerName: r[1] || '',
@@ -176,7 +179,8 @@ export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
 export async function resolveEmergency(sheetId: string, rowIndex: number): Promise<void> {
   const auth = getWriteAuth();
   const sheets = google.sheets({ version: 'v4', auth });
-  const range = `Emergencies!F${rowIndex + 2}`; // +2 skips header row, converts 0-based to 1-based
+  const tabName = await resolveTabName(sheetId, 'emergencies');
+  const range = `'${tabName}'!F${rowIndex + 2}`; // +2 skips header row, converts 0-based to 1-based
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
     range,
@@ -188,7 +192,8 @@ export async function resolveEmergency(sheetId: string, rowIndex: number): Promi
 // ── KPI helpers ───────────────────────────────────────────────────────────────
 export function computeKPIs(
   interactions: Interaction[],
-  bookings: Booking[]
+  bookings: Booking[],
+  emergencies: Emergency[] = []
 ) {
   const today = new Date().toISOString().slice(0, 10);
 
@@ -211,7 +216,14 @@ export function computeKPIs(
     (i) => i.outcome?.toLowerCase() === 'booked' || i.outcome?.toLowerCase() === 'hot'
   ).length;
 
-  return { callsToday, bookingsToday, revenue, hotLeads };
+  const totalInteractions = interactions.length;
+  const totalBookings = bookings.length;
+  const emergenciesLogged = emergencies.length;
+  const conversionRate = totalInteractions > 0
+    ? Math.round((totalBookings / totalInteractions) * 100)
+    : 0;
+
+  return { callsToday, bookingsToday, revenue, hotLeads, totalInteractions, totalBookings, emergenciesLogged, conversionRate };
 }
 
 // ── Write helpers ─────────────────────────────────────────────────────────────

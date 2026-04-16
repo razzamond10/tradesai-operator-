@@ -182,7 +182,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
   const interactions: any[] = data?.interactions || [];
   const bookings: any[] = data?.bookings || [];
   const emergencies: any[] = data?.emergencies || [];
-  const kpis = data?.kpis || { callsToday: 0, bookingsToday: 0, revenue: 0, hotLeads: 0 };
+  const kpis = data?.kpis || { callsToday: 0, bookingsToday: 0, revenue: 0, hotLeads: 0, totalInteractions: 0, totalBookings: 0, emergenciesLogged: 0, conversionRate: 0 };
 
   // Lead Sources donut — from intent field
   const intentMap: Record<string, number> = {};
@@ -286,24 +286,24 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '14px' }}>
               <KPICard
                 stripe="var(--a1)" iconBg="var(--a1b)" icon="📞"
-                badge={`+${Math.max(0, kpis.callsToday - 1)} vs yesterday`}
-                label="Total Calls" value={kpis.callsToday} sub="total calls today"
+                badge={`${kpis.callsToday} today`}
+                label="Total Interactions" value={kpis.totalInteractions} sub="all time calls logged"
               />
               <KPICard
                 stripe="var(--a3)" iconBg="var(--a3b)" icon="✅"
-                badge={interactions.length > 0 ? `${Math.round((kpis.bookingsToday / Math.max(1,interactions.filter(i=>(i.timestamp||'').startsWith(today())).length))*100)}% conv.` : '0% conv.'}
-                label="Bookings" value={kpis.bookingsToday} sub="confirmed today"
-              />
-              <KPICard
-                stripe="var(--a2)" iconBg="var(--a2b)" icon="💷"
-                badge={`${fmtCurrency(revTotal)} total`}
-                label="Revenue Today" value={`£${kpis.revenue.toLocaleString()}`} sub="from confirmed jobs"
+                badge={`${kpis.bookingsToday} today`}
+                label="Total Bookings" value={kpis.totalBookings} sub="all time confirmed"
               />
               <KPICard
                 stripe="var(--a4)" iconBg="var(--a4b)" icon="🚨"
-                badge={openEmergencies.length > 0 ? 'Unresolved' : 'All clear'}
+                badge={openEmergencies.length > 0 ? `${openEmergencies.length} open` : 'All clear'}
                 badgeWarn={openEmergencies.length > 0}
-                label="Emergencies" value={openEmergencies.length} sub="active today"
+                label="Emergencies Logged" value={kpis.emergenciesLogged} sub="all time"
+              />
+              <KPICard
+                stripe="var(--a2)" iconBg="var(--a2b)" icon="📈"
+                badge={`${fmtCurrency(revTotal)} revenue`}
+                label="Conversion Rate" value={`${kpis.conversionRate}%`} sub="bookings ÷ calls"
               />
             </div>
 

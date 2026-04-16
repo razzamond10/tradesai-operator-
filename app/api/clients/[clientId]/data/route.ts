@@ -51,7 +51,7 @@ export async function GET(
       }),
     ]);
 
-    const kpis = computeKPIs(interactions, bookings);
+    const kpis = computeKPIs(interactions, bookings, emergencies);
 
     return NextResponse.json({
       config,
