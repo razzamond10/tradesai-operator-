@@ -55,6 +55,7 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   const sections = NAV_SECTIONS(clientId);
@@ -89,13 +90,19 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
       display: 'flex', minHeight: '100vh', background: '#F2F2F8',
       fontFamily: '"Inter",system-ui,sans-serif', fontSize: '14px',
     }}>
+      {/* ── Mobile overlay ── */}
+      {mobileNavOpen && (
+        <div className="admin-nav-overlay" onClick={() => setMobileNavOpen(false)} style={{ display: 'none' }} />
+      )}
+
       {/* ── Sidebar ── */}
-      <aside style={{
+      <aside className={`admin-sidebar${mobileNavOpen ? ' admin-sidebar-open' : ''}`} style={{
         position: 'fixed', top: 0, left: 0, bottom: 0, width: '220px',
         background: 'linear-gradient(180deg,#1A0A3C 0%,#26145A 100%)',
         display: 'flex', flexDirection: 'column', zIndex: 100,
         boxShadow: '2px 0 20px rgba(0,0,0,0.2)',
         fontFamily: '"Inter",system-ui,sans-serif',
+        transition: 'transform 0.25s ease',
       }}>
         {/* Logo */}
         <div style={{ padding: '16px 16px 10px', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
@@ -230,7 +237,20 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
       </aside>
 
       {/* ── Main content ── */}
-      <div style={{ marginLeft: '220px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', overflow: 'hidden' }}>
+      <div className="admin-main" style={{ marginLeft: '220px', flex: 1, display: 'flex', flexDirection: 'column', minHeight: '100vh', overflow: 'hidden' }}>
+        {/* Mobile header bar */}
+        <div className="admin-mobile-header" style={{ display: 'none' }}>
+          <button
+            onClick={() => setMobileNavOpen(o => !o)}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', color: '#1A0A3C', fontSize: '20px', lineHeight: 1 }}
+            aria-label="Open navigation"
+          >☰</button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img src="/logo.jpg" alt="logo" style={{ width: '24px', height: '24px', borderRadius: '4px' }} />
+            <span style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '13px', fontWeight: 700, color: '#1A0A3C' }}>TradesAI</span>
+          </div>
+          <div style={{ width: '36px' }} />
+        </div>
         {children}
       </div>
 
@@ -253,6 +273,26 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
         }
         body{background:var(--bg);color:var(--ink);}
         *{box-sizing:border-box;margin:0;padding:0;}
+        @media (max-width: 768px) {
+          .admin-sidebar { transform: translateX(-100%) !important; }
+          .admin-sidebar.admin-sidebar-open { transform: translateX(0) !important; }
+          .admin-main { margin-left: 0 !important; }
+          .admin-mobile-header {
+            display: flex !important; align-items: center; justify-content: space-between;
+            padding: 10px 14px; background: #fff; border-bottom: 1px solid var(--divider);
+            position: sticky; top: 0; z-index: 50; box-shadow: 0 1px 4px rgba(26,10,60,0.08);
+          }
+          .admin-nav-overlay {
+            display: block !important; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.45); z-index: 99;
+          }
+          .admin-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+          .admin-grid-3 { grid-template-columns: 1fr !important; }
+          .admin-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
+          .admin-card-stack { flex-direction: column !important; }
+          .topbar-clock { display: none !important; }
+          .topbar-divider { display: none !important; }
+        }
       `}</style>
     </div>
   );

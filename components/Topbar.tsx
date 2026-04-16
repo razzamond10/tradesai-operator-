@@ -44,11 +44,11 @@ export default function Topbar({ breadcrumb, page, sub, onRefresh, period, onPer
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <div style={{ textAlign: 'right' }}>
+        <div className="topbar-clock" style={{ textAlign: 'right' }}>
           <div style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '12px', color: '#3D2580', fontWeight: 500, letterSpacing: '.5px' }}>{time}</div>
           <div style={{ fontSize: '10px', color: '#7468A0' }}>{date}</div>
         </div>
-        <div style={{ width: '1px', height: '24px', background: '#D8D0F0' }} />
+        <div className="topbar-divider" style={{ width: '1px', height: '24px', background: '#D8D0F0' }} />
         {onPeriod && ['Today','Week','Month'].map((p) => (
           <button key={p} onClick={() => onPeriod(p.toLowerCase())} style={{
             padding: '5px 12px', borderRadius: '6px', fontSize: '11px', fontWeight: 600,

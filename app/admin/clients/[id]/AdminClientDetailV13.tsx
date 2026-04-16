@@ -280,7 +280,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
         )}
 
         {loading && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '20px' }}>
+          <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '20px' }}>
             {[1,2,3,4].map(i => (
               <div key={i} style={{ height: '110px', borderRadius: '10px', background: 'rgba(0,0,0,0.05)', animation: 'shimmer 1.5s ease-in-out infinite' }} />
             ))}
@@ -299,7 +299,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '14px' }}>
+            <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '14px' }}>
               <KPICard
                 stripe="var(--a1)" iconBg="var(--a1b)" icon="📞"
                 badge={`${kpis.callsToday} today`}
@@ -615,7 +615,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
 
             {/* Week strip */}
             <div style={{ marginBottom: '8px', fontFamily: '"Inter Tight",sans-serif', fontSize: '11px', fontWeight: 700, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '.8px' }}>This week</div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '10px', marginBottom: '24px' }}>
+            <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '10px', marginBottom: '24px' }}>
               {[
                 { label: 'Total Calls', val: wkCalls, change: `${wkCalls} this week` },
                 { label: 'Bookings', val: wkBookings, change: `${wkBookings} confirmed` },

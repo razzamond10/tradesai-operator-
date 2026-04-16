@@ -73,11 +73,11 @@ export default function Landing() {
           <img src="/logo.jpg" alt="Trades Ai Operator" style={{ height: '50px', width: 'auto', borderRadius: '10px', boxShadow: '0 8px 25px rgba(0,212,255,0.2)' }} />
           <div><h1 style={{ fontSize: '1.25rem', fontWeight: '800', margin: 0, letterSpacing: '-0.5px', color: '#fff' }}>Trades <span style={{ color: '#d4af37', fontWeight: '800' }}>Ai</span> Operator</h1><p style={{ fontSize: '0.65rem', color: '#888', margin: '0.25rem 0 0 0', letterSpacing: '0.5px' }}>24/7 AI RECEPTIONIST</p></div>
         </Link>
-        <button onClick={() => document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' })} style={{ padding: '0.65rem 1.6rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 8px 20px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 12px 30px rgba(0,212,255,0.3)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 8px 20px rgba(0,212,255,0.2)'; }}>Book Your Free 10-Minute Demo Call</button>
+        <button className="lp-hbtn" onClick={() => document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' })} style={{ padding: '0.65rem 1.6rem', background: 'linear-gradient(135deg, #00d4ff 0%, #0099cc 100%)', color: '#000', border: 'none', borderRadius: '8px', fontSize: '0.95rem', fontWeight: '700', cursor: 'pointer', transition: 'all 0.3s ease', boxShadow: '0 8px 20px rgba(0,212,255,0.2)' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.transform = 'translateY(-2px)'; (e.target as HTMLElement).style.boxShadow = '0 12px 30px rgba(0,212,255,0.3)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.transform = 'translateY(0)'; (e.target as HTMLElement).style.boxShadow = '0 8px 20px rgba(0,212,255,0.2)'; }}><span className="lp-btn-full">Book Your Free 10-Minute Demo Call</span><span className="lp-btn-short">Book Demo</span></button>
       </header>
 
       <section style={{ padding: '4.5rem 2rem 4rem', textAlign: 'center', maxWidth: '950px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
-        <h2 style={{ fontSize: '3.6rem', fontWeight: '800', lineHeight: '1.1', marginBottom: '1rem', letterSpacing: '-1.5px', background: 'linear-gradient(180deg, #fff 0%, #e0f2ff 50%, #b8d4ff 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Never Miss Another £500 Job Again</h2>
+        <h2 className="lp-h2" style={{ fontSize: '3.6rem', fontWeight: '800', lineHeight: '1.1', marginBottom: '1rem', letterSpacing: '-1.5px', background: 'linear-gradient(180deg, #fff 0%, #e0f2ff 50%, #b8d4ff 100%)', backgroundClip: 'text', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Never Miss Another £500 Job Again</h2>
         <p style={{ fontSize: '1.15rem', color: '#c8b8d8', marginBottom: '2.5rem', letterSpacing: '0.3px', fontWeight: '500', lineHeight: '1.6' }}>24/7 AI receptionist that answers in your voice, books jobs instantly, and sends you the details — even at 3am on a Sunday.</p>
         
         {/* Trust Bar */}
@@ -91,7 +91,7 @@ export default function Landing() {
           <button onClick={() => setShowVideo(true)} style={{ padding: '1rem 2.5rem', background: 'rgba(0,180,255,0.12)', color: '#00d4ff', border: '2px solid rgba(0,180,255,0.4)', borderRadius: '10px', fontWeight: '700', fontSize: '1.05rem', cursor: 'pointer', boxShadow: '0 8px 20px rgba(0,180,255,0.15)', transition: 'all 0.3s ease' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.background = 'rgba(0,180,255,0.18)'; (e.target as HTMLElement).style.boxShadow = '0 12px 30px rgba(0,180,255,0.25)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.background = 'rgba(0,180,255,0.12)'; (e.target as HTMLElement).style.boxShadow = '0 8px 20px rgba(0,180,255,0.15)'; }}>Click here to watch the video →</button>
         </div>
         
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.2rem', maxWidth: '600px', margin: '0 auto', fontSize: '0.85rem', color: '#aaa', marginTop: '2.5rem' }}>
+        <div className="lp-trust-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.2rem', maxWidth: '600px', margin: '0 auto', fontSize: '0.85rem', color: '#aaa', marginTop: '2.5rem' }}>
           <div style={{ padding: '1.1rem', background: 'linear-gradient(135deg, rgba(0,100,180,0.1) 0%, rgba(100,60,180,0.1) 100%)', border: '1px solid rgba(100,180,220,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.8rem', backdropFilter: 'blur(10px)' }}><span style={{ fontSize: '1.4rem' }}>🔒</span> <span>Secure & GDPR Compliant</span></div>
           <div style={{ padding: '1.1rem', background: 'linear-gradient(135deg, rgba(0,100,180,0.1) 0%, rgba(100,60,180,0.1) 100%)', border: '1px solid rgba(100,180,220,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.8rem', backdropFilter: 'blur(10px)' }}><span style={{ fontSize: '1.4rem' }}>🇬🇧</span> <span>UK-Based & Fully Insured</span></div>
           <div style={{ padding: '1.1rem', background: 'linear-gradient(135deg, rgba(0,100,180,0.1) 0%, rgba(100,60,180,0.1) 100%)', border: '1px solid rgba(100,180,220,0.2)', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '0.8rem', backdropFilter: 'blur(10px)' }}><span style={{ fontSize: '1.4rem' }}>✅</span> <span>Global Compliance & Cert Management</span></div>
@@ -111,7 +111,7 @@ export default function Landing() {
             
             <div style={{ marginBottom: '1.5rem' }}>
               <p style={{ fontSize: '0.85rem', color: '#999', marginBottom: '0.75rem', fontWeight: '500' }}>Choose your voice:</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
+              <div className="lp-voice-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.75rem' }}>
                 {voiceNames.map((name, idx) => (
                   <button key={idx} onClick={() => { setCurrentVoiceIndex(idx); setIsAudioPaused(true); audioRef.current?.pause(); audioRef.current?.load(); }} style={{ padding: '0.75rem 1rem', background: currentVoiceIndex === idx ? 'rgba(0,212,255,0.3)' : 'rgba(100,150,200,0.1)', border: currentVoiceIndex === idx ? '2px solid rgba(0,212,255,0.6)' : '1px solid rgba(100,150,200,0.2)', borderRadius: '8px', color: currentVoiceIndex === idx ? '#00d4ff' : '#ccc', fontWeight: currentVoiceIndex === idx ? '700' : '500', fontSize: '0.95rem', cursor: 'pointer', transition: 'all 0.2s ease' }} onMouseEnter={(e) => { if (currentVoiceIndex !== idx) { (e.target as HTMLElement).style.background = 'rgba(100,150,200,0.2)'; (e.target as HTMLElement).style.color = '#ddd'; } }} onMouseLeave={(e) => { if (currentVoiceIndex !== idx) { (e.target as HTMLElement).style.background = 'rgba(100,150,200,0.1)'; (e.target as HTMLElement).style.color = '#ccc'; } }}>{name}</button>
                 ))}
@@ -138,19 +138,19 @@ export default function Landing() {
       )}
 
       <section style={{ padding: '3.5rem 2rem', maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
-        <div style={{ padding: '2.8rem', background: 'linear-gradient(135deg, rgba(0,120,180,0.12) 0%, rgba(120,80,180,0.12) 100%)', border: '1px solid rgba(100,180,255,0.18)', borderRadius: '16px', display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '3.5rem', alignItems: 'center', marginBottom: '2.5rem', backdropFilter: 'blur(10px)', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
-          <div style={{ fontSize: '7rem', textAlign: 'center', lineHeight: '1', animation: 'float 3s ease-in-out infinite' }}>☎️</div>
+        <div className="lp-panel" style={{ padding: '2.8rem', background: 'linear-gradient(135deg, rgba(0,120,180,0.12) 0%, rgba(120,80,180,0.12) 100%)', border: '1px solid rgba(100,180,255,0.18)', borderRadius: '16px', display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '3.5rem', alignItems: 'center', marginBottom: '2.5rem', backdropFilter: 'blur(10px)', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
+          <div className="lp-emoji" style={{ fontSize: '7rem', textAlign: 'center', lineHeight: '1', animation: 'float 3s ease-in-out infinite' }}>☎️</div>
           <div><h2 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '1.2rem', letterSpacing: '-0.5px' }}>Never Miss a Call</h2><p style={{ color: '#bbb', lineHeight: '1.8', fontSize: '1rem', margin: '0 0 1.5rem 0' }}>Every enquiry is answered 24/7, even at 3am on a Sunday. Your customers hear a professional, friendly voice — not a voicemail. No more missed jobs.</p><button onClick={() => document.getElementById('demo-section').scrollIntoView({ behavior: 'smooth' })} style={{ padding: '0.85rem 1.8rem', background: 'rgba(0,180,255,0.15)', color: '#00d4ff', border: '1px solid rgba(0,180,255,0.4)', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '0.95rem', transition: 'all 0.3s ease' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.background = 'rgba(0,180,255,0.25)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.background = 'rgba(0,180,255,0.15)'; }}>Hear a live demo →</button></div>
         </div>
 
-        <div style={{ padding: '2.8rem', background: 'linear-gradient(135deg, rgba(0,120,180,0.12) 0%, rgba(120,80,180,0.12) 100%)', border: '1px solid rgba(100,180,255,0.18)', borderRadius: '16px', display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '3.5rem', alignItems: 'center', marginBottom: '2.5rem', backdropFilter: 'blur(10px)', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
+        <div className="lp-panel lp-panel-rev" style={{ padding: '2.8rem', background: 'linear-gradient(135deg, rgba(0,120,180,0.12) 0%, rgba(120,80,180,0.12) 100%)', border: '1px solid rgba(100,180,255,0.18)', borderRadius: '16px', display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '3.5rem', alignItems: 'center', marginBottom: '2.5rem', backdropFilter: 'blur(10px)', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
           <div><h2 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '1.2rem', letterSpacing: '-0.5px' }}>Instant Booking</h2><p style={{ color: '#bbb', lineHeight: '1.8', fontSize: '1rem', margin: '0 0 1.5rem 0' }}>Your diary stays accurate. The system checks your real Google Calendar and books available slots. Customers get automatic SMS confirmation. No back-and-forth emails.</p><button onClick={() => setShowVideo(true)} style={{ padding: '0.85rem 1.8rem', background: 'rgba(0,180,255,0.15)', color: '#00d4ff', border: '1px solid rgba(0,180,255,0.4)', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '0.95rem', transition: 'all 0.3s ease' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.background = 'rgba(0,180,255,0.25)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.background = 'rgba(0,180,255,0.15)'; }}>Watch how it works →</button></div>
-          <div style={{ fontSize: '7rem', textAlign: 'center', lineHeight: '1', animation: 'float 3s ease-in-out infinite 0.5s' }}>💷</div>
+          <div className="lp-emoji" style={{ fontSize: '7rem', textAlign: 'center', lineHeight: '1', animation: 'float 3s ease-in-out infinite 0.5s' }}>💷</div>
         </div>
       </section>
 
       <section style={{ padding: '3.5rem 2rem', maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem', marginBottom: expandedFeature !== null ? '2rem' : '0' }}>
+        <div className="lp-feat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '2rem', marginBottom: expandedFeature !== null ? '2rem' : '0' }}>
           {features.map((feature, idx) => (
             <div key={idx} style={{ padding: '2.2rem', background: 'linear-gradient(135deg, rgba(80,40,120,0.25) 0%, rgba(40,20,80,0.25) 100%)', border: '1px solid rgba(120,100,180,0.15)', borderRadius: '12px', backdropFilter: 'blur(10px)', transition: 'all 0.3s ease', cursor: 'pointer', transform: hoveredFeature === idx ? 'translateY(-10px)' : 'translateY(0)', boxShadow: hoveredFeature === idx ? '0 35px 70px rgba(0,180,255,0.18)' : '0 10px 35px rgba(0,0,0,0.25)' }} onMouseEnter={() => setHoveredFeature(idx)} onMouseLeave={() => setHoveredFeature(null)} onClick={() => setExpandedFeature(expandedFeature === idx ? null : idx)}>
               <div style={{ fontSize: '4.5rem', marginBottom: '1rem', transition: 'transform 0.3s ease', transform: hoveredFeature === idx ? 'scale(1.25)' : 'scale(1)' }}>{feature.icon}</div>
@@ -170,7 +170,7 @@ export default function Landing() {
               </div>
               <button onClick={() => setExpandedFeature(null)} style={{ background: 'none', border: 'none', color: '#00d4ff', fontSize: '1.5rem', cursor: 'pointer', fontWeight: 'bold' }}>✕</button>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
+            <div className="lp-feat-details" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '1.5rem' }}>
               {features[expandedFeature].details.map((detail, idx) => (
                 <div key={idx} style={{ padding: '1.2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '8px' }}>
                   <p style={{ fontSize: '0.9rem', color: '#ddd', lineHeight: '1.6', margin: 0 }}>{detail}</p>
@@ -182,8 +182,8 @@ export default function Landing() {
       </section>
 
       <section style={{ padding: '3.5rem 2rem', maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 5 }}>
-        <div style={{ padding: '2.8rem', background: 'linear-gradient(135deg, rgba(0,120,180,0.12) 0%, rgba(120,80,180,0.12) 100%)', border: '1px solid rgba(100,180,255,0.18)', borderRadius: '16px', display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '3.5rem', alignItems: 'center', backdropFilter: 'blur(10px)', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
-          <div style={{ fontSize: '7rem', textAlign: 'center', lineHeight: '1', animation: 'float 3s ease-in-out infinite 1s' }}>📈</div>
+        <div className="lp-panel" style={{ padding: '2.8rem', background: 'linear-gradient(135deg, rgba(0,120,180,0.12) 0%, rgba(120,80,180,0.12) 100%)', border: '1px solid rgba(100,180,255,0.18)', borderRadius: '16px', display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '3.5rem', alignItems: 'center', backdropFilter: 'blur(10px)', boxShadow: '0 25px 50px rgba(0,0,0,0.2)' }}>
+          <div className="lp-emoji" style={{ fontSize: '7rem', textAlign: 'center', lineHeight: '1', animation: 'float 3s ease-in-out infinite 1s' }}>📈</div>
           <div><h2 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '1.2rem', letterSpacing: '-0.5px' }}>Maximise Revenue & Operational Efficiency</h2><p style={{ color: '#bbb', lineHeight: '1.8', fontSize: '1rem', margin: '0 0 1.5rem 0' }}>Every customer interaction is automatically logged and tracked with complete audit trail visibility. You have instantaneous access to all incoming enquiries, confirmed bookings, and revenue data. This transparency enables data-driven decision making and identifies revenue opportunities in real time. More calls answered directly correlates to more jobs secured and greater revenue generation.</p><button onClick={() => document.getElementById('booking-section').scrollIntoView({ behavior: 'smooth' })} style={{ padding: '0.85rem 1.8rem', background: 'rgba(0,180,255,0.15)', color: '#00d4ff', border: '1px solid rgba(0,180,255,0.4)', borderRadius: '8px', cursor: 'pointer', fontWeight: '600', fontSize: '0.95rem', transition: 'all 0.3s ease' }} onMouseEnter={(e) => { (e.target as HTMLElement).style.background = 'rgba(0,180,255,0.25)'; }} onMouseLeave={(e) => { (e.target as HTMLElement).style.background = 'rgba(0,180,255,0.15)'; }}>Get your free test call →</button></div>
         </div>
       </section>
@@ -313,7 +313,7 @@ export default function Landing() {
             <div key={idx} style={{ padding: '2.5rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(0,180,255,0.2)', borderRadius: '12px' }}>
               <h4 style={{ fontSize: '1.5rem', fontWeight: '800', color: '#00d4ff', margin: '0 0 0.5rem 0' }}>{study.headline}</h4>
               <p style={{ fontSize: '0.9rem', color: '#999', margin: '0 0 1.5rem 0' }}>{study.company} • {study.team}</p>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
+              <div className="lp-case-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
                 <div>
                   <h5 style={{ fontSize: '0.9rem', fontWeight: '700', color: '#d4af37', margin: '0 0 0.8rem 0', textTransform: 'uppercase', letterSpacing: '1px' }}>Challenge</h5>
                   <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0, lineHeight: '1.6' }}>{study.challenge}</p>
@@ -384,7 +384,7 @@ export default function Landing() {
           <p style={{ color: '#bbb', fontSize: '1.05rem', lineHeight: '1.7' }}>Book a free 10-minute demo call. Experience it live, ask questions, and start in under 48 hours.</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'start' }}>
+        <div className="lp-booking-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '3rem', alignItems: 'start' }}>
           <div>
             <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '1.5rem', color: '#d4af37' }}>What Happens Next</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
@@ -433,7 +433,29 @@ export default function Landing() {
         <p style={{ color: '#555', fontSize: '0.8rem' }}>© 2026 Trades Ai Operator. All rights reserved. | <a href="/terms" style={{ color: '#00d4ff', textDecoration: 'none' }}>Terms & Conditions</a> | <a href="/privacy" style={{ color: '#00d4ff', textDecoration: 'none' }}>Privacy</a> | Designed for UK trade businesses only.</p>
       </section>
 
-      <style>{`@keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } } @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }`}</style>
+      <style>{`
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .lp-btn-short { display: none; }
+        @media (max-width: 640px) {
+          .lp-h2 { font-size: 2.1rem !important; letter-spacing: -0.5px !important; }
+          .lp-hbtn { font-size: 0.8rem !important; padding: 0.55rem 0.9rem !important; white-space: nowrap; }
+          .lp-btn-full { display: none; }
+          .lp-btn-short { display: inline; }
+          .lp-trust-grid { grid-template-columns: 1fr !important; }
+          .lp-voice-grid { grid-template-columns: repeat(2, 1fr) !important; }
+          .lp-panel { grid-template-columns: 1fr !important; gap: 1.5rem !important; padding: 1.5rem !important; }
+          .lp-panel-rev > div:first-child { order: 2; }
+          .lp-panel-rev .lp-emoji { order: 1; }
+          .lp-emoji { font-size: 4rem !important; }
+          .lp-feat-grid { grid-template-columns: 1fr !important; }
+          .lp-feat-details { grid-template-columns: 1fr !important; }
+          .lp-booking-grid { grid-template-columns: 1fr !important; gap: 2rem !important; }
+          .lp-case-grid { grid-template-columns: 1fr !important; gap: 1.2rem !important; }
+          header { padding: 0.75rem 1rem !important; }
+          section { padding-left: 1rem !important; padding-right: 1rem !important; }
+        }
+      `}</style>
     </div>
   );
 }

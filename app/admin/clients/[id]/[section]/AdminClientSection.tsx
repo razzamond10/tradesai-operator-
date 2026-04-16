@@ -103,7 +103,7 @@ function AnalyticsSection({ interactions, bookings }: { interactions: any[]; boo
 
   return (
     <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
+      <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
         <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📞" label="Total Calls" value={interactions.length} sub="all time" badge="all time" />
         <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="📅" label="Bookings" value={bookings.length} sub="from AI calls" badge="total" />
         <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="🎯" label="Conversion Rate" value={`${convRate}%`} sub="calls → bookings" badge="rate" />
@@ -161,7 +161,7 @@ function ScheduleSection({ bookings }: { bookings: any[] }) {
 
   return (
     <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
+      <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
         <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📅" label="Total Bookings" value={bookings.length} sub="all time" />
         <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="✅" label="Confirmed / Done" value={confirmedCount} sub="confirmed or completed" />
         <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="⏳" label="Pending / Booked" value={pendingCount} sub="awaiting or scheduled" />
@@ -241,7 +241,7 @@ function PipelineSection({ interactions, bookings }: { interactions: any[]; book
 
   return (
     <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
+      <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
         <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📥" label="Total Leads" value={total} sub="calls captured" />
         <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="✅" label="Completed Jobs" value={stageCounts['completed'].length} sub="successfully finished" />
         <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="🎯" label="Conversion Rate" value={`${convRate}%`} sub="lead to completion" />
@@ -522,7 +522,7 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
 
   return (
     <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
+      <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
         <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💰" label="Total Revenue" value={fmtCurrency(revTotal)} sub="all bookings" />
         <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="✅" label="Confirmed Value" value={fmtCurrency(revConfirmed)} sub="confirmed jobs" />
         <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📊" label="Avg Job Value" value={fmtCurrency(avgValue)} sub="per booking" />
@@ -667,7 +667,7 @@ function ForecastSection({ interactions, bookings }: { interactions: any[]; book
 
   return (
     <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
+      <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
         <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📞" label="Avg Daily Calls" value={avgCallsDisplay} sub="per day (all-time rate)" />
         <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💰" label="Avg Daily Revenue" value={fmtCurrency(avgRevRaw)} sub="per day (all-time rate)" />
         <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📈" label="Projected Calls (30d)" value={projCalls30} sub="at current rate" />
@@ -709,7 +709,7 @@ function ReviewsSection({ interactions }: { interactions: any[] }) {
 
   return (
     <>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
+      <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
         <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="⭐" label="Feedback Calls" value={feedback.length} sub="review interactions" />
         <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="😊" label="Positive" value={positive.length} sub="happy customers" />
         <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="😐" label="Neutral" value={neutral.length} sub="no strong sentiment" />
@@ -828,7 +828,7 @@ export default function AdminClientSection({ clientId, section, user }: { client
 
   function renderSection() {
     if (loading) return (
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px' }}>
+      <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px' }}>
         {[1,2,3,4].map(i => <div key={i} style={{ height: '110px', borderRadius: '10px', background: 'rgba(0,0,0,0.05)', animation: 'shimmer 1.5s ease-in-out infinite' }} />)}
       </div>
     );
