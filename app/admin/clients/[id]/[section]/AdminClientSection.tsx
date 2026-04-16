@@ -971,35 +971,64 @@ function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; 
             {leads.length === 0 ? '🎉 All interactions converted to bookings!' : 'No leads match your filter'}
           </div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
-              <thead>
-                <tr style={{ background: 'var(--slate)' }}>
-                  {['Date', 'Customer Name', 'Phone', 'Issue', 'Quote / Notes', 'Status'].map(h => (
-                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sorted.map((lead, i) => {
-                  const hot = isHot(lead);
-                  const os = outcomeStyle(lead.outcome);
-                  return (
-                    <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: hot ? 'rgba(201,168,76,0.05)' : i%2===0 ? '#fff' : 'var(--bg)', borderLeft: hot ? '3px solid var(--a2)' : '3px solid transparent' }}>
-                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{(lead.timestamp||'').slice(0,10) || '—'}</td>
-                      <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{hot && <span style={{ marginRight: '4px' }}>🔥</span>}{lead.callerName || '—'}</td>
-                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{lead.phone || '—'}</td>
-                      <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.intent || '—'}</td>
-                      <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.notes || '—'}</td>
-                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
-                        <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{os.label}</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <>
+            {/* Desktop table */}
+            <div className="lead-table-wrap" style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                <thead>
+                  <tr style={{ background: 'var(--slate)' }}>
+                    {['Date', 'Customer Name', 'Phone', 'Issue', 'Quote / Notes', 'Status'].map(h => (
+                      <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.map((lead, i) => {
+                    const hot = isHot(lead);
+                    const os = outcomeStyle(lead.outcome);
+                    return (
+                      <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: hot ? 'rgba(201,168,76,0.05)' : i%2===0 ? '#fff' : 'var(--bg)', borderLeft: hot ? '3px solid var(--a2)' : '3px solid transparent' }}>
+                        <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{(lead.timestamp||'').slice(0,10) || '—'}</td>
+                        <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{hot && <span style={{ marginRight: '4px' }}>🔥</span>}{lead.callerName || '—'}</td>
+                        <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{lead.phone || '—'}</td>
+                        <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.intent || '—'}</td>
+                        <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.notes || '—'}</td>
+                        <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                          <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{os.label}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            {/* Mobile cards */}
+            <div className="lead-cards-wrap" style={{ display: 'none', padding: '8px' }}>
+              {sorted.map((lead, i) => {
+                const hot = isHot(lead);
+                const os = outcomeStyle(lead.outcome);
+                return (
+                  <div key={i} style={{
+                    padding: '12px 14px', borderRadius: '8px', marginBottom: '8px',
+                    background: hot ? 'rgba(201,168,76,0.06)' : '#fff',
+                    border: `1px solid ${hot ? 'rgba(201,168,76,0.35)' : 'var(--divider)'}`,
+                    borderLeft: `3px solid ${hot ? 'var(--a2)' : 'var(--divider)'}`,
+                  }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)' }}>
+                        {hot && <span style={{ marginRight: '4px' }}>🔥</span>}{lead.callerName || '—'}
+                      </span>
+                      <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '9px', color: 'var(--muted)' }}>{(lead.timestamp||'').slice(0,10)}</span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '8px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                      {lead.intent || '—'}
+                    </div>
+                    <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{os.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </Card>
     </>
@@ -1262,6 +1291,8 @@ export default function AdminClientSection({ clientId, section, user }: { client
             .comms-cards-wrap { display: block !important; }
             .rev-table-wrap { display: none !important; }
             .rev-cards-wrap { display: block !important; }
+            .lead-table-wrap { display: none !important; }
+            .lead-cards-wrap { display: block !important; }
           }
         `}</style>
       </div>

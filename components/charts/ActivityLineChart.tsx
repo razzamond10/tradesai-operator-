@@ -29,7 +29,7 @@ function buildDayArrays(dates: string[], interactions: any[], bookings: any[]) {
 }
 
 const NO_DATA_STYLE: React.CSSProperties = {
-  height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  width: '100%', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center',
   flexDirection: 'column', gap: '6px',
 };
 
@@ -179,5 +179,5 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
     return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
   }, [interactions, bookings, mode]);
 
-  return <div style={{ position: 'relative', height: '180px', overflow: 'hidden', maxWidth: '100%' }}><canvas ref={canvasRef} /></div>;
+  return <div style={{ position: 'relative', width: '100%', height: '220px', overflow: 'hidden' }}><canvas ref={canvasRef} /></div>;
 }

@@ -436,16 +436,21 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                     <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--a1)', opacity: 0.7 }}>View all ›</span>
                   </div>
                 </div>
-                <div style={{ padding: '8px 14px', maxHeight: '210px', overflowY: 'auto' }}>
+                <div style={{ padding: '8px 10px', maxHeight: '210px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   {openEmergencies.length === 0 ? (
                     <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--muted)', fontSize: '11px' }}>All clear</div>
                   ) : openEmergencies.map((em, i) => (
-                    <div key={i} style={{ padding: '8px 0', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
-                      <span style={{ fontSize: '14px' }}>🚨</span>
-                      <div>
-                        <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ink)' }}>{em.callerName || 'Unknown'}</div>
-                        <div style={{ fontSize: '10px', color: 'var(--a4)', fontWeight: 600 }}>{em.type} · {em.severity}</div>
-                        <div style={{ fontSize: '9.5px', color: 'var(--muted)', fontFamily: '"IBM Plex Mono",monospace' }}>{em.phone}</div>
+                    <div key={i} style={{ padding: '9px 11px', borderRadius: '7px', background: 'var(--a4b)', border: '1px solid rgba(192,24,48,0.15)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ink)' }}>{em.callerName || 'Unknown'}</span>
+                        <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '9px', color: 'var(--muted)' }}>{em.phone}</span>
+                      </div>
+                      <div style={{ fontSize: '10px', color: '#9A6200', fontWeight: 600, marginBottom: '4px' }}>
+                        🚨 {em.type || 'Emergency'}{em.severity ? ` · ${em.severity}` : ''}
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: 'var(--a4)', color: '#fff' }}>⚠ Unresolved</span>
+                        <span style={{ fontSize: '9px', color: 'var(--muted)', fontFamily: '"IBM Plex Mono",monospace' }}>{(em.timestamp || '').slice(0, 10)}</span>
                       </div>
                     </div>
                   ))}
