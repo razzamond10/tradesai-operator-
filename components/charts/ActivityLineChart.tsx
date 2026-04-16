@@ -29,7 +29,7 @@ function buildDayArrays(dates: string[], interactions: any[], bookings: any[]) {
 }
 
 const NO_DATA_STYLE: React.CSSProperties = {
-  width: '100%', height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  width: '100%', height: '240px', display: 'flex', alignItems: 'center', justifyContent: 'center',
   flexDirection: 'column', gap: '6px',
 };
 
@@ -167,11 +167,11 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
         },
         options: {
           responsive: true, maintainAspectRatio: false,
-          layout: { padding: { left: 8, bottom: 16 } },
+          layout: { padding: { left: 8, right: 8, top: 8, bottom: 24 } },
           plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
           scales: {
-            x: { grid: { display: false }, ticks: { color: '#7468A0', font: { size: 10 }, maxTicksLimit: 10 } },
-            y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { color: '#7468A0', font: { size: 10 }, stepSize: 1 }, beginAtZero: true },
+            x: { grid: { display: false }, ticks: { display: true, color: '#7468A0', font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 6 } },
+            y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { display: true, color: '#7468A0', font: { size: 10 }, stepSize: 1 }, beginAtZero: true },
           },
         },
       });
@@ -180,5 +180,5 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
     return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
   }, [interactions, bookings, mode]);
 
-  return <div style={{ position: 'relative', width: '100%', height: '220px', overflow: 'hidden' }}><canvas ref={canvasRef} /></div>;
+  return <div style={{ position: 'relative', width: '100%', height: '240px', overflow: 'hidden' }}><canvas ref={canvasRef} /></div>;
 }

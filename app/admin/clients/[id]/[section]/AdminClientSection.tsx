@@ -131,7 +131,7 @@ function AnalyticsSection({ interactions, bookings }: { interactions: any[]; boo
 
       <Card style={{ marginBottom: '16px' }}>
         <CardHdr title="30-Day Call Volume" sub="Calls captured by AI" badge={`${interactions.length} total`} badgeColor="#3D1FA8" />
-        <div style={{ padding: '14px', height: '180px' }}>
+        <div style={{ padding: '14px' }}>
           <ActivityLineChart interactions={interactions} bookings={bookings} mode="month" />
         </div>
       </Card>
@@ -719,13 +719,13 @@ function ForecastSection({ interactions, bookings }: { interactions: any[]; book
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
         <Card>
           <CardHdr title="Call Volume Trend" sub="Last 30 days" />
-          <div style={{ padding: '14px', height: '160px' }}>
+          <div style={{ padding: '14px' }}>
             <ActivityLineChart interactions={interactions} bookings={bookings} mode="month" />
           </div>
         </Card>
         <Card>
           <CardHdr title="Revenue Trend" sub="Last 30 days" />
-          <div style={{ padding: '14px', height: '160px' }}>
+          <div style={{ padding: '14px' }}>
             <ActivityLineChart interactions={interactions} bookings={bookings} mode="month" />
           </div>
         </Card>
