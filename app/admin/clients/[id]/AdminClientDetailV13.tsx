@@ -271,7 +271,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
         sub="Full overview — live from Google Sheets"
       />
 
-      <div style={{ padding: '18px 22px', flex: 1, overflowY: 'auto' }}>
+      <div className="dash-content" style={{ padding: '18px 22px', flex: 1, overflowY: 'auto' }}>
 
         {error && (
           <div style={{ padding: '10px 14px', background: 'var(--a4b)', border: '1px solid #F5C0C8', borderRadius: '8px', color: 'var(--a4)', fontSize: '12px', marginBottom: '14px' }}>
@@ -468,7 +468,8 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                   badgeColor="var(--a1)"
                   viewHref={`${base}/schedule`}
                 />
-                <div style={{ overflowX: 'auto' }}>
+                {/* Desktop table */}
+                <div className="sched-table-wrap" style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead>
                       <tr>
@@ -497,6 +498,24 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                       })}
                     </tbody>
                   </table>
+                </div>
+                {/* Mobile cards */}
+                <div className="sched-cards-wrap" style={{ display: 'none', padding: '8px' }}>
+                  {upcoming.length === 0 ? (
+                    <div style={{ padding: '20px', textAlign: 'center', color: 'var(--muted)', fontSize: '11px' }}>No scheduled jobs</div>
+                  ) : upcoming.map((b, i) => {
+                    const sb = statusBadge(b.status);
+                    return (
+                      <div key={i} style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--divider)', background: '#fff', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
+                          <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '11px', fontWeight: 700, color: 'var(--ink2)' }}>{b.scheduledDate || '—'}</span>
+                          <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: sb.bg, color: sb.color }}>{b.status || '—'}</span>
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)', marginBottom: '3px' }}>{b.customerName || '—'}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--ink2)' }}>{b.jobType || '—'}</div>
+                      </div>
+                    );
+                  })}
                 </div>
               </NavCard>
 
@@ -718,6 +737,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
           .nav-card { transition: box-shadow .15s, border-color .15s; }
           .nav-card-link:hover .nav-card { box-shadow: 0 6px 20px rgba(26,10,60,0.14) !important; border-color: rgba(201,168,76,0.4) !important; }
           @media (max-width: 768px) {
+            .dash-content { padding: 12px 16px !important; }
             .admin-dash-row-3 { grid-template-columns: 1fr !important; }
             .admin-pipeline-grid { grid-template-columns: repeat(3,1fr) !important; }
             .pipeline-stage-circle { width: 30px !important; height: 30px !important; font-size: 10px !important; }
