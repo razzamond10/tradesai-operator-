@@ -343,7 +343,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
 
             {/* Row 1: Line chart + 2 donuts */}
             <div className="admin-dash-row-3" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-              <Card>
+              <Card style={{ overflow: 'hidden', maxWidth: '100%' }}>
                 <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>Activity Overview</div>
@@ -370,16 +370,16 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                     ))}
                   </div>
                 </div>
-                <div style={{ padding: '12px 14px', minHeight: '200px' }}>
+                <div style={{ padding: '12px 14px', minHeight: '200px', overflow: 'hidden', width: '100%' }}>
                   <ActivityLineChart interactions={interactions} bookings={bookings} mode={chartMode} />
                 </div>
               </Card>
 
               <NavCard href={`${base}/pipeline`}>
                 <CardHdr title="Lead Sources" sub="Where enquiries originate" viewHref={`${base}/pipeline`} />
-                <div style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
+                <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
                   <DonutChart data={srcData} total={interactions.length} centerLabel="CALLS" />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {srcData.slice(0,5).map((s) => (
                       <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
@@ -394,9 +394,9 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
 
               <NavCard href={`${base}/pipeline`}>
                 <CardHdr title="Pipeline Status" sub="Current lead breakdown" viewHref={`${base}/pipeline`} />
-                <div style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
+                <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
                   <DonutChart data={pipeData} total={interactions.length} centerLabel="LEADS" />
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {pipeData.slice(0,5).map((s) => (
                       <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
@@ -693,6 +693,9 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
             .pipeline-stage-label { font-size: 8px !important; }
             .pipeline-stage-arrow { font-size: 12px !important; }
             .pipeline-stages-row { gap: 2px !important; padding: 10px !important; }
+            .donut-card-inner { grid-template-columns: 1fr !important; }
+            .donut-legend { width: 100% !important; }
+            .donut-legend span { white-space: normal !important; overflow: visible !important; text-overflow: unset !important; }
           }
           @media (max-width: 480px) {
             .admin-pipeline-grid { grid-template-columns: repeat(2,1fr) !important; }
