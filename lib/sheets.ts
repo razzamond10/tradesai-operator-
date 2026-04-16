@@ -194,13 +194,14 @@ export interface Booking {
   jobType: string;
   scheduledDate: string;
   status: string;
+  calendarEventId: string;
   value: string;
 }
 
 export async function getBookings(sheetId: string): Promise<Booking[]> {
   const tabName = await resolveTabName(sheetId, 'bookings');
-  // Col layout: A=timestamp, B=businessName, C=customerName, D=phone, E=jobType, F=scheduledDate, G=status, H=value
-  const rows = await readSheet(sheetId, `'${tabName}'!A2:H`);
+  // Col layout: A=timestamp, B=businessName, C=customerName, D=phone, E=jobType, F=scheduledDate, G=status, H=calendarEventId, I=value
+  const rows = await readSheet(sheetId, `'${tabName}'!A2:I`);
   return rows.map((r) => ({
     businessName: r[1] || '',
     timestamp: normTimestamp(r[0] || ''),
@@ -209,7 +210,8 @@ export async function getBookings(sheetId: string): Promise<Booking[]> {
     jobType: r[4] || '',
     scheduledDate: r[5] || '',
     status: r[6] || '',
-    value: r[7] || '',
+    calendarEventId: r[7] || '',
+    value: r[8] || '',
   }));
 }
 

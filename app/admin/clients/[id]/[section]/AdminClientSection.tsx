@@ -141,8 +141,8 @@ function ScheduleSection({ bookings }: { bookings: any[] }) {
   const filtered = upcoming.filter(b => {
     const matchStatus = statusFilter === 'all' || (b.status || '').toLowerCase() === statusFilter;
     const matchSearch = !search ||
-      (b.callerName || '').toLowerCase().includes(search.toLowerCase()) ||
-      (b.serviceType || '').toLowerCase().includes(search.toLowerCase());
+      (b.customerName || '').toLowerCase().includes(search.toLowerCase()) ||
+      (b.jobType || '').toLowerCase().includes(search.toLowerCase());
     return matchStatus && matchSearch;
   });
 
@@ -187,10 +187,10 @@ function ScheduleSection({ bookings }: { bookings: any[] }) {
                 {filtered.map((b, i) => (
                   <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i % 2 === 0 ? '#fff' : 'var(--bg)' }}>
                     <td style={{ padding: '9px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)' }}>{b.scheduledDate || '—'}</td>
-                    <td style={{ padding: '9px 12px', fontWeight: 600, color: 'var(--ink)' }}>{b.callerName || '—'}</td>
-                    <td style={{ padding: '9px 12px', color: 'var(--ink2)' }}>{b.serviceType || '—'}</td>
+                    <td style={{ padding: '9px 12px', fontWeight: 600, color: 'var(--ink)' }}>{b.customerName || '—'}</td>
+                    <td style={{ padding: '9px 12px', color: 'var(--ink2)' }}>{b.jobType || '—'}</td>
                     <td style={{ padding: '9px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)' }}>{b.phone || '—'}</td>
-                    <td style={{ padding: '9px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: 'var(--a3)' }}>{b.value ? `£${b.value}` : '—'}</td>
+                    <td style={{ padding: '9px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: 'var(--a3)' }}>{parseValue(b.value) > 0 ? `£${parseValue(b.value).toLocaleString()}` : '—'}</td>
                     <td style={{ padding: '9px 12px' }}><StatusBadge status={b.status} /></td>
                   </tr>
                 ))}
@@ -549,9 +549,9 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
               ) : withRunning.map((b, i) => (
                 <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i % 2 === 0 ? '#fff' : 'var(--bg)' }}>
                   <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)' }}>{(b.timestamp||'—').slice(0,10)}</td>
-                  <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)' }}>{b.callerName || '—'}</td>
-                  <td style={{ padding: '8px 12px', color: 'var(--ink2)' }}>{b.serviceType || '—'}</td>
-                  <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: parseValue(b.value) > 0 ? 'var(--a3)' : 'var(--muted)' }}>{b.value ? `£${b.value}` : '—'}</td>
+                  <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)' }}>{b.customerName || '—'}</td>
+                  <td style={{ padding: '8px 12px', color: 'var(--ink2)' }}>{b.serviceType || b.jobType || '—'}</td>
+                  <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: parseValue(b.value) > 0 ? 'var(--a3)' : 'var(--muted)' }}>{parseValue(b.value) > 0 ? `£${parseValue(b.value).toLocaleString()}` : '—'}</td>
                   <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: 'var(--ink2)', fontSize: '10px' }}>{fmtCurrency(b.running)}</td>
                   <td style={{ padding: '8px 12px' }}><StatusBadge status={b.status} /></td>
                 </tr>

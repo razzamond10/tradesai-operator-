@@ -57,10 +57,12 @@ export async function GET(
     console.log(`[data] Raw totals: interactions=${allInteractions.length} bookings=${allBookings.length} emergencies=${allEmergencies.length}`);
 
     // Filter to rows belonging to this client — the shared sheet has data for all clients
-    const bizName = config.businessName.trim().toLowerCase();
-    const interactions = allInteractions.filter((r) => r.businessName.trim().toLowerCase() === bizName);
-    const bookings = allBookings.filter((r) => r.businessName.trim().toLowerCase() === bizName);
-    const emergencies = allEmergencies.filter((r) => r.businessName.trim().toLowerCase() === bizName);
+    // Normalise apostrophe variants (straight ' vs curly ') before comparing
+    const normBiz = (s: string) => s.trim().toLowerCase().replace(/[\u2018\u2019\u02bc']/g, "'");
+    const bizName = normBiz(config.businessName);
+    const interactions = allInteractions.filter((r) => normBiz(r.businessName) === bizName);
+    const bookings = allBookings.filter((r) => normBiz(r.businessName) === bizName);
+    const emergencies = allEmergencies.filter((r) => normBiz(r.businessName) === bizName);
 
     console.log(`[data] After businessName filter ("${config.businessName}"): interactions=${interactions.length} bookings=${bookings.length} emergencies=${emergencies.length}`);
 
