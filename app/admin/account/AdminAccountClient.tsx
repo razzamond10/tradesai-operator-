@@ -84,7 +84,7 @@ export default function AdminAccountClient({ user }: { user: { email: string; na
         {/* Profile card */}
         <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #D8D0F0', boxShadow: '0 2px 10px rgba(26,10,60,0.07)', marginBottom: '20px', overflow: 'hidden' }}>
           <div style={{ height: '4px', background: 'linear-gradient(90deg,#3D1FA8,#C9A84C)' }} />
-          <div style={{ padding: '24px 28px', display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <div style={{ padding: '24px 28px', display: 'flex', alignItems: 'center', gap: '16px', overflow: 'hidden' }}>
             <div style={{
               width: '64px', height: '64px', borderRadius: '50%', flexShrink: 0,
               background: 'linear-gradient(135deg,#3D1FA8,#6B3FD0)',
@@ -93,16 +93,16 @@ export default function AdminAccountClient({ user }: { user: { email: string; na
             }}>
               {initials}
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '20px', fontWeight: 900, color: '#1A0A3C', marginBottom: '2px' }}>{user.name}</div>
-              <div style={{ fontSize: '12px', color: '#7468A0', marginBottom: '8px' }}>{user.email}</div>
+            <div style={{ flex: 1, minWidth: 0, overflow: 'hidden' }}>
+              <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '20px', fontWeight: 900, color: '#1A0A3C', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name}</div>
+              <div style={{ fontSize: '12px', color: '#7468A0', marginBottom: '8px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', wordBreak: 'break-all' }}>{user.email}</div>
               <span style={{
                 display: 'inline-block', padding: '3px 10px', borderRadius: '20px',
                 background: '#3D1FA818', color: '#3D1FA8',
                 fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '.5px',
               }}>{user.role}</span>
             </div>
-            <div style={{ textAlign: 'right' }}>
+            <div style={{ textAlign: 'right', flexShrink: 0 }}>
               <div style={{ fontSize: '10px', fontWeight: 700, color: '#9A90C0', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '4px' }}>Session</div>
               <div style={{ fontSize: '11px', color: '#1A0A3C', fontFamily: '"IBM Plex Mono",monospace' }}>Active</div>
             </div>

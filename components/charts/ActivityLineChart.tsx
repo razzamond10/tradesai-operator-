@@ -167,6 +167,7 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
         },
         options: {
           responsive: true, maintainAspectRatio: false,
+          layout: { padding: { left: 8, bottom: 16 } },
           plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
           scales: {
             x: { grid: { display: false }, ticks: { color: '#7468A0', font: { size: 10 }, maxTicksLimit: 10 } },

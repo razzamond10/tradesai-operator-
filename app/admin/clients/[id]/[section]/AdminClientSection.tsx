@@ -68,16 +68,20 @@ function CardHdr({ title, sub, badge, badgeColor }: { title: string; sub?: strin
 
 function KPICard({ stripe, iconBg, icon, label, value, sub, badge }: { stripe: string; iconBg: string; icon: string; label: string; value: string | number; sub: string; badge?: string }) {
   return (
-    <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', overflow: 'hidden' }}>
-      <div style={{ height: '3px', background: stripe }} />
-      <div style={{ padding: '14px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-          <div style={{ width: '28px', height: '28px', borderRadius: '7px', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>{icon}</div>
-          {badge && <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: iconBg, color: stripe }}>{badge}</span>}
+    <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', overflow: 'hidden', minHeight: '120px', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ height: '3px', background: stripe, flexShrink: 0 }} />
+      <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <div style={{ width: '28px', height: '28px', borderRadius: '7px', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>{icon}</div>
+            {badge && <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: iconBg, color: stripe }}>{badge}</span>}
+          </div>
+          <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'var(--muted)', marginBottom: '4px' }}>{label}</div>
         </div>
-        <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'var(--muted)', marginBottom: '4px' }}>{label}</div>
-        <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '28px', fontWeight: 900, color: 'var(--ink)', lineHeight: 1.1 }}>{value}</div>
-        <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '4px' }}>{sub}</div>
+        <div>
+          <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '28px', fontWeight: 900, color: 'var(--ink)', lineHeight: 1.1 }}>{value}</div>
+          <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '4px' }}>{sub}</div>
+        </div>
       </div>
     </div>
   );
@@ -1187,7 +1191,7 @@ function ConfigurationSection({ config }: { config: any }) {
         </button>
         {showContactMsg && (
           <div style={{ marginTop: '10px', padding: '10px 14px', borderRadius: '8px', background: 'var(--a1b)', border: '1px solid rgba(61,31,168,0.15)', fontSize: '12px', color: 'var(--a1)', fontWeight: 500 }}>
-            To update your configuration, please contact support at <strong>support@tradesai.co.uk</strong>
+            To update your configuration, please contact support at <strong>admin@tradesaioperator.uk</strong>
           </div>
         )}
       </div>

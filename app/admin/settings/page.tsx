@@ -11,8 +11,8 @@ export default async function AdminSettingsPage() {
   if (user.role !== 'admin') redirect('/login');
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F2F2F8', fontFamily: '"Inter",system-ui,sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#fff', borderRadius: '14px', padding: '40px 48px', boxShadow: '0 4px 20px rgba(26,10,60,0.10)', border: '1px solid #D8D0F0', maxWidth: '420px', width: '100%', textAlign: 'center' }}>
+    <div style={{ minHeight: '100vh', background: '#F2F2F8', fontFamily: '"Inter",system-ui,sans-serif', padding: '40px 20px' }}>
+      <div style={{ background: '#fff', borderRadius: '14px', padding: '40px 48px', boxShadow: '0 4px 20px rgba(26,10,60,0.10)', border: '1px solid #D8D0F0', maxWidth: '420px', width: '100%', textAlign: 'center', margin: '0 auto' }}>
         <div style={{ width: '52px', height: '52px', borderRadius: '12px', background: '#EDE8FF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', margin: '0 auto 16px' }}>
           ⚙️
         </div>
