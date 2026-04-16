@@ -113,10 +113,15 @@ const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
 
 function DetailRow({ label, value }: { label: string; value: string }) {
   if (!value) return null;
+  const isPhone = label === 'Phone';
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginBottom: '14px' }}>
       <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '1px' }}>{label}</span>
-      <span style={{ fontSize: '13px', color: 'var(--ink)', fontWeight: 500, wordBreak: 'break-word' }}>{value}</span>
+      {isPhone ? (
+        <a href={`tel:${value.replace(/\s/g, '')}`} style={{ fontSize: '13px', color: 'var(--ink)', fontWeight: 500, wordBreak: 'break-word', textDecoration: 'none' }}>{value}</a>
+      ) : (
+        <span style={{ fontSize: '13px', color: 'var(--ink)', fontWeight: 500, wordBreak: 'break-word' }}>{value}</span>
+      )}
     </div>
   );
 }

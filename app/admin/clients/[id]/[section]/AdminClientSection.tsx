@@ -87,6 +87,16 @@ function KPICard({ stripe, iconBg, icon, label, value, sub, badge }: { stripe: s
   );
 }
 
+function EmptyState({ icon, title, sub }: { icon: string; title: string; sub?: string }) {
+  return (
+    <div style={{ padding: '48px 24px', textAlign: 'center' }}>
+      <div style={{ fontSize: '36px', marginBottom: '12px' }}>{icon}</div>
+      <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ink)', marginBottom: '4px' }}>{title}</div>
+      {sub && <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{sub}</div>}
+    </div>
+  );
+}
+
 function statusColor(status: string): { bg: string; color: string } {
   const lower = (status || '').toLowerCase();
   if (lower.includes('confirm') || lower.includes('complet') || lower.includes('done') || lower.includes('paid')) return { bg: 'var(--a3b)', color: 'var(--a3)' };
@@ -119,6 +129,10 @@ function AnalyticsSection({ interactions, bookings }: { interactions: any[]; boo
 
   const convRate = interactions.length > 0 ? Math.round((bookings.length / interactions.length) * 100) : 0;
   const revTotal = bookings.reduce((s, b) => s + parseValue(b.value), 0);
+
+  if (interactions.length === 0 && bookings.length === 0) {
+    return <EmptyState icon="📞" title="No calls yet" sub="Your AI is ready and waiting on the first call." />;
+  }
 
   return (
     <>
@@ -296,6 +310,10 @@ function EmergenciesSection({ emergencies, clientId }: { emergencies: any[]; cli
   const [resolving, setResolving] = useState<Record<number, boolean>>({});
   const [localResolved, setLocalResolved] = useState<Record<number, boolean>>({});
 
+  if (emergencies.length === 0) {
+    return <EmptyState icon="🚨" title="No emergencies logged" sub="That's a good thing. Urgent calls will appear here when flagged." />;
+  }
+
   // Merge sheet data with optimistic local overrides
   const merged = emergencies.map((e, i) => localResolved[i] ? { ...e, resolved: 'Yes' } : e);
   const active = merged.filter(e => (e.resolved || '').toLowerCase() !== 'yes');
@@ -363,7 +381,7 @@ function EmergenciesSection({ emergencies, clientId }: { emergencies: any[]; cli
                           <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: isActive ? 'var(--a4b)' : 'var(--a3b)', color: isActive ? 'var(--a4)' : 'var(--a3)' }}>{isActive ? '⚠ Unresolved' : '✓ Resolved'}</span>
                         </div>
                         <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
-                          <span style={{ fontFamily: '"IBM Plex Mono",monospace' }}>{em.phone || '—'}</span>
+                          <a href={`tel:${(em.phone || '').replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none', fontFamily: '"IBM Plex Mono",monospace' }}>{em.phone || '—'}</a>
                           {em.timestamp && <span> · {em.timestamp.slice(0, 16).replace('T', ' ')}</span>}
                         </div>
                       </div>
@@ -500,7 +518,9 @@ function CommsSection({ interactions }: { interactions: any[] }) {
                       ].map(({ label, val, mono }) => (
                         <div key={label}>
                           <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '2px' }}>{label}</div>
-                          <div style={{ fontSize: '11px', color: 'var(--ink)', fontFamily: mono ? '"IBM Plex Mono",monospace' : 'inherit' }}>{val || '—'}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--ink)', fontFamily: mono ? '"IBM Plex Mono",monospace' : 'inherit' }}>
+                            {label === 'Phone' && val ? <a href={`tel:${val.replace(/\s/g, '')}`} style={{ color: 'var(--ink)', textDecoration: 'none' }}>{val}</a> : val || '—'}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -532,6 +552,10 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
   const confirmed = bookings.filter(b => statusColor(b.status).color === 'var(--a3)');
   const revConfirmed = confirmed.reduce((s, b) => s + parseValue(b.value), 0);
   const avgValue = bookings.length > 0 ? Math.round(revTotal / bookings.length) : 0;
+
+  if (bookings.length === 0) {
+    return <EmptyState icon="💷" title="No revenue data yet" sub="Revenue will appear here after your first booking with a quoted value." />;
+  }
 
   const distinctStatuses = [...new Set(bookings.map(b => (b.status || '').trim()).filter(Boolean))];
   const filtered = bookings.filter(b => statusFilter === 'all' || (b.status || '').trim() === statusFilter);
@@ -833,6 +857,10 @@ function JobScheduleSection({ bookings }: { bookings: any[] }) {
     else { setSortKey(key); setSortDir('asc'); }
   }
   const si = (key: SortKey) => sortKey === key ? (sortDir === 'asc' ? ' ↑' : ' ↓') : '';
+  if (bookings.length === 0) {
+    return <EmptyState icon="🔧" title="No jobs scheduled" sub="Bookings from your AI will appear here once jobs are confirmed." />;
+  }
+
   const confirmedCount = bookings.filter(b => statusColor(b.status).color === 'var(--a3)').length;
   const pendingCount   = bookings.filter(b => statusColor(b.status).color === 'var(--a6)').length;
   const revTotal = bookings.reduce((s, b) => s + parseValue(b.value), 0);
@@ -876,7 +904,7 @@ function JobScheduleSection({ bookings }: { bookings: any[] }) {
                       <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{b._date || '—'}</td>
                       <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b._time || '—'}</td>
                       <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{b.customerName || '—'}</td>
-                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b.phone || '—'}</td>
+                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b.phone ? <a href={`tel:${b.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{b.phone}</a> : '—'}</td>
                       <td style={{ padding: '8px 12px', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{b.postcode || '—'}</td>
                       <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.jobType || '—'}</td>
                       <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}><StatusBadge status={b.status} /></td>
@@ -897,7 +925,8 @@ function JobScheduleSection({ bookings }: { bookings: any[] }) {
                     <StatusBadge status={b.status} />
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)', marginBottom: '3px' }}>{b.customerName || '—'}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '4px' }}>{b.jobType || '—'}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '3px' }}>{b.jobType || '—'}</div>
+                  {b.phone && <div style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono",monospace', color: 'var(--muted)', marginBottom: '4px' }}><a href={`tel:${b.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{b.phone}</a></div>}
                   {parseValue(b.value) > 0 && <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--a3)' }}>£{parseValue(b.value).toLocaleString()}</div>}
                 </div>
               ))}
@@ -945,6 +974,10 @@ function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; 
     if (aHot !== bHot) return aHot - bHot;
     return (b.timestamp||'').localeCompare(a.timestamp||'');
   });
+
+  if (interactions.length === 0) {
+    return <EmptyState icon="🎯" title="No active leads" sub="New calls from your AI will populate this pipeline." />;
+  }
 
   const hotCount  = leads.filter(isHot).length;
   const coldCount = leads.filter(l => !isHot(l)).length;
@@ -994,7 +1027,7 @@ function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; 
                       <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: hot ? 'rgba(201,168,76,0.05)' : i%2===0 ? '#fff' : 'var(--bg)', borderLeft: hot ? '3px solid var(--a2)' : '3px solid transparent' }}>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{(lead.timestamp||'').slice(0,10) || '—'}</td>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{hot && <span style={{ marginRight: '4px' }}>🔥</span>}{lead.callerName || '—'}</td>
-                        <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{lead.phone || '—'}</td>
+                        <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{lead.phone ? <a href={`tel:${lead.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{lead.phone}</a> : '—'}</td>
                         <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.intent || '—'}</td>
                         <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.notes || '—'}</td>
                         <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
@@ -1024,9 +1057,10 @@ function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; 
                       </span>
                       <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '9px', color: 'var(--muted)' }}>{(lead.timestamp||'').slice(0,10)}</span>
                     </div>
-                    <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '8px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '6px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {lead.intent || '—'}
                     </div>
+                    {lead.phone && <div style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono",monospace', color: 'var(--muted)', marginBottom: '8px' }}><a href={`tel:${lead.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{lead.phone}</a></div>}
                     <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{os.label}</span>
                   </div>
                 );
@@ -1045,6 +1079,7 @@ type CommsTab = typeof COMMS_TABS[number];
 function CommunicationsSection({ interactions }: { interactions: any[] }) {
   const [tab, setTab] = useState<CommsTab>('All');
   const [search, setSearch] = useState('');
+  const [selectedCall, setSelectedCall] = useState<any>(null);
 
   function matchTab(i: any, t: CommsTab) {
     if (t === 'All') return true;
@@ -1064,6 +1099,10 @@ function CommunicationsSection({ interactions }: { interactions: any[] }) {
     if (l.includes('follow'))    return { bg: 'var(--a1b)', color: 'var(--a1)' };
     return { bg: 'var(--slate)', color: 'var(--muted)' };
   };
+
+  if (interactions.length === 0) {
+    return <EmptyState icon="📞" title="No calls captured yet" sub="AI-handled calls will appear here as they come in." />;
+  }
 
   const sorted = [...interactions].reverse();
   const filtered = sorted.filter(i => {
@@ -1110,10 +1149,10 @@ function CommunicationsSection({ interactions }: { interactions: any[] }) {
                     const booked = bookingMade(item);
                     const os = outcomeStyle(item.outcome);
                     return (
-                      <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i%2===0 ? '#fff' : 'var(--bg)' }}>
+                      <tr key={i} onClick={() => setSelectedCall(item)} style={{ borderBottom: '1px solid var(--slate)', background: i%2===0 ? '#fff' : 'var(--bg)', cursor: 'pointer' }}>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{(item.timestamp||'—').slice(0,16).replace('T',' ')}</td>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{item.callerName || '—'}</td>
-                        <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{item.phone || '—'}</td>
+                        <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{item.phone ? <a href={`tel:${item.phone.replace(/\s/g, '')}`} onClick={e => e.stopPropagation()} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{item.phone}</a> : '—'}</td>
                         <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.intent || '—'}</td>
                         <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
                           <span style={{ fontSize: '11px', fontWeight: 700, color: booked ? 'var(--a3)' : 'var(--muted)' }}>{booked ? '✓ Yes' : '✗ No'}</span>
@@ -1133,11 +1172,12 @@ function CommunicationsSection({ interactions }: { interactions: any[] }) {
                 const booked = bookingMade(item);
                 const os = outcomeStyle(item.outcome);
                 return (
-                  <div key={i} style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--divider)', background: '#fff', marginBottom: '8px' }}>
+                  <div key={i} onClick={() => setSelectedCall(item)} style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--divider)', background: '#fff', marginBottom: '8px', cursor: 'pointer' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                       <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)' }}>{item.callerName || '—'}</span>
                       <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '9px', color: 'var(--muted)' }}>{(item.timestamp||'').slice(0,10)}</span>
                     </div>
+                    {item.phone && <div style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono",monospace', color: 'var(--muted)', marginBottom: '4px' }}><a href={`tel:${item.phone.replace(/\s/g, '')}`} onClick={e => e.stopPropagation()} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{item.phone}</a></div>}
                     <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '8px' }}>{item.intent || '—'}</div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '11px', fontWeight: 700, color: booked ? 'var(--a3)' : 'var(--muted)' }}>{booked ? '✓ Booked' : '✗ No booking'}</span>
@@ -1150,6 +1190,50 @@ function CommunicationsSection({ interactions }: { interactions: any[] }) {
           </>
         )}
       </Card>
+
+      {/* Call summary modal */}
+      {selectedCall && (
+        <div
+          onClick={() => setSelectedCall(null)}
+          style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px' }}
+        >
+          <div
+            onClick={e => e.stopPropagation()}
+            style={{ background: '#fff', borderRadius: '12px', padding: '20px', maxWidth: '480px', width: '100%', maxHeight: '80vh', overflowY: 'auto' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '16px', gap: '12px' }}>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '18px', fontWeight: 900, color: 'var(--ink)', marginBottom: '4px' }}>{selectedCall.callerName || 'Unknown Caller'}</div>
+                {selectedCall.phone && (
+                  <a href={`tel:${selectedCall.phone.replace(/\s/g, '')}`} style={{ fontSize: '13px', color: 'var(--a1)', fontFamily: '"IBM Plex Mono",monospace', textDecoration: 'none' }}>{selectedCall.phone}</a>
+                )}
+              </div>
+              <button onClick={() => setSelectedCall(null)} style={{ background: 'var(--slate)', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', color: 'var(--muted)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+              {[
+                { label: 'Date / Time', val: (selectedCall.timestamp||'').slice(0,16).replace('T',' ') },
+                { label: 'Intent', val: selectedCall.intent },
+                { label: 'Outcome', val: selectedCall.outcome },
+                { label: 'Booking Made', val: (selectedCall.outcome||'').toLowerCase().includes('book') ? '✓ Yes' : '✗ No' },
+              ].map(({ label, val }) => (
+                <div key={label}>
+                  <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '3px' }}>{label}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--ink)', fontWeight: label === 'Booking Made' ? 600 : 400 }}>{val || '—'}</div>
+                </div>
+              ))}
+            </div>
+            {selectedCall.notes ? (
+              <div>
+                <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '6px' }}>Transcript / Notes</div>
+                <div style={{ fontSize: '12px', color: 'var(--ink)', lineHeight: 1.6, padding: '12px', background: 'var(--bg)', borderRadius: '8px', border: '1px solid var(--divider)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{selectedCall.notes}</div>
+              </div>
+            ) : (
+              <div style={{ fontSize: '11px', color: 'var(--faint)', fontStyle: 'italic' }}>No transcript recorded for this call.</div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -1259,7 +1343,9 @@ export default function AdminClientSection({ clientId, section, user }: { client
       case 'forecast':    return <ForecastSection interactions={interactions} bookings={bookings} />;
       case 'reviews':     return <ReviewsSection interactions={interactions} />;
       case 'config':      return <ConfigSection config={config} />;
-      case 'bookings':        return (
+      case 'bookings':        return bookings.length === 0 ? (
+        <EmptyState icon="📅" title="No bookings yet" sub="Bookings from your AI will appear here as they're scheduled." />
+      ) : (
         <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', padding: '18px' }}>
           <BookingsCalendar bookings={bookings} />
         </div>
