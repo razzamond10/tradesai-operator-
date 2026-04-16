@@ -90,18 +90,18 @@ export async function getClientConfigs(): Promise<ClientConfig[]> {
   const tabName = await resolveTabName(spreadsheetId, 'client config');
   const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:I`);
   return rows.map((r) => {
-    const businessName = r[0] || '';
-    const twilioNumber = r[8] || '';
+    const businessName = (r[0] || '').trim();
+    const twilioNumber = (r[8] || '').trim();
     const slug = toSlug(businessName);
     return {
       businessName,
-      tradeType: r[1] || '',
-      contactName: r[2] || '',
-      phone: r[3] || '',
-      calendarId: r[4] || '',
-      sheetId: r[5] || '',
-      botpressId: r[6] || '',
-      makeWebhookUrl: r[7] || '',
+      tradeType: (r[1] || '').trim(),
+      contactName: (r[2] || '').trim(),
+      phone: (r[3] || '').trim(),
+      calendarId: (r[4] || '').trim(),
+      sheetId: (r[5] || '').trim(),
+      botpressId: (r[6] || '').trim(),
+      makeWebhookUrl: (r[7] || '').trim(),
       twilioNumber,
       slug,
       clientId: twilioNumber || slug,
