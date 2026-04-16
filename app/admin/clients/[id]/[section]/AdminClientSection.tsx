@@ -68,12 +68,17 @@ function KPICard({ stripe, iconBg, icon, label, value, sub, badge }: { stripe: s
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
+function statusColor(status: string): { bg: string; color: string } {
   const lower = (status || '').toLowerCase();
-  let bg = 'var(--slate)', color = 'var(--muted)';
-  if (lower === 'completed' || lower === 'confirmed') { bg = 'var(--a3b)'; color = 'var(--a3)'; }
-  else if (lower === 'cancelled') { bg = 'var(--a4b)'; color = 'var(--a4)'; }
-  else if (lower === 'pending') { bg = 'var(--a2b)'; color = 'var(--a6)'; }
+  if (lower.includes('confirm') || lower.includes('complet') || lower.includes('done') || lower.includes('paid')) return { bg: 'var(--a3b)', color: 'var(--a3)' };
+  if (lower.includes('cancel') || lower.includes('declin') || lower.includes('reject') || lower.includes('no show')) return { bg: 'var(--a4b)', color: 'var(--a4)' };
+  if (lower.includes('pending') || lower.includes('await') || lower.includes('scheduled') || lower.includes('booked') || lower.includes('new')) return { bg: 'var(--a2b)', color: 'var(--a6)' };
+  if (lower.includes('progress') || lower.includes('active') || lower.includes('ongoing')) return { bg: 'var(--a1b)', color: 'var(--a1)' };
+  return { bg: 'var(--slate)', color: 'var(--muted)' };
+}
+
+function StatusBadge({ status }: { status: string }) {
+  const { bg, color } = statusColor(status);
   return (
     <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: bg, color }}>{status || 'Unknown'}</span>
   );
@@ -134,39 +139,45 @@ function ScheduleSection({ bookings }: { bookings: any[] }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
 
-  const upcoming = [...bookings]
-    .filter(b => b.scheduledDate)
-    .sort((a, b) => (a.scheduledDate > b.scheduledDate ? 1 : -1));
+  const sorted = [...bookings].sort((a, b) => (a.scheduledDate > b.scheduledDate ? 1 : -1));
 
-  const filtered = upcoming.filter(b => {
-    const matchStatus = statusFilter === 'all' || (b.status || '').toLowerCase() === statusFilter;
+  const filtered = sorted.filter(b => {
+    const matchStatus = statusFilter === 'all' || (b.status || '').toLowerCase() === statusFilter.toLowerCase();
     const matchSearch = !search ||
       (b.customerName || '').toLowerCase().includes(search.toLowerCase()) ||
       (b.jobType || '').toLowerCase().includes(search.toLowerCase());
     return matchStatus && matchSearch;
   });
 
-  const statusCounts: Record<string, number> = { all: upcoming.length };
-  upcoming.forEach(b => { const s = (b.status || 'unknown').toLowerCase(); statusCounts[s] = (statusCounts[s] || 0) + 1; });
+  // Derive status counts from actual data — not hardcoded strings
+  const statusCounts: Record<string, number> = { all: bookings.length };
+  bookings.forEach(b => { const s = (b.status || '').trim(); if (s) statusCounts[s] = (statusCounts[s] || 0) + 1; });
+  const distinctStatuses = Object.keys(statusCounts).filter(s => s !== 'all');
+
+  // KPI counts using partial matching so "Confirmed ✓" still counts as confirmed
+  const confirmedCount = bookings.filter(b => statusColor(b.status).color === 'var(--a3)').length;
+  const pendingCount   = bookings.filter(b => statusColor(b.status).color === 'var(--a6)').length;
+  const cancelledCount = bookings.filter(b => statusColor(b.status).color === 'var(--a4)').length;
 
   return (
     <>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
         <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📅" label="Total Bookings" value={bookings.length} sub="all time" />
-        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="✅" label="Confirmed" value={bookings.filter(b => (b.status||'').toLowerCase()==='confirmed').length} sub="scheduled" />
-        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="⏳" label="Pending" value={bookings.filter(b => (b.status||'').toLowerCase()==='pending').length} sub="awaiting confirmation" />
-        <KPICard stripe="var(--a4)" iconBg="var(--a4b)" icon="❌" label="Cancelled" value={bookings.filter(b => (b.status||'').toLowerCase()==='cancelled').length} sub="not proceeding" />
+        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="✅" label="Confirmed / Done" value={confirmedCount} sub="confirmed or completed" />
+        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="⏳" label="Pending / Booked" value={pendingCount} sub="awaiting or scheduled" />
+        <KPICard stripe="var(--a4)" iconBg="var(--a4b)" icon="❌" label="Cancelled" value={cancelledCount} sub="not proceeding" />
       </div>
 
       <Card>
         <CardHdr title="Job Schedule" sub="Bookings sorted by date" badge={`${filtered.length} jobs`} badgeColor="#C9A84C" />
         <div style={{ padding: '12px 14px', display: 'flex', gap: '8px', borderBottom: '1px solid var(--divider)', flexWrap: 'wrap', alignItems: 'center' }}>
-          {['all','confirmed','pending','completed','cancelled'].map(s => (
+          {/* Filter tabs derived from real status values in the data */}
+          {['all', ...distinctStatuses].map(s => (
             <button key={s} onClick={() => setStatusFilter(s)} style={{
               padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer',
               background: statusFilter === s ? 'var(--a2)' : 'var(--slate)', color: statusFilter === s ? '#fff' : 'var(--muted)',
               fontFamily: '"Inter",sans-serif', textTransform: 'capitalize',
-            }}>{s} {s === 'all' ? `(${statusCounts.all})` : `(${statusCounts[s] || 0})`}</button>
+            }}>{s} ({s === 'all' ? bookings.length : statusCounts[s] || 0})</button>
           ))}
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
             style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '11px', outline: 'none', width: '160px', fontFamily: '"Inter",sans-serif' }} />
@@ -498,11 +509,13 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
   const [statusFilter, setStatusFilter] = useState('all');
 
   const revTotal = bookings.reduce((s, b) => s + parseValue(b.value), 0);
-  const confirmed = bookings.filter(b => ['confirmed','completed'].includes((b.status||'').toLowerCase()));
+  // Use partial-match colour check to identify "confirmed/completed" bookings
+  const confirmed = bookings.filter(b => statusColor(b.status).color === 'var(--a3)');
   const revConfirmed = confirmed.reduce((s, b) => s + parseValue(b.value), 0);
   const avgValue = bookings.length > 0 ? Math.round(revTotal / bookings.length) : 0;
 
-  const filtered = bookings.filter(b => statusFilter === 'all' || (b.status||'').toLowerCase() === statusFilter);
+  const distinctStatuses = [...new Set(bookings.map(b => (b.status || '').trim()).filter(Boolean))];
+  const filtered = bookings.filter(b => statusFilter === 'all' || (b.status || '').trim() === statusFilter);
 
   let running = 0;
   const withRunning = [...filtered].map(b => { running += parseValue(b.value); return { ...b, running }; });
@@ -526,7 +539,7 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
       <Card>
         <CardHdr title="Bookings" sub="All jobs with revenue" badge={`${filtered.length} entries`} badgeColor="#C9A84C" />
         <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--divider)', display: 'flex', gap: '4px' }}>
-          {['all','confirmed','pending','completed','cancelled'].map(s => (
+          {['all', ...distinctStatuses].map(s => (
             <button key={s} onClick={() => setStatusFilter(s)} style={{
               padding: '3px 9px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer',
               background: statusFilter === s ? 'var(--a2)' : 'var(--slate)', color: statusFilter === s ? '#fff' : 'var(--muted)',

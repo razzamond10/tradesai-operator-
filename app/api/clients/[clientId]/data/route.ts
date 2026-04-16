@@ -93,6 +93,8 @@ export async function GET(
         calendarEventId: b.calendarEventId?.slice(0, 10),
         value: b.value,
       })),
+      // All distinct status values found — use this to diagnose filter mismatches
+      allStatusValues: [...new Set(bookings.map((b) => b.status).filter(Boolean))],
     };
 
     return NextResponse.json({
