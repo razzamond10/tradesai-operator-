@@ -39,7 +39,7 @@ export async function GET(
     }
 
     // Fetch each tab independently so a missing tab doesn't crash the whole request
-    const [interactions, bookings, emergencies] = await Promise.all([
+    const [allInteractions, allBookings, allEmergencies] = await Promise.all([
       getInteractions(sheetId).catch((e) => {
         console.error(`[data] InteractionsLog FAILED for sheetId=${sheetId}:`, e?.message);
         return [];
@@ -54,7 +54,15 @@ export async function GET(
       }),
     ]);
 
-    console.log(`[data] Fetched: interactions=${interactions.length} bookings=${bookings.length} emergencies=${emergencies.length}`);
+    console.log(`[data] Raw totals: interactions=${allInteractions.length} bookings=${allBookings.length} emergencies=${allEmergencies.length}`);
+
+    // Filter to rows belonging to this client — the shared sheet has data for all clients
+    const bizName = config.businessName.trim().toLowerCase();
+    const interactions = allInteractions.filter((r) => r.businessName.trim().toLowerCase() === bizName);
+    const bookings = allBookings.filter((r) => r.businessName.trim().toLowerCase() === bizName);
+    const emergencies = allEmergencies.filter((r) => r.businessName.trim().toLowerCase() === bizName);
+
+    console.log(`[data] After businessName filter ("${config.businessName}"): interactions=${interactions.length} bookings=${bookings.length} emergencies=${emergencies.length}`);
 
     const kpis = computeKPIs(interactions, bookings, emergencies);
 

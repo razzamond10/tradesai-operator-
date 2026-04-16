@@ -106,6 +106,7 @@ export async function getClientConfig(
 
 // ── InteractionsLog ──────────────────────────────────────────────────────────
 export interface Interaction {
+  businessName: string;
   timestamp: string;
   callerName: string;
   phone: string;
@@ -119,6 +120,7 @@ export async function getInteractions(sheetId: string): Promise<Interaction[]> {
   // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=intent, F=outcome, G=notes
   const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
   return rows.map((r) => ({
+    businessName: r[1] || '',
     timestamp: r[0] || '',
     callerName: r[2] || '',
     phone: r[3] || '',
@@ -130,6 +132,7 @@ export async function getInteractions(sheetId: string): Promise<Interaction[]> {
 
 // ── Bookings ──────────────────────────────────────────────────────────────────
 export interface Booking {
+  businessName: string;
   timestamp: string;
   customerName: string;
   phone: string;
@@ -144,6 +147,7 @@ export async function getBookings(sheetId: string): Promise<Booking[]> {
   // Col layout: A=timestamp, B=businessName, C=customerName, D=phone, E=jobType, F=scheduledDate, G=status, H=value
   const rows = await readSheet(sheetId, `'${tabName}'!A2:H`);
   return rows.map((r) => ({
+    businessName: r[1] || '',
     timestamp: r[0] || '',
     customerName: r[2] || '',
     phone: r[3] || '',
@@ -156,6 +160,7 @@ export async function getBookings(sheetId: string): Promise<Booking[]> {
 
 // ── Emergencies ───────────────────────────────────────────────────────────────
 export interface Emergency {
+  businessName: string;
   timestamp: string;
   callerName: string;
   phone: string;
@@ -169,6 +174,7 @@ export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
   // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=type, F=severity, G=resolved
   const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
   return rows.map((r) => ({
+    businessName: r[1] || '',
     timestamp: r[0] || '',
     callerName: r[2] || '',
     phone: r[3] || '',
