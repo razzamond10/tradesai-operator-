@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import AdminClientShell from '@/components/AdminClientShell';
 import Topbar from '@/components/Topbar';
 import ActivityLineChart from '@/components/charts/ActivityLineChart';
@@ -577,6 +577,62 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
   );
 }
 
+function DowBarChart({ interactions }: { interactions: any[] }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const chartRef = useRef<any>(null);
+
+  if (interactions.length === 0) {
+    return (
+      <div style={{ height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '6px' }}>
+        <div style={{ fontSize: '20px' }}>📊</div>
+        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)' }}>Not enough data yet</div>
+      </div>
+    );
+  }
+
+  useEffect(() => {
+    const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const counts = new Array(7).fill(0);
+    interactions.forEach(i => {
+      // timestamp is "YYYY-MM-DD HH:MM:SS" — parse as local date to get correct weekday
+      const raw = (i.timestamp || '').replace(' ', 'T');
+      const d = new Date(raw);
+      if (!isNaN(d.getTime())) counts[d.getDay()]++;
+    });
+
+    const maxVal = Math.max(...counts, 1);
+
+    import('chart.js').then(({ Chart, BarController, BarElement, CategoryScale, LinearScale, Tooltip }) => {
+      Chart.register(BarController, BarElement, CategoryScale, LinearScale, Tooltip);
+      if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
+      if (!canvasRef.current) return;
+      chartRef.current = new Chart(canvasRef.current, {
+        type: 'bar',
+        data: {
+          labels: dayLabels,
+          datasets: [{
+            data: counts,
+            backgroundColor: counts.map(v => `rgba(61,31,168,${0.2 + (v / maxVal) * 0.65})`),
+            borderRadius: 5,
+            borderSkipped: false,
+          }],
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c: any) => ` ${c.raw} call${c.raw === 1 ? '' : 's'}` } } },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: '#7468A0', font: { size: 11 } } },
+            y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { color: '#7468A0', font: { size: 10 }, stepSize: 1 }, beginAtZero: true },
+          },
+        },
+      });
+    });
+    return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
+  }, [interactions]);
+
+  return <div style={{ position: 'relative', height: '160px' }}><canvas ref={canvasRef} /></div>;
+}
+
 function ForecastSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
   const days = last30Days();
   const callsByDay = days.map(d => interactions.filter(i => (i.timestamp||'').startsWith(d)).length);
@@ -636,7 +692,7 @@ function ForecastSection({ interactions, bookings }: { interactions: any[]; book
       <Card>
         <CardHdr title="Busiest Days of Week" sub="Call volume by day" badge="all time" badgeColor="#C9A84C" />
         <div style={{ padding: '14px', height: '160px' }}>
-          <BarChart bookings={bookings} />
+          <DowBarChart interactions={interactions} />
         </div>
       </Card>
     </>
