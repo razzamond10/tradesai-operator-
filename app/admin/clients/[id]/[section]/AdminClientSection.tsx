@@ -5,6 +5,7 @@ import Topbar from '@/components/Topbar';
 import ActivityLineChart from '@/components/charts/ActivityLineChart';
 import DonutChart from '@/components/charts/DonutChart';
 import BarChart from '@/components/charts/BarChart';
+import BookingsCalendar from '@/components/BookingsCalendar';
 import type { JWTPayload } from '@/lib/auth';
 
 // ── helpers ────────────────────────────────────────────────────────────────────
@@ -802,6 +803,7 @@ const SECTION_META: Record<string, { label: string; sub: string }> = {
   forecast:    { label: 'Forecasting',      sub: 'Trends, projections and call patterns'          },
   reviews:     { label: 'Reviews & Ratings', sub: 'Customer feedback and sentiment analysis'      },
   config:      { label: 'Configuration',    sub: 'Client settings and AI configuration'           },
+  bookings:    { label: 'Bookings Calendar', sub: 'Monthly view of all scheduled jobs'             },
 };
 
 // ── Main component ─────────────────────────────────────────────────────────────
@@ -845,6 +847,11 @@ export default function AdminClientSection({ clientId, section, user }: { client
       case 'forecast':    return <ForecastSection interactions={interactions} bookings={bookings} />;
       case 'reviews':     return <ReviewsSection interactions={interactions} />;
       case 'config':      return <ConfigSection config={config} />;
+      case 'bookings':    return (
+        <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', padding: '18px' }}>
+          <BookingsCalendar bookings={bookings} />
+        </div>
+      );
       default:            return null;
     }
   }

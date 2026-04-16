@@ -23,6 +23,7 @@ const NAV_SECTIONS = (id: string) => [
     label: 'Operations',
     items: [
       { label: 'Job Schedule', icon: '📅', href: `/admin/clients/${id}/schedule` },
+      { label: 'Bookings Calendar', icon: '🗓️', href: `/admin/clients/${id}/bookings` },
       { label: 'Lead Pipeline', icon: '📋', href: `/admin/clients/${id}/pipeline` },
       { label: 'Emergencies', icon: '🚨', href: `/admin/clients/${id}/emergencies` },
       { label: 'Communications', icon: '💬', href: `/admin/clients/${id}/comms` },
