@@ -12,8 +12,12 @@ import type { JWTPayload } from '@/lib/auth';
 // ── helpers ────────────────────────────────────────────────────────────────────
 
 function parseValue(v: string) {
-  const n = parseFloat((v || '').replace(/[^0-9.]/g, '') || '0');
-  return isNaN(n) ? 0 : n;
+  // Strip currency symbols and commas first, then everything except digits/dot
+  const cleaned = (v || '').replace(/[£$€,\s]/g, '').replace(/[^0-9.]/g, '');
+  const n = parseFloat(cleaned || '0');
+  // Cap at £99,999 — prevents phone numbers / timestamps from inflating revenue
+  if (isNaN(n) || n < 0 || n > 99999) return 0;
+  return n;
 }
 
 function today() { return new Date().toISOString().slice(0, 10); }
@@ -121,9 +125,9 @@ function HourBarChart({ interactions }: { interactions: any[] }) {
   const chartRef = useRef<any>(null);
 
   useEffect(() => {
-    const todayStr = today();
+    // All-time distribution by hour — not filtered to today so historical data always shows
     const hours = new Array(24).fill(0);
-    interactions.filter(i => (i.timestamp || '').startsWith(todayStr)).forEach(i => {
+    interactions.forEach(i => {
       const h = parseInt((i.timestamp || '').slice(11, 13), 10);
       if (!isNaN(h) && h >= 0 && h < 24) hours[h]++;
     });
@@ -168,7 +172,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [chartMode, setChartMode] = useState<'today' | 'week' | 'month'>('today');
+  const [chartMode, setChartMode] = useState<'today' | 'week' | 'month'>('week');
 
   useEffect(() => {
     fetch(`/api/clients/${encodeURIComponent(clientId)}/data`)
@@ -404,7 +408,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
               </NavCard>
 
               <Card>
-                <CardHdr title="Calls by Hour" sub="Today's call distribution" />
+                <CardHdr title="Calls by Hour" sub="All-time call distribution by hour" />
                 <div style={{ padding: '12px' }}>
                   <HourBarChart interactions={interactions} />
                 </div>

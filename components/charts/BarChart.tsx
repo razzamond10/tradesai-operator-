@@ -1,6 +1,12 @@
 'use client';
 import { useEffect, useRef } from 'react';
 
+function safeValue(raw: string): number {
+  const n = parseFloat((raw || '').replace(/[£$€,\s]/g, '').replace(/[^0-9.]/g, '') || '0');
+  if (isNaN(n) || n < 0 || n > 99999) return 0;
+  return n;
+}
+
 export default function BarChart({ bookings }: { bookings: any[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<any>(null);
@@ -9,8 +15,7 @@ export default function BarChart({ bookings }: { bookings: any[] }) {
     const jobRevenue: Record<string, number> = {};
     bookings.forEach(b => {
       const type = b.jobType || 'Other';
-      const val = parseFloat((b.value || '').replace(/[^0-9.]/g, '') || '0');
-      jobRevenue[type] = (jobRevenue[type] || 0) + (isNaN(val) ? 0 : val);
+      jobRevenue[type] = (jobRevenue[type] || 0) + safeValue(b.value);
     });
 
     const entries = Object.entries(jobRevenue).sort((a, b) => b[1] - a[1]).slice(0, 6);

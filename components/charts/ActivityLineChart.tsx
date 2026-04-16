@@ -1,6 +1,12 @@
 'use client';
 import { useEffect, useRef } from 'react';
 
+function safeValue(raw: string): number {
+  const n = parseFloat((raw || '').replace(/[£$€,\s]/g, '').replace(/[^0-9.]/g, '') || '0');
+  if (isNaN(n) || n < 0 || n > 99999) return 0;
+  return n;
+}
+
 interface Props {
   interactions: any[];
   bookings: any[];
@@ -31,8 +37,8 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
         const h = parseInt((b.timestamp || '').slice(11, 13), 10);
         if (!isNaN(h)) {
           bookingData[h]++;
-          const v = parseFloat((b.value || '').replace(/[^0-9.]/g, '') || '0');
-          revenueData[h] += isNaN(v) ? 0 : Math.round(v / 100);
+          const v = safeValue(b.value);
+          revenueData[h] += Math.round(v / 100);
         }
       });
     } else if (mode === 'week') {
@@ -46,7 +52,7 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
       bookingData = days.map(d => bookings.filter(b => (b.timestamp || '').startsWith(d)).length);
       revenueData = days.map(d => {
         const v = bookings.filter(b => (b.timestamp || '').startsWith(d))
-          .reduce((s, b) => s + parseFloat((b.value || '').replace(/[^0-9.]/g, '') || '0'), 0);
+          .reduce((s, b) => s + safeValue(b.value), 0);
         return Math.round(v / 100);
       });
     } else {
@@ -67,7 +73,7 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
         const idx = Math.max(0, 4 - age);
         if (idx >= 0 && idx < 5) {
           bookingData[idx]++;
-          const v = parseFloat((b.value || '').replace(/[^0-9.]/g, '') || '0');
+          const v = safeValue(b.value);
           revenueData[idx] += Math.round(v / 100);
         }
       });
