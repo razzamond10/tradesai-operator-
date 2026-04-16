@@ -116,14 +116,15 @@ export interface Interaction {
 
 export async function getInteractions(sheetId: string): Promise<Interaction[]> {
   const tabName = await resolveTabName(sheetId, 'interactionslog');
-  const rows = await readSheet(sheetId, `'${tabName}'!A2:F`);
+  // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=intent, F=outcome, G=notes
+  const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
   return rows.map((r) => ({
     timestamp: r[0] || '',
-    callerName: r[1] || '',
-    phone: r[2] || '',
-    intent: r[3] || '',
-    outcome: r[4] || '',
-    notes: r[5] || '',
+    callerName: r[2] || '',
+    phone: r[3] || '',
+    intent: r[4] || '',
+    outcome: r[5] || '',
+    notes: r[6] || '',
   }));
 }
 
@@ -140,15 +141,16 @@ export interface Booking {
 
 export async function getBookings(sheetId: string): Promise<Booking[]> {
   const tabName = await resolveTabName(sheetId, 'bookings');
-  const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
+  // Col layout: A=timestamp, B=businessName, C=customerName, D=phone, E=jobType, F=scheduledDate, G=status, H=value
+  const rows = await readSheet(sheetId, `'${tabName}'!A2:H`);
   return rows.map((r) => ({
     timestamp: r[0] || '',
-    customerName: r[1] || '',
-    phone: r[2] || '',
-    jobType: r[3] || '',
-    scheduledDate: r[4] || '',
-    status: r[5] || '',
-    value: r[6] || '',
+    customerName: r[2] || '',
+    phone: r[3] || '',
+    jobType: r[4] || '',
+    scheduledDate: r[5] || '',
+    status: r[6] || '',
+    value: r[7] || '',
   }));
 }
 
@@ -164,14 +166,15 @@ export interface Emergency {
 
 export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
   const tabName = await resolveTabName(sheetId, 'emergencies');
-  const rows = await readSheet(sheetId, `'${tabName}'!A2:F`);
+  // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=type, F=severity, G=resolved
+  const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
   return rows.map((r) => ({
     timestamp: r[0] || '',
-    callerName: r[1] || '',
-    phone: r[2] || '',
-    type: r[3] || '',
-    severity: r[4] || '',
-    resolved: r[5] || '',
+    callerName: r[2] || '',
+    phone: r[3] || '',
+    type: r[4] || '',
+    severity: r[5] || '',
+    resolved: r[6] || '',
   }));
 }
 
@@ -180,7 +183,7 @@ export async function resolveEmergency(sheetId: string, rowIndex: number): Promi
   const auth = getWriteAuth();
   const sheets = google.sheets({ version: 'v4', auth });
   const tabName = await resolveTabName(sheetId, 'emergencies');
-  const range = `'${tabName}'!F${rowIndex + 2}`; // +2 skips header row, converts 0-based to 1-based
+  const range = `'${tabName}'!G${rowIndex + 2}`; // col G = resolved; +2 skips header, converts 0-based to 1-based
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
     range,

@@ -27,10 +27,13 @@ export async function GET(
     const config = await getClientConfig(params.clientId);
     if (!config) return NextResponse.json({ error: `Client "${params.clientId}" not found in master sheet` }, { status: 404 });
 
+    console.log(`[data] Config for ${params.clientId}: businessName="${config.businessName}" sheetId="${config.sheetId}"`);
+
     const sheetId = config.sheetId;
 
     if (!sheetId) {
       // Config exists but no sheet linked yet — return config with empty data
+      console.warn(`[data] No sheetId in config for ${params.clientId}`);
       const kpis = computeKPIs([], []);
       return NextResponse.json({ config, kpis, interactions: [], bookings: [], emergencies: [] });
     }
@@ -38,18 +41,20 @@ export async function GET(
     // Fetch each tab independently so a missing tab doesn't crash the whole request
     const [interactions, bookings, emergencies] = await Promise.all([
       getInteractions(sheetId).catch((e) => {
-        console.warn(`[data] InteractionsLog unavailable for ${sheetId}:`, e?.message);
+        console.error(`[data] InteractionsLog FAILED for sheetId=${sheetId}:`, e?.message);
         return [];
       }),
       getBookings(sheetId).catch((e) => {
-        console.warn(`[data] Bookings unavailable for ${sheetId}:`, e?.message);
+        console.error(`[data] Bookings FAILED for sheetId=${sheetId}:`, e?.message);
         return [];
       }),
       getEmergencies(sheetId).catch((e) => {
-        console.warn(`[data] Emergencies unavailable for ${sheetId}:`, e?.message);
+        console.error(`[data] Emergencies FAILED for sheetId=${sheetId}:`, e?.message);
         return [];
       }),
     ]);
+
+    console.log(`[data] Fetched: interactions=${interactions.length} bookings=${bookings.length} emergencies=${emergencies.length}`);
 
     const kpis = computeKPIs(interactions, bookings, emergencies);
 
