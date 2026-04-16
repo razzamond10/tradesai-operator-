@@ -229,29 +229,29 @@ export default function BookingsCalendar({ bookings }: Props) {
   return (
     <div>
       {/* ── Navigation header ── */}
-      <div style={{
+      <div className="cal-nav-header" style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        marginBottom: '16px',
+        marginBottom: '16px', flexWrap: 'nowrap', gap: '8px',
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
           <button onClick={prevMonth} style={{
             background: 'var(--slate)', border: '1px solid var(--divider)', borderRadius: '7px',
             width: '32px', height: '32px', cursor: 'pointer', fontSize: '14px', color: 'var(--ink)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>‹</button>
-          <span style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '16px', fontWeight: 700, color: 'var(--ink)', minWidth: '160px', textAlign: 'center' }}>
+          <span className="cal-month-label" style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '16px', fontWeight: 700, color: 'var(--ink)', minWidth: '150px', textAlign: 'center' }}>
             {MONTH_NAMES[month - 1]} {year}
           </span>
           <button onClick={nextMonth} style={{
             background: 'var(--slate)', border: '1px solid var(--divider)', borderRadius: '7px',
             width: '32px', height: '32px', cursor: 'pointer', fontSize: '14px', color: 'var(--ink)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>›</button>
         </div>
         <button onClick={() => { const t = new Date(); setYear(t.getFullYear()); setMonth(t.getMonth() + 1); }} style={{
           background: 'var(--slate)', border: '1px solid var(--divider)', borderRadius: '7px',
           padding: '5px 12px', cursor: 'pointer', fontSize: '11px', fontWeight: 600, color: 'var(--ink)',
-          fontFamily: '"Inter",sans-serif',
+          fontFamily: '"Inter",sans-serif', flexShrink: 0,
         }}>Today</button>
       </div>
 
@@ -394,6 +394,7 @@ export default function BookingsCalendar({ bookings }: Props) {
         @media (max-width: 640px) {
           .cal-desktop { display: none !important; }
           .cal-mobile { display: block !important; }
+          .cal-month-label { min-width: 110px !important; font-size: 13px !important; }
         }
       `}</style>
     </div>

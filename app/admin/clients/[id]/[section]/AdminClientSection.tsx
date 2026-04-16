@@ -562,31 +562,54 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
             }}>{s}</button>
           ))}
         </div>
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
-            <thead>
-              <tr style={{ background: 'var(--slate)' }}>
-                {['Date', 'Customer', 'Service', 'Value', 'Running Total', 'Status'].map(h => (
-                  <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {withRunning.length === 0 ? (
-                <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)' }}>No bookings found</td></tr>
-              ) : withRunning.map((b, i) => (
-                <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i % 2 === 0 ? '#fff' : 'var(--bg)' }}>
-                  <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)' }}>{(b.timestamp||'—').slice(0,10)}</td>
-                  <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)' }}>{b.customerName || '—'}</td>
-                  <td style={{ padding: '8px 12px', color: 'var(--ink2)' }}>{b.serviceType || b.jobType || '—'}</td>
-                  <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: parseValue(b.value) > 0 ? 'var(--a3)' : 'var(--muted)' }}>{parseValue(b.value) > 0 ? `£${parseValue(b.value).toLocaleString()}` : '—'}</td>
-                  <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: 'var(--ink2)', fontSize: '10px' }}>{fmtCurrency(b.running)}</td>
-                  <td style={{ padding: '8px 12px' }}><StatusBadge status={b.status} /></td>
+        <>
+          {/* Desktop table */}
+          <div className="rev-table-wrap" style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <thead>
+                <tr style={{ background: 'var(--slate)' }}>
+                  {['Date', 'Customer', 'Service', 'Value', 'Running Total', 'Status'].map(h => (
+                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px' }}>{h}</th>
+                  ))}
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {withRunning.length === 0 ? (
+                  <tr><td colSpan={6} style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)' }}>No bookings found</td></tr>
+                ) : withRunning.map((b, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i % 2 === 0 ? '#fff' : 'var(--bg)' }}>
+                    <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)' }}>{(b.timestamp||'—').slice(0,10)}</td>
+                    <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)' }}>{b.customerName || '—'}</td>
+                    <td style={{ padding: '8px 12px', color: 'var(--ink2)' }}>{b.serviceType || b.jobType || '—'}</td>
+                    <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: parseValue(b.value) > 0 ? 'var(--a3)' : 'var(--muted)' }}>{parseValue(b.value) > 0 ? `£${parseValue(b.value).toLocaleString()}` : '—'}</td>
+                    <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: 'var(--ink2)', fontSize: '10px' }}>{fmtCurrency(b.running)}</td>
+                    <td style={{ padding: '8px 12px' }}><StatusBadge status={b.status} /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {/* Mobile cards */}
+          <div className="rev-cards-wrap" style={{ display: 'none', padding: '8px' }}>
+            {withRunning.length === 0 ? (
+              <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No bookings found</div>
+            ) : withRunning.map((b, i) => (
+              <div key={i} style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--divider)', background: '#fff', marginBottom: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '5px' }}>
+                  <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)' }}>{b.customerName || '—'}</span>
+                  <StatusBadge status={b.status} />
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '6px' }}>{b.serviceType || b.jobType || '—'}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '14px', fontWeight: 900, color: parseValue(b.value) > 0 ? 'var(--a3)' : 'var(--muted)' }}>
+                    {parseValue(b.value) > 0 ? `£${parseValue(b.value).toLocaleString()}` : '—'}
+                  </span>
+                  <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '9px', color: 'var(--muted)' }}>{(b.timestamp||'').slice(0,10)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       </Card>
     </>
   );
@@ -830,33 +853,52 @@ function JobScheduleSection({ bookings }: { bookings: any[] }) {
         {sorted.length === 0 ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No bookings found</div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
-              <thead>
-                <tr style={{ background: 'var(--slate)' }}>
-                  {([['date','Date'],['','Time'],['customer','Customer Name'],['','Phone'],['','Postcode'],['','Issue'],['status','Status'],['value','Value']] as [string,string][]).map(([k,label]) => (
-                    <th key={label} onClick={k ? () => toggleSort(k as SortKey) : undefined} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px', cursor: k ? 'pointer' : 'default', whiteSpace: 'nowrap', userSelect: 'none' }}>
-                      {label}{k ? si(k as SortKey) : ''}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {sorted.map((b, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i%2===0 ? '#fff' : 'var(--bg)' }}>
-                    <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{b._date || '—'}</td>
-                    <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b._time || '—'}</td>
-                    <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{b.customerName || '—'}</td>
-                    <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b.phone || '—'}</td>
-                    <td style={{ padding: '8px 12px', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{b.postcode || '—'}</td>
-                    <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.jobType || '—'}</td>
-                    <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}><StatusBadge status={b.status} /></td>
-                    <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: parseValue(b.value)>0 ? 'var(--a3)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{parseValue(b.value)>0 ? `£${parseValue(b.value).toLocaleString()}` : '—'}</td>
+          <>
+            {/* Desktop table */}
+            <div className="sched-table-wrap" style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                <thead>
+                  <tr style={{ background: 'var(--slate)' }}>
+                    {([['date','Date'],['','Time'],['customer','Customer Name'],['','Phone'],['','Postcode'],['','Issue'],['status','Status'],['value','Value']] as [string,string][]).map(([k,label]) => (
+                      <th key={label} onClick={k ? () => toggleSort(k as SortKey) : undefined} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px', cursor: k ? 'pointer' : 'default', whiteSpace: 'nowrap', userSelect: 'none' }}>
+                        {label}{k ? si(k as SortKey) : ''}
+                      </th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {sorted.map((b, i) => (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i%2===0 ? '#fff' : 'var(--bg)' }}>
+                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{b._date || '—'}</td>
+                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b._time || '—'}</td>
+                      <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{b.customerName || '—'}</td>
+                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b.phone || '—'}</td>
+                      <td style={{ padding: '8px 12px', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{b.postcode || '—'}</td>
+                      <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.jobType || '—'}</td>
+                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}><StatusBadge status={b.status} /></td>
+                      <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: parseValue(b.value)>0 ? 'var(--a3)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{parseValue(b.value)>0 ? `£${parseValue(b.value).toLocaleString()}` : '—'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Mobile cards */}
+            <div className="sched-cards-wrap" style={{ display: 'none', padding: '8px' }}>
+              {sorted.map((b, i) => (
+                <div key={i} style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--divider)', background: '#fff', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                    <div style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '11px', fontWeight: 700, color: 'var(--ink2)' }}>
+                      {b._date || '—'}{b._time ? ` · ${b._time}` : ''}
+                    </div>
+                    <StatusBadge status={b.status} />
+                  </div>
+                  <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)', marginBottom: '3px' }}>{b.customerName || '—'}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '4px' }}>{b.jobType || '—'}</div>
+                  {parseValue(b.value) > 0 && <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--a3)' }}>£{parseValue(b.value).toLocaleString()}</div>}
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </Card>
     </>
@@ -1019,37 +1061,60 @@ function CommunicationsSection({ interactions }: { interactions: any[] }) {
         {filtered.length === 0 ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No calls found</div>
         ) : (
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
-              <thead>
-                <tr style={{ background: 'var(--slate)' }}>
-                  {['Date', 'Customer Name', 'Phone', 'Issue / Intent', 'Booking Made', 'Status'].map(h => (
-                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px' }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((item, i) => {
-                  const booked = bookingMade(item);
-                  const os = outcomeStyle(item.outcome);
-                  return (
-                    <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i%2===0 ? '#fff' : 'var(--bg)' }}>
-                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{(item.timestamp||'—').slice(0,16).replace('T',' ')}</td>
-                      <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{item.callerName || '—'}</td>
-                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{item.phone || '—'}</td>
-                      <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.intent || '—'}</td>
-                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
-                        <span style={{ fontSize: '11px', fontWeight: 700, color: booked ? 'var(--a3)' : 'var(--muted)' }}>{booked ? '✓ Yes' : '✗ No'}</span>
-                      </td>
-                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
-                        <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{item.outcome || 'Unknown'}</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <>
+            {/* Desktop table */}
+            <div className="comms-table-wrap" style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+                <thead>
+                  <tr style={{ background: 'var(--slate)' }}>
+                    {['Date', 'Customer Name', 'Phone', 'Issue / Intent', 'Booking Made', 'Status'].map(h => (
+                      <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.map((item, i) => {
+                    const booked = bookingMade(item);
+                    const os = outcomeStyle(item.outcome);
+                    return (
+                      <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i%2===0 ? '#fff' : 'var(--bg)' }}>
+                        <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{(item.timestamp||'—').slice(0,16).replace('T',' ')}</td>
+                        <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{item.callerName || '—'}</td>
+                        <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{item.phone || '—'}</td>
+                        <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.intent || '—'}</td>
+                        <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 700, color: booked ? 'var(--a3)' : 'var(--muted)' }}>{booked ? '✓ Yes' : '✗ No'}</span>
+                        </td>
+                        <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                          <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{item.outcome || 'Unknown'}</span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+            {/* Mobile cards */}
+            <div className="comms-cards-wrap" style={{ display: 'none', padding: '8px' }}>
+              {filtered.map((item, i) => {
+                const booked = bookingMade(item);
+                const os = outcomeStyle(item.outcome);
+                return (
+                  <div key={i} style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--divider)', background: '#fff', marginBottom: '8px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)' }}>{item.callerName || '—'}</span>
+                      <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '9px', color: 'var(--muted)' }}>{(item.timestamp||'').slice(0,10)}</span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '8px' }}>{item.intent || '—'}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: 700, color: booked ? 'var(--a3)' : 'var(--muted)' }}>{booked ? '✓ Booked' : '✗ No booking'}</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{item.outcome || 'Unknown'}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
       </Card>
     </>
@@ -1188,7 +1253,17 @@ export default function AdminClientSection({ clientId, section, user }: { client
       />
       <div style={{ padding: '18px 22px', flex: 1, overflowY: 'auto' }}>
         {renderSection()}
-        <style>{`@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
+        <style>{`
+          @keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}
+          @media (max-width: 768px) {
+            .sched-table-wrap { display: none !important; }
+            .sched-cards-wrap { display: block !important; }
+            .comms-table-wrap { display: none !important; }
+            .comms-cards-wrap { display: block !important; }
+            .rev-table-wrap { display: none !important; }
+            .rev-cards-wrap { display: block !important; }
+          }
+        `}</style>
       </div>
     </AdminClientShell>
   );

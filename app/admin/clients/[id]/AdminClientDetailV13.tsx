@@ -559,7 +559,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                   <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--a1)', opacity: 0.7 }}>View all ›</span>
                 </div>
               </div>
-              <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', flexWrap: 'wrap' }}>
+              <div className="pipeline-stages-row" style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', flexWrap: 'wrap' }}>
                 {[
                   { label: 'New Leads', status: 'new', color: '#3D1FA8' },
                   { label: 'Quoted', status: 'quoted', color: '#9A6200' },
@@ -571,7 +571,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                 ].map((stage, idx, arr) => (
                   <div key={stage.status} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{
+                      <div className="pipeline-stage-circle" style={{
                         width: '36px', height: '36px', borderRadius: '50%', background: stage.color,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         fontFamily: '"Inter Tight",sans-serif', fontSize: '13px', fontWeight: 900, color: '#fff',
@@ -579,9 +579,9 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                       }}>
                         {stageCount(stage.status)}
                       </div>
-                      <div style={{ fontSize: '9px', color: 'var(--muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{stage.label}</div>
+                      <div className="pipeline-stage-label" style={{ fontSize: '9px', color: 'var(--muted)', fontWeight: 600, whiteSpace: 'nowrap' }}>{stage.label}</div>
                     </div>
-                    {idx < arr.length - 1 && <div style={{ color: 'var(--faint)', fontSize: '16px', marginBottom: '18px', flexShrink: 0 }}>›</div>}
+                    {idx < arr.length - 1 && <div className="pipeline-stage-arrow" style={{ color: 'var(--faint)', fontSize: '16px', marginBottom: '18px', flexShrink: 0 }}>›</div>}
                   </div>
                 ))}
               </div>
@@ -684,6 +684,10 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
           @media (max-width: 768px) {
             .admin-dash-row-3 { grid-template-columns: 1fr !important; }
             .admin-pipeline-grid { grid-template-columns: repeat(3,1fr) !important; }
+            .pipeline-stage-circle { width: 30px !important; height: 30px !important; font-size: 10px !important; }
+            .pipeline-stage-label { font-size: 8px !important; }
+            .pipeline-stage-arrow { font-size: 12px !important; }
+            .pipeline-stages-row { gap: 2px !important; padding: 10px !important; }
           }
           @media (max-width: 480px) {
             .admin-pipeline-grid { grid-template-columns: repeat(2,1fr) !important; }

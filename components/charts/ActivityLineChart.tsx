@@ -179,5 +179,5 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
     return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
   }, [interactions, bookings, mode]);
 
-  return <div style={{ position: 'relative', height: '180px' }}><canvas ref={canvasRef} /></div>;
+  return <div style={{ position: 'relative', height: '180px', overflow: 'hidden', maxWidth: '100%' }}><canvas ref={canvasRef} /></div>;
 }
