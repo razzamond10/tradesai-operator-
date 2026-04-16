@@ -197,7 +197,7 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
         </div>
 
         {/* KPI cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginBottom: '28px' }}>
+        <div className="admin-portfolio-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginBottom: '28px' }}>
           {[
             { stripe: 'var(--a1)', iconBg: 'var(--a1b)', icon: '👥', label: 'Total Clients', value: loading ? '—' : clients.length, sub: 'registered accounts', badge: loading ? '…' : `${clients.length} accounts` },
             { stripe: 'var(--a3)', iconBg: 'var(--a3b)', icon: '📞', label: 'AI Lines Active', value: loading ? '—' : activeLines, sub: 'with Twilio numbers', badge: 'AI answering' },
@@ -346,6 +346,12 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
         body{background:var(--bg);color:var(--ink);}
         *{box-sizing:border-box;margin:0;padding:0;}
         @keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}
+        @media (max-width: 768px) {
+          .admin-portfolio-grid { grid-template-columns: repeat(2,1fr) !important; }
+        }
+        @media (max-width: 480px) {
+          .admin-portfolio-grid { grid-template-columns: 1fr !important; }
+        }
       `}</style>
     </div>
   );

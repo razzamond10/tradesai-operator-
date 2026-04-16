@@ -289,10 +289,16 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
           }
           .admin-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
           .admin-grid-3 { grid-template-columns: 1fr !important; }
+          .admin-dash-row-3 { grid-template-columns: 1fr !important; }
+          .admin-pipeline-grid { grid-template-columns: repeat(3,1fr) !important; }
           .admin-table-wrap { overflow-x: auto !important; -webkit-overflow-scrolling: touch; }
           .admin-card-stack { flex-direction: column !important; }
           .topbar-clock { display: none !important; }
           .topbar-divider { display: none !important; }
+        }
+        @media (max-width: 480px) {
+          .admin-grid-4 { grid-template-columns: 1fr !important; }
+          .admin-pipeline-grid { grid-template-columns: repeat(2,1fr) !important; }
         }
       `}</style>
     </div>

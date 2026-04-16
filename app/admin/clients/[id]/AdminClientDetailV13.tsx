@@ -342,7 +342,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
             </div>
 
             {/* Row 1: Line chart + 2 donuts */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+            <div className="admin-dash-row-3" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
               <Card>
                 <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
@@ -370,7 +370,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                     ))}
                   </div>
                 </div>
-                <div style={{ padding: '12px 14px' }}>
+                <div style={{ padding: '12px 14px', minHeight: '200px' }}>
                   <ActivityLineChart interactions={interactions} bookings={bookings} mode={chartMode} />
                 </div>
               </Card>
@@ -411,17 +411,17 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
             </div>
 
             {/* Row 2: Bar chart + Hour bar + Live alerts */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+            <div className="admin-dash-row-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
               <NavCard href={`${base}/revenue`}>
                 <CardHdr title="Revenue by Job Type" sub="This month — estimated from bookings" badge={fmtCurrency(revTotal)} badgeColor="var(--a1)" viewHref={`${base}/revenue`} />
-                <div style={{ padding: '12px' }}>
+                <div style={{ padding: '12px', minHeight: '180px' }}>
                   <BarChart bookings={bookings} />
                 </div>
               </NavCard>
 
               <Card>
                 <CardHdr title="Calls by Hour" sub="All-time call distribution by hour" />
-                <div style={{ padding: '12px' }}>
+                <div style={{ padding: '12px', minHeight: '180px' }}>
                   <HourBarChart interactions={interactions} />
                 </div>
               </Card>
@@ -454,7 +454,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
             </div>
 
             {/* Row 3: Job Schedule + Performance + Activity Feed */}
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+            <div className="admin-dash-row-3" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
               <NavCard href={`${base}/schedule`}>
                 <CardHdr
                   title="Job Schedule"
@@ -591,7 +591,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
               <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '11px', fontWeight: 700, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '.8px' }}>Pipeline Overview</div>
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: '10px', marginBottom: '18px' }}>
+            <div className="admin-pipeline-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6,1fr)', gap: '10px', marginBottom: '18px' }}>
               {[
                 { label: 'New Leads', val: stageCount('new'), badge: 'New', bg: 'var(--a1b)', color: 'var(--a1)', barColor: 'var(--a1)' },
                 { label: 'Quoted', val: stageCount('quoted'), badge: 'Quote', bg: 'var(--a2b)', color: 'var(--a6)', barColor: 'var(--a6)' },
@@ -681,6 +681,13 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
           @keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}
           .nav-card { transition: box-shadow .15s, border-color .15s; }
           .nav-card-link:hover .nav-card { box-shadow: 0 6px 20px rgba(26,10,60,0.14) !important; border-color: rgba(201,168,76,0.4) !important; }
+          @media (max-width: 768px) {
+            .admin-dash-row-3 { grid-template-columns: 1fr !important; }
+            .admin-pipeline-grid { grid-template-columns: repeat(3,1fr) !important; }
+          }
+          @media (max-width: 480px) {
+            .admin-pipeline-grid { grid-template-columns: repeat(2,1fr) !important; }
+          }
         `}</style>
       </div>
     </AdminClientShell>
