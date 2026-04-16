@@ -52,10 +52,12 @@ export interface ClientConfig {
   tradeType: string;
   contactName: string;
   phone: string;
-  calendarId: string;
-  sheetId: string;
-  twilioNumber: string;
-  clientId: string;
+  calendarId: string;   // col E — Google Calendar ID
+  sheetId: string;      // col F — client data sheet ID
+  botpressId: string;   // col G — Botpress bot ID
+  makeWebhookUrl: string; // col H — Make.com webhook URL
+  twilioNumber: string; // col I — Twilio phone number (also used as clientId)
+  clientId: string;     // col I — same as twilioNumber; used for routing
 }
 
 /** Strip leading emoji / non-ASCII characters from a tab name for comparison */
@@ -88,7 +90,9 @@ export async function getClientConfigs(): Promise<ClientConfig[]> {
     phone: r[3] || '',
     calendarId: r[4] || '',
     sheetId: r[5] || '',
-    twilioNumber: r[7] || '',
+    botpressId: r[6] || '',
+    makeWebhookUrl: r[7] || '',
+    twilioNumber: r[8] || '',
     clientId: r[8] || '',
   }));
 }

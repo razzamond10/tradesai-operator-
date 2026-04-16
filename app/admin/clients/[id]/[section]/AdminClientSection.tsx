@@ -80,7 +80,7 @@ function StatusBadge({ status }: { status: string }) {
 
 // ── Section renderers ──────────────────────────────────────────────────────────
 
-function AnalyticsSection({ interactions, bookings, emergencies }: { interactions: any[]; bookings: any[]; emergencies: any[] }) {
+function AnalyticsSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
 
   const intentMap: Record<string, number> = {};
   interactions.forEach(i => { const k = i.intent || 'Unknown'; intentMap[k] = (intentMap[k] || 0) + 1; });
@@ -672,7 +672,8 @@ function ConfigSection({ config }: { config: any }) {
     { label: 'Phone Number', value: config.phone, icon: '📞', mono: true },
     { label: 'Email', value: config.email, icon: '✉️', mono: true },
     { label: 'Location', value: config.location, icon: '📍' },
-    { label: 'Twilio Number', value: config.twilioNumber, icon: '🤖', mono: true },
+    { label: 'Twilio Number', value: config.twilioNumber, icon: '📱', mono: true },
+    { label: 'AI Webhook', value: config.makeWebhookUrl, icon: '🔗', mono: true },
     { label: 'Sheet ID', value: config.sheetId, icon: '📊', mono: true },
     { label: 'Client ID', value: config.clientId, icon: '🔑', mono: true },
     { label: 'AI Greeting', value: config.aiGreeting, icon: '💬' },
@@ -744,7 +745,7 @@ export default function AdminClientSection({ clientId, section, user }: { client
       <div style={{ padding: '16px', background: 'var(--a4b)', border: '1px solid #F5C0C8', borderRadius: '8px', color: 'var(--a4)', fontSize: '12px' }}>⚠ {error}</div>
     );
     switch (section) {
-      case 'analytics':   return <AnalyticsSection interactions={interactions} bookings={bookings} emergencies={emergencies} />;
+      case 'analytics':   return <AnalyticsSection interactions={interactions} bookings={bookings} />;
       case 'schedule':    return <ScheduleSection bookings={bookings} />;
       case 'pipeline':    return <PipelineSection interactions={interactions} bookings={bookings} />;
       case 'emergencies': return <EmergenciesSection emergencies={emergencies} clientId={clientId} />;
