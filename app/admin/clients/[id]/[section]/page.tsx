@@ -3,7 +3,10 @@ import { redirect } from 'next/navigation';
 import { verifyJWT } from '@/lib/auth';
 import AdminClientSection from './AdminClientSection';
 
-const VALID_SECTIONS = ['analytics', 'schedule', 'pipeline', 'emergencies', 'comms', 'revenue', 'forecast', 'reviews', 'config', 'bookings'];
+const VALID_SECTIONS = [
+  'analytics', 'schedule', 'pipeline', 'emergencies', 'comms', 'revenue', 'forecast', 'reviews', 'config', 'bookings',
+  'job-schedule', 'lead-pipeline', 'communications', 'configuration',
+];
 
 export default async function AdminClientSectionPage({
   params,

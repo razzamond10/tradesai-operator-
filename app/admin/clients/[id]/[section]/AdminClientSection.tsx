@@ -25,6 +25,20 @@ function last30Days() {
   });
 }
 
+const _MONTHS: Record<string, string> = { jan:'01',feb:'02',mar:'03',apr:'04',may:'05',jun:'06',jul:'07',aug:'08',sep:'09',oct:'10',nov:'11',dec:'12' };
+function parseScheduledDate(raw: string): { date: string; time: string } | null {
+  if (!raw) return null;
+  let m = raw.match(/^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2})/);
+  if (m) return { date: m[1], time: m[2] };
+  m = raw.match(/^(\d{4}-\d{2}-\d{2})/);
+  if (m) return { date: m[1], time: '' };
+  m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+(\d{2}:\d{2}))?/);
+  if (m) return { date: `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`, time: m[4] || '' };
+  m = raw.match(/(\d{1,2})\s+([A-Za-z]+)\s+(\d{4})(?:\s+(?:at\s+)?(\d{2}:\d{2}))?/i);
+  if (m) { const mo = _MONTHS[m[2].toLowerCase().slice(0,3)]; if (mo) return { date: `${m[3]}-${mo}-${m[1].padStart(2,'0')}`, time: m[4] || '' }; }
+  return null;
+}
+
 // ── Reusable sub-components ────────────────────────────────────────────────────
 
 function Card({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
@@ -700,57 +714,21 @@ function ForecastSection({ interactions, bookings }: { interactions: any[]; book
   );
 }
 
-function ReviewsSection({ interactions }: { interactions: any[] }) {
-  const feedback = interactions.filter(i => (i.intent || '').toLowerCase().includes('feedback') || (i.intent || '').toLowerCase().includes('review') || (i.outcome || '').toLowerCase().includes('feedback'));
-  const positive = feedback.filter(i => ['great','good','excellent','happy','satisfied','positive','recommend'].some(w => (i.notes||'').toLowerCase().includes(w)));
-  const negative = feedback.filter(i => ['complaint','bad','poor','unhappy','dissatisfied','issue','problem'].some(w => (i.notes||'').toLowerCase().includes(w)));
-  const neutral = feedback.filter(i => !positive.includes(i) && !negative.includes(i));
-
-  const score = feedback.length > 0 ? Math.round(((positive.length * 100 + neutral.length * 50) / feedback.length)).toFixed(0) : '—';
-
+function ReviewsSection({ interactions: _interactions }: { interactions: any[] }) {
   return (
-    <>
-      <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
-        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="⭐" label="Feedback Calls" value={feedback.length} sub="review interactions" />
-        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="😊" label="Positive" value={positive.length} sub="happy customers" />
-        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="😐" label="Neutral" value={neutral.length} sub="no strong sentiment" />
-        <KPICard stripe="var(--a4)" iconBg="var(--a4b)" icon="😞" label="Negative" value={negative.length} sub="complaints" />
-      </div>
-
-      <Card style={{ marginBottom: '12px' }}>
-        <div style={{ padding: '20px', textAlign: 'center' }}>
-          <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: '8px' }}>Sentiment Score</div>
-          <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '48px', fontWeight: 900, color: 'var(--a2)', lineHeight: 1 }}>{score}{feedback.length > 0 ? '%' : ''}</div>
-          <div style={{ fontSize: '11px', color: 'var(--muted)', marginTop: '6px' }}>Based on {feedback.length} feedback call{feedback.length !== 1 ? 's' : ''}</div>
+    <Card>
+      <div style={{ padding: '60px 24px', textAlign: 'center' }}>
+        <div style={{ fontSize: '56px', marginBottom: '20px', lineHeight: 1 }}>⭐</div>
+        <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '20px', fontWeight: 800, color: 'var(--ink)', marginBottom: '12px' }}>No Reviews Collected Yet</div>
+        <div style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.7, maxWidth: '420px', margin: '0 auto 28px' }}>
+          Reviews feature coming in Professional tier (Oct 2026). Customers will be able to leave star ratings and written feedback automatically after each completed job.
         </div>
-      </Card>
-
-      <Card>
-        <CardHdr title="Feedback Interactions" sub="Calls with review or feedback intent" badge={`${feedback.length} total`} badgeColor="#C9A84C" />
-        {feedback.length === 0 ? (
-          <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No feedback interactions logged yet</div>
-        ) : (
-          <div>
-            {[...feedback].reverse().map((item, i) => {
-              const isPos = positive.includes(item);
-              const isNeg = negative.includes(item);
-              return (
-                <div key={i} style={{ padding: '12px 14px', borderBottom: '1px solid var(--slate)', borderLeft: `3px solid ${isPos ? 'var(--a3)' : isNeg ? 'var(--a4)' : 'var(--faint)'}` }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink)' }}>{item.callerName || 'Unknown'}</span>
-                    <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: isPos ? 'var(--a3b)' : isNeg ? 'var(--a4b)' : 'var(--slate)', color: isPos ? 'var(--a3)' : isNeg ? 'var(--a4)' : 'var(--muted)' }}>
-                      {isPos ? '😊 Positive' : isNeg ? '😞 Negative' : '😐 Neutral'}
-                    </span>
-                    <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--muted)', fontFamily: '"IBM Plex Mono",monospace' }}>{(item.timestamp||'').slice(0,10)}</span>
-                  </div>
-                  {item.notes && <div style={{ fontSize: '11px', color: 'var(--ink2)' }}>"{item.notes}"</div>}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </Card>
-    </>
+        <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center', padding: '10px 20px', borderRadius: '10px', background: 'var(--a2b)', border: '1px solid rgba(201,168,76,0.3)' }}>
+          <span style={{ fontSize: '16px' }}>🗓️</span>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--a6)' }}>Coming October 2026 — Professional Tier</span>
+        </div>
+      </div>
+    </Card>
   );
 }
 
@@ -791,6 +769,338 @@ function ConfigSection({ config }: { config: any }) {
   );
 }
 
+// ── New section renderers ──────────────────────────────────────────────────────
+
+type SortKey = 'date' | 'customer' | 'status' | 'value';
+
+function JobScheduleSection({ bookings }: { bookings: any[] }) {
+  const [sortKey, setSortKey] = useState<SortKey>('date');
+  const [sortDir, setSortDir] = useState<'asc'|'desc'>('asc');
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const parsed = bookings.map(b => {
+    const p = parseScheduledDate(b.scheduledDate);
+    return { ...b, _date: p?.date || '', _time: p?.time || '' };
+  });
+  const distinctStatuses = [...new Set(bookings.map(b => (b.status||'').trim()).filter(Boolean))];
+  const filtered = parsed.filter(b => {
+    const matchStatus = statusFilter === 'all' || (b.status||'').trim() === statusFilter;
+    const matchSearch = !search ||
+      (b.customerName||'').toLowerCase().includes(search.toLowerCase()) ||
+      (b.jobType||'').toLowerCase().includes(search.toLowerCase()) ||
+      (b.postcode||'').toLowerCase().includes(search.toLowerCase());
+    return matchStatus && matchSearch;
+  });
+  const sorted = [...filtered].sort((a, b) => {
+    let av = '', bv = '';
+    if (sortKey === 'date')     { av = a._date + a._time; bv = b._date + b._time; }
+    else if (sortKey === 'customer') { av = a.customerName || ''; bv = b.customerName || ''; }
+    else if (sortKey === 'status')   { av = a.status || ''; bv = b.status || ''; }
+    else if (sortKey === 'value')    { av = String(parseValue(a.value)); bv = String(parseValue(b.value)); }
+    const cmp = av.localeCompare(bv, undefined, { numeric: true });
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+  function toggleSort(key: SortKey) {
+    if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+    else { setSortKey(key); setSortDir('asc'); }
+  }
+  const si = (key: SortKey) => sortKey === key ? (sortDir === 'asc' ? ' ↑' : ' ↓') : '';
+  const confirmedCount = bookings.filter(b => statusColor(b.status).color === 'var(--a3)').length;
+  const pendingCount   = bookings.filter(b => statusColor(b.status).color === 'var(--a6)').length;
+  const revTotal = bookings.reduce((s, b) => s + parseValue(b.value), 0);
+
+  return (
+    <>
+      <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
+        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📅" label="Total Bookings" value={bookings.length} sub="all time" />
+        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="✅" label="Confirmed / Done" value={confirmedCount} sub="confirmed or completed" />
+        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="⏳" label="Pending" value={pendingCount} sub="awaiting or scheduled" />
+        <KPICard stripe="var(--a5)" iconBg="var(--a5b)" icon="💰" label="Total Value" value={fmtCurrency(revTotal)} sub="from all bookings" />
+      </div>
+      <Card>
+        <CardHdr title="Job Schedule" sub="All bookings sorted by scheduled date" badge={`${sorted.length} jobs`} badgeColor="#C9A84C" />
+        <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--divider)', display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <button onClick={() => setStatusFilter('all')} style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer', background: statusFilter === 'all' ? 'var(--a2)' : 'var(--slate)', color: statusFilter === 'all' ? '#fff' : 'var(--muted)', fontFamily: '"Inter",sans-serif' }}>All ({bookings.length})</button>
+          {distinctStatuses.map(s => (
+            <button key={s} onClick={() => setStatusFilter(s)} style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer', background: statusFilter === s ? 'var(--a2)' : 'var(--slate)', color: statusFilter === s ? '#fff' : 'var(--muted)', fontFamily: '"Inter",sans-serif', textTransform: 'capitalize' }}>{s} ({bookings.filter(b=>(b.status||'').trim()===s).length})</button>
+          ))}
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, issue, postcode…" style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '11px', outline: 'none', width: '200px', fontFamily: '"Inter",sans-serif' }} />
+        </div>
+        {sorted.length === 0 ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No bookings found</div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <thead>
+                <tr style={{ background: 'var(--slate)' }}>
+                  {([['date','Date'],['','Time'],['customer','Customer Name'],['','Phone'],['','Postcode'],['','Issue'],['status','Status'],['value','Value']] as [string,string][]).map(([k,label]) => (
+                    <th key={label} onClick={k ? () => toggleSort(k as SortKey) : undefined} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px', cursor: k ? 'pointer' : 'default', whiteSpace: 'nowrap', userSelect: 'none' }}>
+                      {label}{k ? si(k as SortKey) : ''}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map((b, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i%2===0 ? '#fff' : 'var(--bg)' }}>
+                    <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{b._date || '—'}</td>
+                    <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b._time || '—'}</td>
+                    <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{b.customerName || '—'}</td>
+                    <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b.phone || '—'}</td>
+                    <td style={{ padding: '8px 12px', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{b.postcode || '—'}</td>
+                    <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.jobType || '—'}</td>
+                    <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}><StatusBadge status={b.status} /></td>
+                    <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: parseValue(b.value)>0 ? 'var(--a3)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{parseValue(b.value)>0 ? `£${parseValue(b.value).toLocaleString()}` : '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+    </>
+  );
+}
+
+function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const bookedPhones = new Set(bookings.map(b => b.phone));
+  const isBooked = (i: any) =>
+    (i.outcome || '').toLowerCase().includes('book') || bookedPhones.has(i.phone);
+  const isHot = (i: any) => {
+    const o = (i.outcome || '').toLowerCase();
+    return o.includes('quot') || o.includes('follow') || o.includes('hot') || o.includes('interest');
+  };
+
+  const leads = interactions.filter(i => !isBooked(i));
+  const allOutcomes = [...new Set(leads.map(i => (i.outcome||'New').trim()).filter(Boolean))];
+
+  const outcomeStyle = (o: string) => {
+    const l = (o || 'new').toLowerCase();
+    if (l.includes('quot'))   return { bg: 'var(--a2b)', color: 'var(--a6)', label: 'Quoted' };
+    if (l.includes('follow')) return { bg: 'var(--a1b)', color: 'var(--a1)', label: 'Follow-up' };
+    if (l.includes('close') || l.includes('lost') || l.includes('cancel')) return { bg: 'var(--a4b)', color: 'var(--a4)', label: 'Closed' };
+    return { bg: 'var(--slate)', color: 'var(--muted)', label: o || 'New' };
+  };
+
+  const filtered = leads.filter(l => {
+    const matchStatus = statusFilter === 'all' || (l.outcome||'New').trim() === statusFilter;
+    const matchSearch = !search ||
+      (l.callerName||'').toLowerCase().includes(search.toLowerCase()) ||
+      (l.intent||'').toLowerCase().includes(search.toLowerCase()) ||
+      (l.phone||'').includes(search);
+    return matchStatus && matchSearch;
+  });
+  const sorted = [...filtered].sort((a, b) => {
+    const aHot = isHot(a) ? 0 : 1, bHot = isHot(b) ? 0 : 1;
+    if (aHot !== bHot) return aHot - bHot;
+    return (b.timestamp||'').localeCompare(a.timestamp||'');
+  });
+
+  const hotCount  = leads.filter(isHot).length;
+  const coldCount = leads.filter(l => !isHot(l)).length;
+
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px', marginBottom: '16px' }}>
+        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📥" label="Total Leads" value={leads.length} sub="unbooked interactions" />
+        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="🔥" label="Hot Leads" value={hotCount} sub="quoted or follow-up" />
+        <KPICard stripe="var(--slate)" iconBg="var(--slate)" icon="❄️" label="Cold Leads" value={coldCount} sub="new or no status" />
+      </div>
+      <Card>
+        <CardHdr title="Lead Pipeline" sub="Interactions that didn't convert to bookings" badge={`${sorted.length} leads`} badgeColor="#3D1FA8" />
+        <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--divider)', display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+          <button onClick={() => setStatusFilter('all')} style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer', background: statusFilter === 'all' ? 'var(--a1)' : 'var(--slate)', color: statusFilter === 'all' ? '#fff' : 'var(--muted)', fontFamily: '"Inter",sans-serif' }}>All ({leads.length})</button>
+          {allOutcomes.map(s => {
+            const os = outcomeStyle(s);
+            return (
+              <button key={s} onClick={() => setStatusFilter(s)} style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer', background: statusFilter === s ? os.color : 'var(--slate)', color: statusFilter === s ? '#fff' : 'var(--muted)', fontFamily: '"Inter",sans-serif' }}>
+                {os.label} ({leads.filter(l=>(l.outcome||'New').trim()===s).length})
+              </button>
+            );
+          })}
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, phone, issue…" style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '11px', outline: 'none', width: '200px', fontFamily: '"Inter",sans-serif' }} />
+        </div>
+        {sorted.length === 0 ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>
+            {leads.length === 0 ? '🎉 All interactions converted to bookings!' : 'No leads match your filter'}
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <thead>
+                <tr style={{ background: 'var(--slate)' }}>
+                  {['Date', 'Customer Name', 'Phone', 'Issue', 'Quote / Notes', 'Status'].map(h => (
+                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {sorted.map((lead, i) => {
+                  const hot = isHot(lead);
+                  const os = outcomeStyle(lead.outcome);
+                  return (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: hot ? 'rgba(201,168,76,0.05)' : i%2===0 ? '#fff' : 'var(--bg)', borderLeft: hot ? '3px solid var(--a2)' : '3px solid transparent' }}>
+                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{(lead.timestamp||'').slice(0,10) || '—'}</td>
+                      <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{hot && <span style={{ marginRight: '4px' }}>🔥</span>}{lead.callerName || '—'}</td>
+                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{lead.phone || '—'}</td>
+                      <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.intent || '—'}</td>
+                      <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.notes || '—'}</td>
+                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{os.label}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+    </>
+  );
+}
+
+const COMMS_TABS = ['All', 'Booked', 'Quoted', 'Emergency', 'Follow-up'] as const;
+type CommsTab = typeof COMMS_TABS[number];
+
+function CommunicationsSection({ interactions }: { interactions: any[] }) {
+  const [tab, setTab] = useState<CommsTab>('All');
+  const [search, setSearch] = useState('');
+
+  function matchTab(i: any, t: CommsTab) {
+    if (t === 'All') return true;
+    const o = (i.outcome || '').toLowerCase();
+    if (t === 'Booked')    return o.includes('book');
+    if (t === 'Quoted')    return o.includes('quot');
+    if (t === 'Emergency') return o.includes('emergency') || o.includes('urgent') || (i.notes||'').toLowerCase().includes('emergency');
+    if (t === 'Follow-up') return o.includes('follow');
+    return true;
+  }
+  const bookingMade = (i: any) => (i.outcome || '').toLowerCase().includes('book');
+  const outcomeStyle = (o: string) => {
+    const l = (o || '').toLowerCase();
+    if (l.includes('book'))      return { bg: 'var(--a3b)', color: 'var(--a3)' };
+    if (l.includes('emergency') || l.includes('urgent')) return { bg: 'var(--a4b)', color: 'var(--a4)' };
+    if (l.includes('quot'))      return { bg: 'var(--a2b)', color: 'var(--a6)' };
+    if (l.includes('follow'))    return { bg: 'var(--a1b)', color: 'var(--a1)' };
+    return { bg: 'var(--slate)', color: 'var(--muted)' };
+  };
+
+  const sorted = [...interactions].reverse();
+  const filtered = sorted.filter(i => {
+    return matchTab(i, tab) && (!search ||
+      (i.callerName||'').toLowerCase().includes(search.toLowerCase()) ||
+      (i.phone||'').includes(search) ||
+      (i.intent||'').toLowerCase().includes(search.toLowerCase()));
+  });
+  const tabCounts = Object.fromEntries(COMMS_TABS.map(t => [t, interactions.filter(i => matchTab(i, t)).length]));
+
+  return (
+    <>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px', marginBottom: '16px' }}>
+        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📞" label="Total Calls" value={interactions.length} sub="all time" />
+        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="📅" label="Bookings Made" value={interactions.filter(bookingMade).length} sub="from AI calls" />
+        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="🕐" label="Today" value={interactions.filter(i=>(i.timestamp||'').startsWith(new Date().toISOString().slice(0,10))).length} sub="calls today" />
+      </div>
+      <Card>
+        <CardHdr title="Full Call Log" sub="All AI-handled interactions" badge={`${filtered.length} shown`} badgeColor="#3D1FA8" />
+        <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--divider)', display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+          {COMMS_TABS.map(t => (
+            <button key={t} onClick={() => setTab(t)} style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer', background: tab === t ? 'var(--a1)' : 'var(--slate)', color: tab === t ? '#fff' : 'var(--muted)', fontFamily: '"Inter",sans-serif' }}>
+              {t} ({tabCounts[t]})
+            </button>
+          ))}
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '11px', outline: 'none', width: '160px', fontFamily: '"Inter",sans-serif' }} />
+        </div>
+        {filtered.length === 0 ? (
+          <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No calls found</div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
+              <thead>
+                <tr style={{ background: 'var(--slate)' }}>
+                  {['Date', 'Customer Name', 'Phone', 'Issue / Intent', 'Booking Made', 'Status'].map(h => (
+                    <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((item, i) => {
+                  const booked = bookingMade(item);
+                  const os = outcomeStyle(item.outcome);
+                  return (
+                    <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: i%2===0 ? '#fff' : 'var(--bg)' }}>
+                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{(item.timestamp||'—').slice(0,16).replace('T',' ')}</td>
+                      <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{item.callerName || '—'}</td>
+                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{item.phone || '—'}</td>
+                      <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{item.intent || '—'}</td>
+                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: '11px', fontWeight: 700, color: booked ? 'var(--a3)' : 'var(--muted)' }}>{booked ? '✓ Yes' : '✗ No'}</span>
+                      </td>
+                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{item.outcome || 'Unknown'}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+    </>
+  );
+}
+
+function ConfigurationSection({ config }: { config: any }) {
+  const [showContactMsg, setShowContactMsg] = useState(false);
+  if (!config) return <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No configuration found</div>;
+
+  const fields = [
+    { label: 'Business Name',  value: config.businessName,    icon: '🏢' },
+    { label: 'Trade Type',     value: config.tradeType,       icon: '🔧' },
+    { label: 'Contact Name',   value: config.contactName,     icon: '👤' },
+    { label: 'Phone Number',   value: config.phone,           icon: '📞', mono: true },
+    { label: 'Twilio Number',  value: config.twilioNumber,    icon: '📱', mono: true },
+    { label: 'Calendar ID',    value: config.calendarId,      icon: '📅', mono: true },
+    { label: 'Sheet ID',       value: config.sheetId,         icon: '📊', mono: true },
+    { label: 'Webhook URL',    value: config.makeWebhookUrl,  icon: '🔗', mono: true },
+    { label: 'Client ID',      value: config.clientId,        icon: '🔑', mono: true },
+    { label: 'Plan Tier',      value: 'Starter',              icon: '⭐' },
+  ].filter(f => f.value);
+
+  return (
+    <Card>
+      <CardHdr title="Client Configuration" sub="Settings from master Google Sheet" badge="read-only" />
+      <div style={{ padding: '16px 16px 0', display: 'flex', flexDirection: 'column' }}>
+        {fields.map(({ label, value, icon, mono }, i) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px', padding: '12px 0', borderBottom: i < fields.length - 1 ? '1px solid var(--slate)' : 'none' }}>
+            <span style={{ fontSize: '16px', flexShrink: 0, width: '24px', textAlign: 'center', marginTop: '1px' }}>{icon}</span>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '3px' }}>{label}</div>
+              <div style={{ fontSize: '12px', color: 'var(--ink)', fontFamily: mono ? '"IBM Plex Mono",monospace' : 'inherit', wordBreak: 'break-all' }}>{value}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ padding: '16px', borderTop: '1px solid var(--divider)', marginTop: '4px' }}>
+        <button onClick={() => setShowContactMsg(m => !m)} style={{ padding: '9px 18px', borderRadius: '8px', background: 'var(--a1)', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: '"Inter",sans-serif' }}>
+          ✏️ Edit Configuration
+        </button>
+        {showContactMsg && (
+          <div style={{ marginTop: '10px', padding: '10px 14px', borderRadius: '8px', background: 'var(--a1b)', border: '1px solid rgba(61,31,168,0.15)', fontSize: '12px', color: 'var(--a1)', fontWeight: 500 }}>
+            To update your configuration, please contact support at <strong>support@tradesai.co.uk</strong>
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
 // ── Section meta ───────────────────────────────────────────────────────────────
 
 const SECTION_META: Record<string, { label: string; sub: string }> = {
@@ -802,8 +1112,12 @@ const SECTION_META: Record<string, { label: string; sub: string }> = {
   revenue:     { label: 'Revenue Tracker',  sub: 'Booking values and revenue totals'              },
   forecast:    { label: 'Forecasting',      sub: 'Trends, projections and call patterns'          },
   reviews:     { label: 'Reviews & Ratings', sub: 'Customer feedback and sentiment analysis'      },
-  config:      { label: 'Configuration',    sub: 'Client settings and AI configuration'           },
-  bookings:    { label: 'Bookings Calendar', sub: 'Monthly view of all scheduled jobs'             },
+  config:          { label: 'Configuration',      sub: 'Client settings and AI configuration'         },
+  bookings:        { label: 'Bookings Calendar',  sub: 'Monthly view of all scheduled jobs'           },
+  'job-schedule':  { label: 'Job Schedule',       sub: 'Sortable table of all booked jobs'            },
+  'lead-pipeline': { label: 'Lead Pipeline',      sub: 'Unbooked interactions and hot leads'          },
+  communications:  { label: 'Communications',     sub: 'Full AI call log and interaction history'     },
+  configuration:   { label: 'Configuration',      sub: 'Client settings and AI configuration'         },
 };
 
 // ── Main component ─────────────────────────────────────────────────────────────
@@ -847,12 +1161,16 @@ export default function AdminClientSection({ clientId, section, user }: { client
       case 'forecast':    return <ForecastSection interactions={interactions} bookings={bookings} />;
       case 'reviews':     return <ReviewsSection interactions={interactions} />;
       case 'config':      return <ConfigSection config={config} />;
-      case 'bookings':    return (
+      case 'bookings':        return (
         <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', padding: '18px' }}>
           <BookingsCalendar bookings={bookings} />
         </div>
       );
-      default:            return null;
+      case 'job-schedule':    return <JobScheduleSection bookings={bookings} />;
+      case 'lead-pipeline':   return <LeadPipelineSection interactions={interactions} bookings={bookings} />;
+      case 'communications':  return <CommunicationsSection interactions={interactions} />;
+      case 'configuration':   return <ConfigurationSection config={config} />;
+      default:                return null;
     }
   }
 

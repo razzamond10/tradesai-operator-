@@ -22,25 +22,25 @@ const NAV_SECTIONS = (id: string) => [
   {
     label: 'Operations',
     items: [
-      { label: 'Job Schedule', icon: '📅', href: `/admin/clients/${id}/schedule` },
+      { label: 'Job Schedule',      icon: '📅', href: `/admin/clients/${id}/job-schedule` },
       { label: 'Bookings Calendar', icon: '🗓️', href: `/admin/clients/${id}/bookings` },
-      { label: 'Lead Pipeline', icon: '📋', href: `/admin/clients/${id}/pipeline` },
-      { label: 'Emergencies', icon: '🚨', href: `/admin/clients/${id}/emergencies` },
-      { label: 'Communications', icon: '💬', href: `/admin/clients/${id}/comms` },
+      { label: 'Lead Pipeline',     icon: '📋', href: `/admin/clients/${id}/lead-pipeline` },
+      { label: 'Emergencies',       icon: '🚨', href: `/admin/clients/${id}/emergencies` },
+      { label: 'Communications',    icon: '💬', href: `/admin/clients/${id}/communications` },
     ],
   },
   {
     label: 'Revenue',
     items: [
-      { label: 'Revenue Tracker', icon: '💰', href: `/admin/clients/${id}/revenue` },
-      { label: 'Forecasting', icon: '📈', href: `/admin/clients/${id}/forecast` },
+      { label: 'Revenue Tracker',   icon: '💰', href: `/admin/clients/${id}/revenue` },
+      { label: 'Forecasting',       icon: '📈', href: `/admin/clients/${id}/forecast` },
       { label: 'Reviews & Ratings', icon: '⭐', href: `/admin/clients/${id}/reviews` },
     ],
   },
   {
     label: 'Settings',
     items: [
-      { label: 'Configuration', icon: '⚙️', href: `/admin/clients/${id}/config` },
+      { label: 'Configuration', icon: '⚙️', href: `/admin/clients/${id}/configuration` },
     ],
   },
 ];
