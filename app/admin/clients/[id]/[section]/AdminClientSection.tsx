@@ -10,6 +10,31 @@ import type { JWTPayload } from '@/lib/auth';
 
 // ── helpers ────────────────────────────────────────────────────────────────────
 
+function exportCSV(filename: string, headers: string[], rows: (string | number)[][]) {
+  const escape = (val: string | number) => {
+    const s = String(val ?? '');
+    if (s.includes(',') || s.includes('"') || s.includes('\n')) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  };
+  const csv = [headers.map(escape).join(','), ...rows.map(r => r.map(escape).join(','))].join('\n');
+  const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function csvFilename(prefix: string, businessName: string) {
+  return `${prefix}_${(businessName || 'client').toLowerCase().replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.csv`;
+}
+
+function ExportButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button onClick={onClick} style={{ padding: '4px 10px', background: 'var(--divider)', border: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: 600, color: 'var(--ink)', cursor: 'pointer', fontFamily: '"Inter",sans-serif', marginLeft: 'auto', flexShrink: 0 }}>
+      ⬇ Export CSV
+    </button>
+  );
+}
+
 function parseValue(v: string) {
   const n = parseFloat((v || '').replace(/[£$€,\s]/g, '').replace(/[^0-9.]/g, '') || '0');
   if (isNaN(n) || n < 0 || n > 99999) return 0;
@@ -305,7 +330,7 @@ function PipelineSection({ interactions, bookings }: { interactions: any[]; book
   );
 }
 
-function EmergenciesSection({ emergencies, clientId }: { emergencies: any[]; clientId: string }) {
+function EmergenciesSection({ emergencies, clientId, businessName = 'client' }: { emergencies: any[]; clientId: string; businessName?: string }) {
   const [filter, setFilter] = useState<'all'|'active'|'resolved'>('all');
   const [resolving, setResolving] = useState<Record<number, boolean>>({});
   const [localResolved, setLocalResolved] = useState<Record<number, boolean>>({});
@@ -346,7 +371,7 @@ function EmergenciesSection({ emergencies, clientId }: { emergencies: any[]; cli
 
       <Card>
         <CardHdr title="Emergency Log" sub="Urgent calls requiring action" />
-        <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--divider)', display: 'flex', gap: '6px' }}>
+        <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--divider)', display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap' }}>
           {(['all','active','resolved'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer',
@@ -356,6 +381,11 @@ function EmergenciesSection({ emergencies, clientId }: { emergencies: any[]; cli
               {f === 'all' ? `All (${emergencies.length})` : f === 'active' ? `Active (${active.length})` : `Resolved (${resolved.length})`}
             </button>
           ))}
+          <ExportButton onClick={() => exportCSV(
+            csvFilename('emergencies', businessName),
+            ['Timestamp', 'Customer', 'Phone', 'Postcode', 'Severity', 'Issue', 'Resolved'],
+            emergencies.map(e => [e.timestamp || '', e.callerName || '', e.phone || '', e.postcode || '', e.severity || '', e.notes || e.issue || '', (e.resolved || '').toLowerCase() === 'yes' ? 'Yes' : 'No'])
+          )} />
         </div>
         <div style={{ padding: '10px' }}>
           {filtered.length === 0 ? (
@@ -544,7 +574,7 @@ function CommsSection({ interactions }: { interactions: any[] }) {
   );
 }
 
-function RevenueSection({ bookings }: { bookings: any[] }) {
+function RevenueSection({ bookings, businessName = 'client' }: { bookings: any[]; businessName?: string }) {
   const [statusFilter, setStatusFilter] = useState('all');
 
   const revTotal = bookings.reduce((s, b) => s + parseValue(b.value), 0);
@@ -581,7 +611,7 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
 
       <Card>
         <CardHdr title="Bookings" sub="All jobs with revenue" badge={`${filtered.length} entries`} badgeColor="#C9A84C" />
-        <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--divider)', display: 'flex', gap: '4px' }}>
+        <div style={{ padding: '8px 12px', borderBottom: '1px solid var(--divider)', display: 'flex', gap: '4px', alignItems: 'center', flexWrap: 'wrap' }}>
           {['all', ...distinctStatuses].map(s => (
             <button key={s} onClick={() => setStatusFilter(s)} style={{
               padding: '3px 9px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer',
@@ -589,6 +619,11 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
               fontFamily: '"Inter",sans-serif', textTransform: 'capitalize',
             }}>{s}</button>
           ))}
+          <ExportButton onClick={() => exportCSV(
+            csvFilename('revenue', businessName),
+            ['Date', 'Customer', 'Phone', 'Issue', 'Status', 'Value (£)'],
+            bookings.map(b => [b.scheduledDate || b.timestamp || '', b.customerName || '', b.phone || '', b.jobType || b.issue || '', b.status || '', parseValue(b.value)])
+          )} />
         </div>
         <>
           {/* Desktop table */}
@@ -1076,7 +1111,7 @@ function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; 
 const COMMS_TABS = ['All', 'Booked', 'Quoted', 'Emergency', 'Follow-up'] as const;
 type CommsTab = typeof COMMS_TABS[number];
 
-function CommunicationsSection({ interactions }: { interactions: any[] }) {
+function CommunicationsSection({ interactions, businessName = 'client' }: { interactions: any[]; businessName?: string }) {
   const [tab, setTab] = useState<CommsTab>('All');
   const [search, setSearch] = useState('');
   const [selectedCall, setSelectedCall] = useState<any>(null);
@@ -1128,7 +1163,12 @@ function CommunicationsSection({ interactions }: { interactions: any[] }) {
               {t} ({tabCounts[t]})
             </button>
           ))}
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '11px', outline: 'none', width: '160px', fontFamily: '"Inter",sans-serif' }} />
+          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '11px', outline: 'none', width: '140px', fontFamily: '"Inter",sans-serif' }} />
+          <ExportButton onClick={() => exportCSV(
+            csvFilename('communications', businessName),
+            ['Timestamp', 'Customer', 'Phone', 'Postcode', 'Issue / Intent', 'Outcome', 'Booking Made', 'Notes'],
+            interactions.map(i => [i.timestamp || '', i.callerName || '', i.phone || '', i.postcode || '', i.intent || '', i.outcome || '', (i.outcome || '').toLowerCase().includes('book') ? 'Yes' : 'No', i.notes || ''])
+          )} />
         </div>
         {filtered.length === 0 ? (
           <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No calls found</div>
@@ -1304,7 +1344,7 @@ const SECTION_META: Record<string, { label: string; sub: string }> = {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function AdminClientSection({ clientId, section, user }: { clientId: string; section: string; user: JWTPayload }) {
+export default function AdminClientSection({ clientId, section, user, isDemoEmpty = false }: { clientId: string; section: string; user: JWTPayload; isDemoEmpty?: boolean }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -1321,6 +1361,7 @@ export default function AdminClientSection({ clientId, section, user }: { client
   const bookings: any[] = data?.bookings || [];
   const emergencies: any[] = data?.emergencies || [];
   const config = data?.config || null;
+  const businessName: string = config?.businessName || 'client';
 
   const meta = SECTION_META[section] || { label: section, sub: '' };
 
@@ -1333,26 +1374,38 @@ export default function AdminClientSection({ clientId, section, user }: { client
     if (error) return (
       <div style={{ padding: '16px', background: 'var(--a4b)', border: '1px solid #F5C0C8', borderRadius: '8px', color: 'var(--a4)', fontSize: '12px' }}>⚠ {error}</div>
     );
+    const db = isDemoEmpty ? [] : bookings;
+    const di = isDemoEmpty ? [] : interactions;
+    const de = isDemoEmpty ? [] : emergencies;
     switch (section) {
-      case 'analytics':   return <AnalyticsSection interactions={interactions} bookings={bookings} />;
-      case 'schedule':    return <ScheduleSection bookings={bookings} />;
-      case 'pipeline':    return <PipelineSection interactions={interactions} bookings={bookings} />;
-      case 'emergencies': return <EmergenciesSection emergencies={emergencies} clientId={clientId} />;
-      case 'comms':       return <CommsSection interactions={interactions} />;
-      case 'revenue':     return <RevenueSection bookings={bookings} />;
-      case 'forecast':    return <ForecastSection interactions={interactions} bookings={bookings} />;
-      case 'reviews':     return <ReviewsSection interactions={interactions} />;
+      case 'analytics':   return <AnalyticsSection interactions={di} bookings={db} />;
+      case 'schedule':    return <ScheduleSection bookings={db} />;
+      case 'pipeline':    return <PipelineSection interactions={di} bookings={db} />;
+      case 'emergencies': return <EmergenciesSection emergencies={de} clientId={clientId} businessName={businessName} />;
+      case 'comms':       return <CommsSection interactions={di} />;
+      case 'revenue':     return <RevenueSection bookings={db} businessName={businessName} />;
+      case 'forecast':    return <ForecastSection interactions={di} bookings={db} />;
+      case 'reviews':     return <ReviewsSection interactions={di} />;
       case 'config':      return <ConfigSection config={config} />;
-      case 'bookings':        return bookings.length === 0 ? (
+      case 'bookings':        return db.length === 0 ? (
         <EmptyState icon="📅" title="No bookings yet" sub="Bookings from your AI will appear here as they're scheduled." />
       ) : (
-        <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', padding: '18px' }}>
-          <BookingsCalendar bookings={bookings} />
-        </div>
+        <>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+            <ExportButton onClick={() => exportCSV(
+              csvFilename('bookings', businessName),
+              ['Date', 'Customer', 'Phone', 'Postcode', 'Issue', 'Status', 'Value (£)'],
+              db.map(b => [b.scheduledDate || b.timestamp || '', b.customerName || '', b.phone || '', b.postcode || '', b.jobType || b.issue || '', b.status || '', parseValue(b.value)])
+            )} />
+          </div>
+          <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', padding: '18px' }}>
+            <BookingsCalendar bookings={db} />
+          </div>
+        </>
       );
-      case 'job-schedule':    return <JobScheduleSection bookings={bookings} />;
-      case 'lead-pipeline':   return <LeadPipelineSection interactions={interactions} bookings={bookings} />;
-      case 'communications':  return <CommunicationsSection interactions={interactions} />;
+      case 'job-schedule':    return <JobScheduleSection bookings={db} />;
+      case 'lead-pipeline':   return <LeadPipelineSection interactions={di} bookings={db} />;
+      case 'communications':  return <CommunicationsSection interactions={di} businessName={businessName} />;
       case 'configuration':   return <ConfigurationSection config={config} />;
       default:                return null;
     }

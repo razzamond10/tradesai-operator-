@@ -10,13 +10,16 @@ const VALID_SECTIONS = [
 
 export default async function AdminClientSectionPage({
   params,
+  searchParams,
 }: {
   params: { id: string; section: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   const token = cookies().get('tradesai_token')?.value;
   if (!token) redirect('/login');
   const user = await verifyJWT(token);
   if (!user || user.role !== 'admin') redirect('/login');
   if (!VALID_SECTIONS.includes(params.section)) redirect(`/admin/clients/${params.id}`);
-  return <AdminClientSection clientId={params.id} section={params.section} user={user} />;
+  const isDemoEmpty = searchParams?.demo === 'empty';
+  return <AdminClientSection clientId={params.id} section={params.section} user={user} isDemoEmpty={isDemoEmpty} />;
 }
