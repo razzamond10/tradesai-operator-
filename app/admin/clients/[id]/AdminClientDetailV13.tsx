@@ -171,7 +171,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
   const [chartMode, setChartMode] = useState<'today' | 'week' | 'month'>('today');
 
   useEffect(() => {
-    fetch(`/api/clients/${clientId}/data`)
+    fetch(`/api/clients/${encodeURIComponent(clientId)}/data`)
       .then((r) => r.json())
       .then((d) => { if (d.error) setError(d.error); else setData(d); })
       .catch(() => setError('Failed to load client data'))

@@ -22,7 +22,7 @@ export async function POST(
     return NextResponse.json({ error: 'rowIndex (number) required' }, { status: 400 });
   }
 
-  const config = await getClientConfig(params.clientId);
+  const config = await getClientConfig(decodeURIComponent(params.clientId));
   if (!config?.sheetId) return NextResponse.json({ error: 'Client not found' }, { status: 404 });
 
   await resolveEmergency(config.sheetId, rowIndex);

@@ -24,7 +24,7 @@ export async function GET(
   }
 
   try {
-    const config = await getClientConfig(params.clientId);
+    const config = await getClientConfig(decodeURIComponent(params.clientId));
     if (!config) return NextResponse.json({ error: `Client "${params.clientId}" not found in master sheet` }, { status: 404 });
 
     console.log(`[data] Config for ${params.clientId}: businessName="${config.businessName}" sheetId="${config.sheetId}"`);

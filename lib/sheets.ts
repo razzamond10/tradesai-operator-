@@ -109,17 +109,30 @@ export async function getClientConfigs(): Promise<ClientConfig[]> {
   });
 }
 
+/** Normalise a phone string for comparison: decode %2B, collapse to digits-only with optional leading + */
+function normalisePhone(raw: string): string {
+  return decodeURIComponent(raw).replace(/\s/g, '');
+}
+
 export async function getClientConfig(
   id: string
 ): Promise<ClientConfig | null> {
   const configs = await getClientConfigs();
-  const normalId = id.toLowerCase();
-  return configs.find((c) =>
-    c.clientId === id ||
-    c.twilioNumber === id ||
-    c.slug === normalId ||
-    toSlug(c.businessName) === normalId
-  ) || null;
+  const decoded = decodeURIComponent(id);
+  const normalId = decoded.toLowerCase();
+  const normPhone = normalisePhone(id);
+  return configs.find((c) => {
+    if (c.clientId === decoded || c.clientId === id) return true;
+    if (c.twilioNumber) {
+      const t = c.twilioNumber.trim();
+      if (t === decoded || t === normPhone) return true;
+      // strip leading + from both sides and compare digits
+      if (t.replace(/^\+/, '') === normPhone.replace(/^\+/, '')) return true;
+    }
+    if (c.slug === normalId) return true;
+    if (toSlug(c.businessName) === normalId) return true;
+    return false;
+  }) || null;
 }
 
 // ── InteractionsLog ──────────────────────────────────────────────────────────

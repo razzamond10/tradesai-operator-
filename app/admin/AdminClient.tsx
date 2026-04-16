@@ -48,7 +48,7 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
   useEffect(() => {
     if (clients.length === 0) return;
     clients.forEach((client) => {
-      fetch(`/api/clients/${client.clientId}/data`)
+      fetch(`/api/clients/${encodeURIComponent(client.clientId)}/data`)
         .then((r) => r.json())
         .then((d) => {
           const interactions: any[] = d.interactions || [];
@@ -246,7 +246,7 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
               return (
                 <button
                   key={client.clientId}
-                  onClick={() => router.push(`/admin/clients/${client.clientId}`)}
+                  onClick={() => router.push(`/admin/clients/${encodeURIComponent(client.clientId)}`)}
                   style={{
                     background: '#fff', borderRadius: '10px', padding: '0',
                     border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)',

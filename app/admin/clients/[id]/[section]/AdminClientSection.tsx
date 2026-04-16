@@ -347,7 +347,7 @@ function EmergenciesSection({ emergencies, clientId }: { emergencies: any[]; cli
                               if (dataIdx < 0) return;
                               setResolving(prev => ({ ...prev, [dataIdx]: true }));
                               try {
-                                await fetch(`/api/clients/${clientId}/emergencies/resolve`, {
+                                await fetch(`/api/clients/${encodeURIComponent(clientId)}/emergencies/resolve`, {
                                   method: 'POST',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ rowIndex: dataIdx }),
@@ -721,7 +721,7 @@ export default function AdminClientSection({ clientId, section, user }: { client
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`/api/clients/${clientId}/data`)
+    fetch(`/api/clients/${encodeURIComponent(clientId)}/data`)
       .then(r => r.json())
       .then(d => { if (d.error) setError(d.error); else setData(d); })
       .catch(() => setError('Failed to load client data'))
