@@ -125,6 +125,7 @@ function HourBarChart({ interactions }: { interactions: any[] }) {
   const chartRef = useRef<any>(null);
 
   useEffect(() => {
+    console.log('[HourBarChart] render', { interactions: interactions.length, sample: interactions.slice(0,2).map(i => i.timestamp) });
     // All-time distribution by hour — not filtered to today so historical data always shows
     const hours = new Array(24).fill(0);
     interactions.forEach(i => {
@@ -134,10 +135,12 @@ function HourBarChart({ interactions }: { interactions: any[] }) {
 
     const labels = Array.from({ length: 24 }, (_, i) => `${i}:00`);
 
+    console.log('[HourBarChart] hours', hours.reduce((s, v) => s + v, 0), 'total calls mapped to hours');
+
     import('chart.js').then(({ Chart, CategoryScale, LinearScale, BarElement, Tooltip }) => {
       Chart.register(CategoryScale, LinearScale, BarElement, Tooltip);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
-      if (!canvasRef.current) return;
+      if (!canvasRef.current) { console.warn('[HourBarChart] canvas not ready'); return; }
       chartRef.current = new Chart(canvasRef.current, {
         type: 'bar',
         data: {

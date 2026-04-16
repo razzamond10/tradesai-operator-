@@ -18,6 +18,8 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
   const chartRef = useRef<any>(null);
 
   useEffect(() => {
+    console.log('[ActivityLineChart] render', { mode, interactions: interactions.length, bookings: bookings.length, sample: interactions.slice(0,2).map(i => i.timestamp) });
+
     let labels: string[] = [];
     let callData: number[] = [];
     let bookingData: number[] = [];
@@ -87,10 +89,12 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
       }
     }
 
+    console.log('[ActivityLineChart] computed', { mode, labels, callData, bookingData });
+
     import('chart.js').then(({ Chart, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend }) => {
       Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
-      if (!canvasRef.current) return;
+      if (!canvasRef.current) { console.warn('[ActivityLineChart] canvas not ready'); return; }
 
       chartRef.current = new Chart(canvasRef.current, {
         type: 'line',

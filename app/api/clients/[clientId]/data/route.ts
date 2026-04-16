@@ -83,6 +83,16 @@ export async function GET(
         bookings: bookings.slice(0, 3).map((r) => r.timestamp),
       },
       sampleValues: bookings.slice(0, 3).map((r) => r.value),
+      // Raw booking field check — verifies column mapping is correct
+      sampleBookingRaw: bookings.slice(0, 2).map((b) => ({
+        customerName: b.customerName,
+        postcode: b.postcode,
+        jobType: b.jobType,
+        scheduledDate: b.scheduledDate,
+        status: b.status,
+        calendarEventId: b.calendarEventId?.slice(0, 10),
+        value: b.value,
+      })),
     };
 
     return NextResponse.json({

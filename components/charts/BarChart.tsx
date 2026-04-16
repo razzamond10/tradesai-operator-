@@ -12,6 +12,8 @@ export default function BarChart({ bookings }: { bookings: any[] }) {
   const chartRef = useRef<any>(null);
 
   useEffect(() => {
+    console.log('[BarChart] render', { bookings: bookings.length, sample: bookings.slice(0,2).map(b => ({ jobType: b.jobType, value: b.value })) });
+
     const jobRevenue: Record<string, number> = {};
     const jobCount: Record<string, number> = {};
     bookings.forEach(b => {
@@ -36,10 +38,12 @@ export default function BarChart({ bookings }: { bookings: any[] }) {
       ? (ctx: any) => ` ${ctx.raw} booking${ctx.raw === 1 ? '' : 's'}`
       : (ctx: any) => ` £${ctx.raw.toLocaleString()}`;
 
+    console.log('[BarChart] computed', { useCount, labels, data });
+
     import('chart.js').then(({ Chart, CategoryScale, LinearScale, BarElement, Tooltip }) => {
       Chart.register(CategoryScale, LinearScale, BarElement, Tooltip);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
-      if (!canvasRef.current) return;
+      if (!canvasRef.current) { console.warn('[BarChart] canvas not ready'); return; }
 
       chartRef.current = new Chart(canvasRef.current, {
         type: 'bar',
