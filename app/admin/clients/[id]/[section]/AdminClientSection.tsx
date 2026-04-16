@@ -54,7 +54,7 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 
 function CardHdr({ title, sub, badge, badgeColor }: { title: string; sub?: string; badge?: string; badgeColor?: string }) {
   return (
-    <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+    <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', minHeight: '76px' }}>
       <div style={{ minWidth: 0 }}>
         <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>{title}</div>
         {sub && <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>{sub}</div>}
@@ -68,20 +68,20 @@ function CardHdr({ title, sub, badge, badgeColor }: { title: string; sub?: strin
 
 function KPICard({ stripe, iconBg, icon, label, value, sub, badge }: { stripe: string; iconBg: string; icon: string; label: string; value: string | number; sub: string; badge?: string }) {
   return (
-    <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', overflow: 'hidden', minHeight: '120px', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
       <div style={{ height: '3px', background: stripe, flexShrink: 0 }} />
-      <div style={{ padding: '14px', display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'space-between' }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <div style={{ width: '28px', height: '28px', borderRadius: '7px', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>{icon}</div>
-            {badge && <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: iconBg, color: stripe }}>{badge}</span>}
-          </div>
-          <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'var(--muted)', marginBottom: '4px', minHeight: '2.4em' }}>{label}</div>
+      <div style={{ padding: '14px', display: 'flex', flexDirection: 'column' }}>
+        {/* Icon slot — fixed height so label always starts at same Y */}
+        <div style={{ height: '36px', marginBottom: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ width: '28px', height: '28px', borderRadius: '7px', background: iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>{icon}</div>
+          {badge && <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: iconBg, color: stripe }}>{badge}</span>}
         </div>
-        <div>
-          <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '28px', fontWeight: 900, color: 'var(--ink)', lineHeight: 1.1 }}>{value}</div>
-          <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '4px' }}>{sub}</div>
-        </div>
+        {/* Label slot — fixed minHeight so value always starts at same Y regardless of wrap */}
+        <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'var(--muted)', lineHeight: '1.3', minHeight: '2.8em', marginBottom: '8px' }}>{label}</div>
+        {/* Value slot — pinned to same Y on every card */}
+        <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '28px', fontWeight: 900, color: 'var(--ink)', lineHeight: 1.1, marginBottom: '4px' }}>{value}</div>
+        {/* Sub slot */}
+        <div style={{ fontSize: '10px', color: 'var(--muted)' }}>{sub}</div>
       </div>
     </div>
   );
