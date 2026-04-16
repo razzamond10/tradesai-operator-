@@ -124,6 +124,15 @@ function HourBarChart({ interactions }: { interactions: any[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<any>(null);
 
+  if (interactions.length === 0) {
+    return (
+      <div style={{ height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '6px' }}>
+        <div style={{ fontSize: '20px' }}>📊</div>
+        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)' }}>Not enough data yet</div>
+      </div>
+    );
+  }
+
   useEffect(() => {
     console.log('[HourBarChart] render', { interactions: interactions.length, sample: interactions.slice(0,2).map(i => i.timestamp) });
     // All-time distribution by hour — not filtered to today so historical data always shows

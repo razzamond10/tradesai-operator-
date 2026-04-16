@@ -582,19 +582,40 @@ function ForecastSection({ interactions, bookings }: { interactions: any[]; book
   const callsByDay = days.map(d => interactions.filter(i => (i.timestamp||'').startsWith(d)).length);
   const revByDay = days.map(d => bookings.filter(b => (b.timestamp||'').startsWith(d)).reduce((s, b) => s + parseValue(b.value), 0));
 
-  const avgCalls = Math.round(callsByDay.reduce((a, b) => a + b, 0) / 30);
-  const avgRev = Math.round(revByDay.reduce((a, b) => a + b, 0) / 30);
+  const totalCalls30 = callsByDay.reduce((a, b) => a + b, 0);
+  const totalRev30   = revByDay.reduce((a, b) => a + b, 0);
 
-  const projCalls30 = avgCalls * 30;
-  const projRev30 = avgRev * 30;
+  // Use all-time data for averages when the 30-day window has too few points
+  const effectiveCalls = totalCalls30 > 0 ? totalCalls30 : interactions.length;
+  const effectiveDays  = totalCalls30 > 0 ? 30 : Math.max(
+    (() => {
+      const dates = [...new Set(interactions.map(i => (i.timestamp||'').slice(0,10)).filter(Boolean))];
+      if (dates.length < 2) return 1;
+      const span = (new Date(dates[dates.length-1]).getTime() - new Date(dates[0]).getTime()) / 86400000;
+      return Math.max(Math.round(span) + 1, 1);
+    })(),
+    1
+  );
+
+  const avgCallsRaw = effectiveCalls / effectiveDays;
+  // Show 1 decimal when fractional to avoid rounding to 0
+  const avgCallsDisplay = avgCallsRaw === 0 ? '0' : avgCallsRaw < 1 ? avgCallsRaw.toFixed(1) : String(Math.round(avgCallsRaw));
+
+  const effectiveRev  = totalRev30 > 0 ? totalRev30 : bookings.reduce((s, b) => s + parseValue(b.value), 0);
+  const effectiveRevDays = totalRev30 > 0 ? 30 : Math.max(effectiveDays, 1);
+  const avgRevRaw = effectiveRev / effectiveRevDays;
+
+  // 30-day projection: extrapolate from observed rate
+  const projCalls30 = Math.round(avgCallsRaw * 30);
+  const projRev30   = Math.round(avgRevRaw * 30);
 
   return (
     <>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
-        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📞" label="Avg Daily Calls" value={avgCalls} sub="last 30 days" />
-        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💰" label="Avg Daily Revenue" value={fmtCurrency(avgRev)} sub="last 30 days" />
-        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📈" label="Projected Calls (30d)" value={projCalls30} sub="based on trend" />
-        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💷" label="Projected Revenue (30d)" value={fmtCurrency(projRev30)} sub="based on trend" />
+        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📞" label="Avg Daily Calls" value={avgCallsDisplay} sub="per day (all-time rate)" />
+        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💰" label="Avg Daily Revenue" value={fmtCurrency(avgRevRaw)} sub="per day (all-time rate)" />
+        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📈" label="Projected Calls (30d)" value={projCalls30} sub="at current rate" />
+        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💷" label="Projected Revenue (30d)" value={fmtCurrency(projRev30)} sub="at current rate" />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>

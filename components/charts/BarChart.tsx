@@ -7,9 +7,23 @@ function safeValue(raw: string): number {
   return n;
 }
 
+const NO_DATA_STYLE: React.CSSProperties = {
+  height: '160px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+  flexDirection: 'column', gap: '6px',
+};
+
 export default function BarChart({ bookings }: { bookings: any[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<any>(null);
+
+  if (bookings.length === 0) {
+    return (
+      <div style={NO_DATA_STYLE}>
+        <div style={{ fontSize: '20px' }}>📊</div>
+        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)' }}>Not enough data yet</div>
+      </div>
+    );
+  }
 
   useEffect(() => {
     console.log('[BarChart] render', { bookings: bookings.length, sample: bookings.slice(0,2).map(b => ({ jobType: b.jobType, value: b.value })) });

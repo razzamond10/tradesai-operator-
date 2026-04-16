@@ -24,9 +24,21 @@ function CardHdr({ title, sub, badge, badgeColor }: { title: string; sub?: strin
 }
 
 // 30-day trend chart
+function EmptyChart({ height = 220 }: { height?: number }) {
+  return (
+    <div style={{ height, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: '6px' }}>
+      <div style={{ fontSize: '22px' }}>📊</div>
+      <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)' }}>Not enough data yet</div>
+      <div style={{ fontSize: '10px', color: '#B0A8D0' }}>Data will appear once calls are logged</div>
+    </div>
+  );
+}
+
 function TrendChart({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<any>(null);
+
+  if (interactions.length === 0 && bookings.length === 0) return <EmptyChart height={220} />;
 
   useEffect(() => {
     const days: string[] = [];
@@ -34,12 +46,23 @@ function TrendChart({ interactions, bookings }: { interactions: any[]; bookings:
       const d = new Date(); d.setDate(d.getDate() - i);
       days.push(d.toISOString().slice(0, 10));
     }
-    const labels = days.map(d => {
-      const dt = new Date(d);
-      return `${dt.getDate()}/${dt.getMonth() + 1}`;
+
+    // Collect all unique dates from actual data
+    const allDataDates = [...new Set([
+      ...interactions.map(i => (i.timestamp || '').slice(0, 10)),
+      ...bookings.map(b => (b.timestamp || '').slice(0, 10)),
+    ].filter(d => d.length === 10))].sort();
+    const activeDaysIn30 = days.filter(d => allDataDates.includes(d));
+
+    // When fewer than 3 distinct active days in the 30-day window, show individual date points
+    const useDates = activeDaysIn30.length >= 3 ? days : allDataDates;
+
+    const labels = useDates.map(d => {
+      const dt = new Date(d + 'T00:00:00');
+      return dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
     });
-    const callData = days.map(d => interactions.filter(i => (i.timestamp || '').startsWith(d)).length);
-    const bookingData = days.map(d => bookings.filter(b => (b.timestamp || '').startsWith(d)).length);
+    const callData = useDates.map(d => interactions.filter(i => (i.timestamp || '').startsWith(d)).length);
+    const bookingData = useDates.map(d => bookings.filter(b => (b.timestamp || '').startsWith(d)).length);
 
     import('chart.js').then(({ Chart, LineController, PointElement, LineElement, CategoryScale, LinearScale, Filler, Tooltip, Legend }) => {
       Chart.register(LineController, PointElement, LineElement, CategoryScale, LinearScale, Filler, Tooltip, Legend);
@@ -74,6 +97,8 @@ function TrendChart({ interactions, bookings }: { interactions: any[]; bookings:
 function DowChart({ interactions }: { interactions: any[] }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<any>(null);
+
+  if (interactions.length === 0) return <EmptyChart height={160} />;
 
   useEffect(() => {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
