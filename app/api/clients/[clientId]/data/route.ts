@@ -66,12 +66,25 @@ export async function GET(
 
     const kpis = computeKPIs(interactions, bookings, emergencies);
 
+    // _debug is stripped in production use but lets us diagnose without Vercel log access
+    const _debug = {
+      sheetId,
+      configBusinessName: config.businessName,
+      rawTotals: { interactions: allInteractions.length, bookings: allBookings.length, emergencies: allEmergencies.length },
+      filteredTotals: { interactions: interactions.length, bookings: bookings.length, emergencies: emergencies.length },
+      sampleBusinessNames: {
+        interactions: allInteractions.slice(0, 3).map((r) => r.businessName),
+        bookings: allBookings.slice(0, 3).map((r) => r.businessName),
+      },
+    };
+
     return NextResponse.json({
       config,
       kpis,
       interactions: interactions.slice(0, 100),
       bookings: bookings.slice(0, 100),
       emergencies: emergencies.slice(0, 50),
+      _debug,
     });
   } catch (err: any) {
     console.error('[data] Fatal error:', err?.message ?? err);
