@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import AdminClientShell from '@/components/AdminClientShell';
 import Topbar from '@/components/Topbar';
 import ActivityLineChart from '@/components/charts/ActivityLineChart';
@@ -75,20 +77,39 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
   );
 }
 
-function CardHdr({ title, sub, badge, badgeColor }: { title: string; sub?: string; badge?: string; badgeColor?: string }) {
+// Clickable card that navigates to a section page
+function NavCard({ href, children, style }: { href: string; children: React.ReactNode; style?: React.CSSProperties }) {
+  return (
+    <Link href={href} style={{ textDecoration: 'none', display: 'block', ...style }} className="nav-card-link">
+      <div className="nav-card" style={{
+        background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)',
+        boxShadow: 'var(--shadow-s)', overflow: 'hidden', cursor: 'pointer',
+      }}>
+        {children}
+      </div>
+    </Link>
+  );
+}
+
+function CardHdr({ title, sub, badge, badgeColor, viewHref }: { title: string; sub?: string; badge?: string; badgeColor?: string; viewHref?: string }) {
   return (
     <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
       <div>
         <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>{title}</div>
         {sub && <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>{sub}</div>}
       </div>
-      {badge && (
-        <span style={{
-          fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px',
-          background: badgeColor ? `${badgeColor}18` : 'var(--slate)',
-          color: badgeColor || 'var(--muted)',
-        }}>{badge}</span>
-      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {badge && (
+          <span style={{
+            fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px',
+            background: badgeColor ? `${badgeColor}18` : 'var(--slate)',
+            color: badgeColor || 'var(--muted)',
+          }}>{badge}</span>
+        )}
+        {viewHref && (
+          <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--a1)', opacity: 0.7 }}>View all ›</span>
+        )}
+      </div>
     </div>
   );
 }
@@ -143,6 +164,7 @@ function HourBarChart({ interactions }: { interactions: any[] }) {
 // ── Main component ─────────────────────────────────────────────────────────────
 
 export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayload; clientId: string }) {
+  const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -218,6 +240,8 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
     return { bg: 'var(--slate)', color: 'var(--muted)' };
   };
 
+  const base = `/admin/clients/${clientId}`;
+
   return (
     <AdminClientShell
       clientId={clientId}
@@ -259,7 +283,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '18px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '14px' }}>
               <KPICard
                 stripe="var(--a1)" iconBg="var(--a1b)" icon="📞"
                 badge={`+${Math.max(0, kpis.callsToday - 1)} vs yesterday`}
@@ -281,6 +305,24 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                 badgeWarn={openEmergencies.length > 0}
                 label="Emergencies" value={openEmergencies.length} sub="active today"
               />
+            </div>
+
+            {/* Quick Actions */}
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '18px' }}>
+              {[
+                { label: 'View All Calls', href: `${base}/comms`, icon: '📞', bg: 'var(--a1b)', color: 'var(--a1)' },
+                { label: 'Add Booking', href: `${base}/schedule`, icon: '📅', bg: 'var(--a3b)', color: 'var(--a3)' },
+                { label: 'Flag Emergency', href: `${base}/emergencies`, icon: '🚨', bg: 'var(--a4b)', color: 'var(--a4)' },
+              ].map(a => (
+                <button key={a.label} onClick={() => router.push(a.href)} style={{
+                  display: 'flex', alignItems: 'center', gap: '6px',
+                  padding: '7px 14px', borderRadius: '8px', border: `1px solid ${a.color}30`,
+                  background: a.bg, color: a.color, fontSize: '11px', fontWeight: 700,
+                  cursor: 'pointer', fontFamily: '"Inter",sans-serif', transition: 'all .15s',
+                }}>
+                  <span>{a.icon}</span> {a.label}
+                </button>
+              ))}
             </div>
 
             {/* Row 1: Line chart + 2 donuts */}
@@ -317,8 +359,8 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                 </div>
               </Card>
 
-              <Card>
-                <CardHdr title="Lead Sources" sub="Where enquiries originate" />
+              <NavCard href={`${base}/pipeline`}>
+                <CardHdr title="Lead Sources" sub="Where enquiries originate" viewHref={`${base}/pipeline`} />
                 <div style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
                   <DonutChart data={srcData} total={interactions.length} centerLabel="CALLS" />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -332,10 +374,10 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                     {srcData.length === 0 && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>No data</span>}
                   </div>
                 </div>
-              </Card>
+              </NavCard>
 
-              <Card>
-                <CardHdr title="Pipeline Status" sub="Current lead breakdown" />
+              <NavCard href={`${base}/pipeline`}>
+                <CardHdr title="Pipeline Status" sub="Current lead breakdown" viewHref={`${base}/pipeline`} />
                 <div style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
                   <DonutChart data={pipeData} total={interactions.length} centerLabel="LEADS" />
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
@@ -349,17 +391,17 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                     {pipeData.length === 0 && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>No data</span>}
                   </div>
                 </div>
-              </Card>
+              </NavCard>
             </div>
 
             {/* Row 2: Bar chart + Hour bar + Live alerts */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-              <Card>
-                <CardHdr title="Revenue by Job Type" sub="This month — estimated from bookings" badge={fmtCurrency(revTotal)} badgeColor="var(--a1)" />
+              <NavCard href={`${base}/revenue`}>
+                <CardHdr title="Revenue by Job Type" sub="This month — estimated from bookings" badge={fmtCurrency(revTotal)} badgeColor="var(--a1)" viewHref={`${base}/revenue`} />
                 <div style={{ padding: '12px' }}>
                   <BarChart bookings={bookings} />
                 </div>
-              </Card>
+              </NavCard>
 
               <Card>
                 <CardHdr title="Calls by Hour" sub="Today's call distribution" />
@@ -368,12 +410,15 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                 </div>
               </Card>
 
-              <Card>
+              <NavCard href={`${base}/emergencies`}>
                 <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>Live Alerts</div>
-                  <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: openEmergencies.length > 0 ? 'var(--a4b)' : 'var(--slate)', color: openEmergencies.length > 0 ? 'var(--a4)' : 'var(--muted)' }}>
-                    {openEmergencies.length}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: openEmergencies.length > 0 ? 'var(--a4b)' : 'var(--slate)', color: openEmergencies.length > 0 ? 'var(--a4)' : 'var(--muted)' }}>
+                      {openEmergencies.length}
+                    </span>
+                    <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--a1)', opacity: 0.7 }}>View all ›</span>
+                  </div>
                 </div>
                 <div style={{ padding: '8px 14px', maxHeight: '210px', overflowY: 'auto' }}>
                   {openEmergencies.length === 0 ? (
@@ -389,17 +434,18 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                     </div>
                   ))}
                 </div>
-              </Card>
+              </NavCard>
             </div>
 
             {/* Row 3: Job Schedule + Performance + Activity Feed */}
             <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-              <Card>
+              <NavCard href={`${base}/schedule`}>
                 <CardHdr
                   title="Job Schedule"
                   sub={upcoming.length > 0 ? `Next: ${upcoming[0]?.scheduledDate || '—'}` : 'No upcoming jobs'}
                   badge={String(upcoming.length)}
                   badgeColor="var(--a1)"
+                  viewHref={`${base}/schedule`}
                 />
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
@@ -431,10 +477,10 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                     </tbody>
                   </table>
                 </div>
-              </Card>
+              </NavCard>
 
-              <Card>
-                <CardHdr title="Performance" badge="Month" badgeColor="var(--a3)" />
+              <NavCard href={`${base}/analytics`}>
+                <CardHdr title="Performance" badge="Month" badgeColor="var(--a3)" viewHref={`${base}/analytics`} />
                 <div style={{ padding: '12px 14px' }}>
                   {[
                     { label: 'Conversion Rate', value: `${convRate}%`, pct: convRate, color: 'var(--a3)' },
@@ -453,10 +499,10 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                     </div>
                   ))}
                 </div>
-              </Card>
+              </NavCard>
 
-              <Card>
-                <CardHdr title="Activity Feed" badge="Live" badgeColor="var(--a3)" />
+              <NavCard href={`${base}/comms`}>
+                <CardHdr title="Activity Feed" badge="Live" badgeColor="var(--a3)" viewHref={`${base}/comms`} />
                 <div style={{ padding: '8px 14px', maxHeight: '250px', overflowY: 'auto' }}>
                   {feed.length === 0 ? (
                     <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--muted)', fontSize: '11px' }}>No activity yet</div>
@@ -479,7 +525,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                     </div>
                   ))}
                 </div>
-              </Card>
+              </NavCard>
             </div>
 
             {/* Job Status Pipeline */}
@@ -489,10 +535,13 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                 <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>Full journey — new lead to paid invoice</div>
               </div>
             </div>
-            <Card style={{ marginBottom: '12px' }}>
+            <NavCard href={`${base}/pipeline`} style={{ marginBottom: '12px' }}>
               <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>Pipeline Stages</div>
-                <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: 'var(--a1b)', color: 'var(--a1)' }}>{pipelineTotal} total</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: 'var(--a1b)', color: 'var(--a1)' }}>{pipelineTotal} total</span>
+                  <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--a1)', opacity: 0.7 }}>View all ›</span>
+                </div>
               </div>
               <div style={{ padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', flexWrap: 'wrap' }}>
                 {[
@@ -520,7 +569,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                   </div>
                 ))}
               </div>
-            </Card>
+            </NavCard>
 
             {/* Pipeline tiles */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
@@ -612,7 +661,11 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
             {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
           </div>
         </div>
-        <style>{`@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
+        <style>{`
+          @keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}
+          .nav-card { transition: box-shadow .15s, border-color .15s; }
+          .nav-card-link:hover .nav-card { box-shadow: 0 6px 20px rgba(26,10,60,0.14) !important; border-color: rgba(201,168,76,0.4) !important; }
+        `}</style>
       </div>
     </AdminClientShell>
   );

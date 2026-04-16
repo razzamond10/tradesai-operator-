@@ -168,6 +168,19 @@ export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
   }));
 }
 
+/** Mark a single emergency row as resolved (column F = "Yes"). rowIndex is 0-based data index. */
+export async function resolveEmergency(sheetId: string, rowIndex: number): Promise<void> {
+  const auth = getWriteAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  const range = `Emergencies!F${rowIndex + 2}`; // +2 skips header row, converts 0-based to 1-based
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range,
+    valueInputOption: 'RAW',
+    requestBody: { values: [['Yes']] },
+  });
+}
+
 // ── KPI helpers ───────────────────────────────────────────────────────────────
 export function computeKPIs(
   interactions: Interaction[],

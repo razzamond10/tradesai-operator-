@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface AdminClientShellProps {
   clientId: string;
@@ -54,6 +54,8 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
   const pathname = usePathname();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
 
   const sections = NAV_SECTIONS(clientId);
   const initials = adminName ? adminName.slice(0, 1).toUpperCase() : 'A';
@@ -64,6 +66,17 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
     await fetch('/api/auth/logout', { method: 'POST' });
     router.push('/login');
   }
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   // exact match for dashboard root, prefix match for sub-pages
   function isActive(href: string) {
@@ -152,16 +165,53 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
           ))}
         </nav>
 
-        {/* User + logout */}
-        <div style={{ padding: '10px 14px', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+        {/* User + profile dropdown + logout */}
+        <div style={{ padding: '10px 14px', borderTop: '1px solid rgba(255,255,255,0.08)', position: 'relative' }} ref={profileRef}>
+          {/* Profile dropdown */}
+          {profileOpen && (
             <div style={{
+              position: 'absolute', bottom: '56px', left: '10px', right: '10px',
+              background: '#fff', borderRadius: '10px', boxShadow: '0 8px 32px rgba(0,0,0,0.22)',
+              border: '1px solid var(--divider)', overflow: 'hidden', zIndex: 200,
+            }}>
+              {[
+                { label: 'My Account', icon: '👤', href: '/admin/account' },
+                { label: 'Platform Settings', icon: '⚙️', href: '/admin/settings' },
+              ].map(item => (
+                <button key={item.label} onClick={() => { setProfileOpen(false); router.push(item.href); }} style={{
+                  display: 'flex', alignItems: 'center', gap: '9px', width: '100%',
+                  padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: '12px', fontWeight: 600, color: 'var(--ink)', fontFamily: '"Inter",sans-serif',
+                  textAlign: 'left', borderBottom: '1px solid var(--slate)', transition: 'background .1s',
+                }}>
+                  <span style={{ fontSize: '14px' }}>{item.icon}</span>
+                  {item.label}
+                </button>
+              ))}
+              <button onClick={() => { setProfileOpen(false); logout(); }} disabled={loggingOut} style={{
+                display: 'flex', alignItems: 'center', gap: '9px', width: '100%',
+                padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer',
+                fontSize: '12px', fontWeight: 600, color: 'var(--a4)', fontFamily: '"Inter",sans-serif',
+                textAlign: 'left', transition: 'background .1s',
+              }}>
+                <span style={{ fontSize: '14px' }}>⎋</span>
+                Sign Out
+              </button>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+            {/* Clickable avatar */}
+            <button onClick={() => setProfileOpen(p => !p)} style={{
               width: '26px', height: '26px', borderRadius: '50%', flexShrink: 0,
               background: 'linear-gradient(135deg,#C9A84C,#E8C96A)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '10px', fontWeight: 800, color: '#1A0A3C',
               fontFamily: '"Inter Tight",sans-serif',
-            }}>{initials}</div>
+              border: profileOpen ? '2px solid #E8C96A' : '2px solid transparent',
+              cursor: 'pointer', transition: 'border-color .15s',
+              outline: 'none',
+            }}>{initials}</button>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{adminName}</div>
               <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>Owner — Admin</div>

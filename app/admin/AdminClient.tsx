@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import type { JWTPayload } from '@/lib/auth';
 
@@ -28,6 +28,9 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [loggingOut, setLoggingOut] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [lastActive, setLastActive] = useState<Record<string, string>>({});
+  const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch('/api/clients')
@@ -38,6 +41,41 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
       })
       .catch(() => setError('Failed to load clients'))
       .finally(() => setLoading(false));
+  }, []);
+
+  // Fetch last active date for each client once the list is loaded
+  useEffect(() => {
+    if (clients.length === 0) return;
+    clients.forEach((client) => {
+      fetch(`/api/clients/${client.clientId}/data`)
+        .then((r) => r.json())
+        .then((d) => {
+          const interactions: any[] = d.interactions || [];
+          if (interactions.length > 0) {
+            const latest = interactions.reduce((a: any, b: any) =>
+              (a.timestamp || '') > (b.timestamp || '') ? a : b
+            );
+            setLastActive((prev) => ({
+              ...prev,
+              [client.clientId]: (latest.timestamp || '').slice(0, 10) || '—',
+            }));
+          } else {
+            setLastActive((prev) => ({ ...prev, [client.clientId]: '—' }));
+          }
+        })
+        .catch(() => setLastActive((prev) => ({ ...prev, [client.clientId]: '—' })));
+    });
+  }, [clients]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
   async function logout() {
@@ -81,27 +119,54 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
             <span style={{ width: '6px', height: '6px', background: '#22C55E', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 5px rgba(34,197,94,0.5)' }} />
             Live data
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-            <div style={{
+
+          {/* Profile dropdown */}
+          <div style={{ position: 'relative' }} ref={profileRef}>
+            <button onClick={() => setProfileOpen(p => !p)} style={{
               width: '30px', height: '30px', borderRadius: '50%',
               background: 'linear-gradient(135deg,#C9A84C,#E8C96A)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '12px', fontWeight: 800, color: '#1A0A3C',
               fontFamily: '"Inter Tight",sans-serif',
-            }}>{initials}</div>
-            <div style={{ display: 'none' }}>
-              <div style={{ fontSize: '11px', fontWeight: 600, color: 'rgba(255,255,255,0.8)' }}>{user.name}</div>
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>Owner — Admin</div>
-            </div>
-            <button onClick={logout} disabled={loggingOut}
-              style={{
-                padding: '6px 14px', borderRadius: '7px', fontSize: '11px', fontWeight: 600,
-                background: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.6)',
-                border: '1px solid rgba(255,255,255,0.12)', cursor: 'pointer',
-                fontFamily: '"Inter",sans-serif', transition: 'all .15s',
+              border: profileOpen ? '2px solid #fff' : '2px solid transparent',
+              cursor: 'pointer', outline: 'none', transition: 'border-color .15s',
+            }}>{initials}</button>
+
+            {profileOpen && (
+              <div style={{
+                position: 'absolute', top: '38px', right: 0,
+                background: '#fff', borderRadius: '10px',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+                border: '1px solid #D8D0F0', overflow: 'hidden',
+                minWidth: '160px', zIndex: 200,
               }}>
-              Sign out
-            </button>
+                <div style={{ padding: '8px 14px 6px', borderBottom: '1px solid #EAEAF4' }}>
+                  <div style={{ fontSize: '11px', fontWeight: 700, color: '#1A0A3C' }}>{user.name}</div>
+                  <div style={{ fontSize: '9px', color: '#7468A0' }}>Owner — Admin</div>
+                </div>
+                {[
+                  { label: 'My Account', icon: '👤', href: '/admin/account' },
+                  { label: 'Platform Settings', icon: '⚙️', href: '/admin/settings' },
+                ].map(item => (
+                  <button key={item.label} onClick={() => { setProfileOpen(false); router.push(item.href); }} style={{
+                    display: 'flex', alignItems: 'center', gap: '9px', width: '100%',
+                    padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer',
+                    fontSize: '12px', fontWeight: 600, color: '#1A0A3C', fontFamily: '"Inter",sans-serif',
+                    textAlign: 'left', borderBottom: '1px solid #EAEAF4', transition: 'background .1s',
+                  }}>
+                    <span>{item.icon}</span> {item.label}
+                  </button>
+                ))}
+                <button onClick={() => { setProfileOpen(false); logout(); }} disabled={loggingOut} style={{
+                  display: 'flex', alignItems: 'center', gap: '9px', width: '100%',
+                  padding: '10px 14px', background: 'none', border: 'none', cursor: 'pointer',
+                  fontSize: '12px', fontWeight: 600, color: '#C01830', fontFamily: '"Inter",sans-serif',
+                  textAlign: 'left', transition: 'background .1s',
+                }}>
+                  <span>⎋</span> Sign Out
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -176,6 +241,7 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
             {filtered.map((client) => {
               const color = tradeColor(client.tradeType);
               const initials = (client.businessName || 'XX').slice(0, 2).toUpperCase();
+              const lastSeen = lastActive[client.clientId];
               return (
                 <button
                   key={client.clientId}
@@ -223,19 +289,30 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', paddingTop: '12px', borderTop: '1px solid var(--slate)' }}>
                       <div style={{ fontSize: '11px', color: 'var(--ink)', display: 'flex', gap: '8px' }}>
-                        <span style={{ color: 'var(--muted)', minWidth: '56px' }}>Contact</span>
+                        <span style={{ color: 'var(--muted)', minWidth: '68px' }}>Contact</span>
                         <span style={{ fontWeight: 600 }}>{client.contactName || '—'}</span>
                       </div>
                       <div style={{ fontSize: '11px', color: 'var(--ink)', display: 'flex', gap: '8px' }}>
-                        <span style={{ color: 'var(--muted)', minWidth: '56px' }}>Phone</span>
+                        <span style={{ color: 'var(--muted)', minWidth: '68px' }}>Phone</span>
                         <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px' }}>{client.phone || '—'}</span>
                       </div>
                       {client.twilioNumber && (
                         <div style={{ fontSize: '11px', display: 'flex', gap: '8px' }}>
-                          <span style={{ color: 'var(--muted)', minWidth: '56px' }}>AI Line</span>
+                          <span style={{ color: 'var(--muted)', minWidth: '68px' }}>AI Line</span>
                           <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--a3)', fontWeight: 600 }}>{client.twilioNumber}</span>
                         </div>
                       )}
+                      <div style={{ fontSize: '11px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                        <span style={{ color: 'var(--muted)', minWidth: '68px' }}>Last Active</span>
+                        {lastSeen === undefined ? (
+                          <span style={{ fontSize: '9px', color: 'var(--faint)' }}>loading…</span>
+                        ) : (
+                          <span style={{
+                            fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px',
+                            color: lastSeen === '—' ? 'var(--faint)' : 'var(--a1)', fontWeight: lastSeen === '—' ? 400 : 600,
+                          }}>{lastSeen}</span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </button>

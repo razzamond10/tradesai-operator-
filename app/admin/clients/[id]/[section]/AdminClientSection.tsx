@@ -260,11 +260,16 @@ function PipelineSection({ interactions, bookings }: { interactions: any[]; book
   );
 }
 
-function EmergenciesSection({ emergencies }: { emergencies: any[] }) {
+function EmergenciesSection({ emergencies, clientId }: { emergencies: any[]; clientId: string }) {
   const [filter, setFilter] = useState<'all'|'active'|'resolved'>('all');
-  const active = emergencies.filter(e => (e.resolved || '').toLowerCase() !== 'yes');
-  const resolved = emergencies.filter(e => (e.resolved || '').toLowerCase() === 'yes');
-  const filtered = filter === 'active' ? active : filter === 'resolved' ? resolved : emergencies;
+  const [resolving, setResolving] = useState<Record<number, boolean>>({});
+  const [localResolved, setLocalResolved] = useState<Record<number, boolean>>({});
+
+  // Merge sheet data with optimistic local overrides
+  const merged = emergencies.map((e, i) => localResolved[i] ? { ...e, resolved: 'Yes' } : e);
+  const active = merged.filter(e => (e.resolved || '').toLowerCase() !== 'yes');
+  const resolved = merged.filter(e => (e.resolved || '').toLowerCase() === 'yes');
+  const filtered = filter === 'active' ? active : filter === 'resolved' ? resolved : merged;
 
   const sevStyle = (s: string) => {
     const l = (s || '').toLowerCase();
@@ -308,11 +313,16 @@ function EmergenciesSection({ emergencies }: { emergencies: any[] }) {
             <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No emergencies</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {[...filtered].reverse().map((em, i) => {
+              {[...filtered].reverse().map((em, origIdx) => {
+                // origIdx in reversed array; find original index in emergencies for the API call
+                const dataIdx = emergencies.findIndex(
+                  (e) => e.timestamp === em.timestamp && e.phone === em.phone
+                );
                 const sev = sevStyle(em.severity);
                 const isActive = (em.resolved || '').toLowerCase() !== 'yes';
+                const isResolving = resolving[dataIdx];
                 return (
-                  <div key={i} style={{ padding: '12px 14px', borderRadius: '8px', border: `1px solid ${isActive ? '#F5C0C8' : 'var(--divider)'}`, borderLeft: `4px solid ${isActive ? 'var(--a4)' : 'var(--a3)'}`, background: '#fff' }}>
+                  <div key={origIdx} style={{ padding: '12px 14px', borderRadius: '8px', border: `1px solid ${isActive ? '#F5C0C8' : 'var(--divider)'}`, borderLeft: `4px solid ${isActive ? 'var(--a4)' : 'var(--a3)'}`, background: '#fff' }}>
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                       <span style={{ fontSize: '20px' }}>{isActive ? '🚨' : '✅'}</span>
                       <div style={{ flex: 1 }}>
@@ -326,9 +336,40 @@ function EmergenciesSection({ emergencies }: { emergencies: any[] }) {
                           {em.timestamp && <span> · {em.timestamp.slice(0, 16).replace('T', ' ')}</span>}
                         </div>
                       </div>
-                      {isActive && (
-                        <a href={`tel:${em.phone}`} style={{ padding: '5px 12px', borderRadius: '7px', background: 'var(--a4)', color: '#fff', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>📞 Call</a>
-                      )}
+                      <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                        {isActive && (
+                          <a href={`tel:${em.phone}`} style={{ padding: '5px 12px', borderRadius: '7px', background: 'var(--a4)', color: '#fff', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>📞 Call</a>
+                        )}
+                        {isActive && (
+                          <button
+                            disabled={isResolving || dataIdx < 0}
+                            onClick={async () => {
+                              if (dataIdx < 0) return;
+                              setResolving(prev => ({ ...prev, [dataIdx]: true }));
+                              try {
+                                await fetch(`/api/clients/${clientId}/emergencies/resolve`, {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({ rowIndex: dataIdx }),
+                                });
+                                setLocalResolved(prev => ({ ...prev, [dataIdx]: true }));
+                              } finally {
+                                setResolving(prev => ({ ...prev, [dataIdx]: false }));
+                              }
+                            }}
+                            style={{
+                              padding: '5px 12px', borderRadius: '7px',
+                              background: isResolving ? 'var(--slate)' : 'var(--a3b)',
+                              color: isResolving ? 'var(--muted)' : 'var(--a3)',
+                              fontSize: '11px', fontWeight: 700, border: '1px solid var(--a3)',
+                              cursor: isResolving ? 'not-allowed' : 'pointer',
+                              fontFamily: '"Inter",sans-serif', transition: 'all .15s',
+                            }}
+                          >
+                            {isResolving ? '…' : '✓ Mark Resolved'}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -344,7 +385,7 @@ function EmergenciesSection({ emergencies }: { emergencies: any[] }) {
 function CommsSection({ interactions }: { interactions: any[] }) {
   const [search, setSearch] = useState('');
   const [outcome, setOutcome] = useState('all');
-  const [selected, setSelected] = useState<any>(null);
+  const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   const outcomes = [...new Set(interactions.map(i => i.outcome).filter(Boolean))];
   const filtered = [...interactions].reverse().filter(i => {
@@ -372,7 +413,7 @@ function CommsSection({ interactions }: { interactions: any[] }) {
       </div>
 
       <Card>
-        <CardHdr title="Call Log" sub="All AI-answered interactions" badge={`${filtered.length} shown`} badgeColor="#3D1FA8" />
+        <CardHdr title="Call Log" sub="Click any row to expand full transcript" badge={`${filtered.length} shown`} badgeColor="#3D1FA8" />
         <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--divider)', display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
             {['all', ...outcomes.slice(0,5)].map(o => (
@@ -386,49 +427,66 @@ function CommsSection({ interactions }: { interactions: any[] }) {
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…"
             style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '11px', outline: 'none', width: '160px' }} />
         </div>
-        <div style={{ display: 'flex', gap: 0 }}>
-          {/* List */}
-          <div style={{ flex: 1, overflowY: 'auto', maxHeight: '480px', borderRight: selected ? '1px solid var(--divider)' : 'none' }}>
-            {filtered.length === 0 ? (
-              <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No calls found</div>
-            ) : filtered.map((item, i) => {
-              const os = outcomeStyle(item.outcome);
-              return (
-                <div key={i} onClick={() => setSelected(selected?.timestamp === item.timestamp ? null : item)} style={{
-                  padding: '10px 14px', borderBottom: '1px solid var(--slate)', cursor: 'pointer', transition: 'background .12s',
-                  background: selected?.timestamp === item.timestamp ? 'var(--a1b)' : 'transparent',
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
-                    <span style={{ fontWeight: 600, fontSize: '12px', color: 'var(--ink)' }}>{item.callerName || 'Unknown'}</span>
-                    <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: os.bg, color: os.color }}>{item.outcome || '—'}</span>
-                  </div>
-                  <div style={{ fontSize: '10px', color: 'var(--muted)', display: 'flex', gap: '10px' }}>
-                    <span>{item.intent || 'General'}</span>
-                    <span style={{ fontFamily: '"IBM Plex Mono",monospace' }}>{(item.timestamp || '').slice(0, 16).replace('T', ' ')}</span>
+        <div>
+          {filtered.length === 0 ? (
+            <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No calls found</div>
+          ) : filtered.map((item, i) => {
+            const key = `${item.timestamp}-${i}`;
+            const isOpen = expandedKey === key;
+            const os = outcomeStyle(item.outcome);
+            return (
+              <div key={key} style={{ borderBottom: '1px solid var(--slate)' }}>
+                {/* Summary row */}
+                <div
+                  onClick={() => setExpandedKey(isOpen ? null : key)}
+                  style={{
+                    padding: '10px 14px', cursor: 'pointer', transition: 'background .12s',
+                    background: isOpen ? 'var(--a1b)' : 'transparent',
+                    display: 'flex', alignItems: 'center', gap: '8px',
+                  }}
+                >
+                  <span style={{ fontSize: '10px', color: 'var(--faint)', transition: 'transform .15s', display: 'inline-block', transform: isOpen ? 'rotate(90deg)' : 'rotate(0deg)' }}>›</span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2px' }}>
+                      <span style={{ fontWeight: 600, fontSize: '12px', color: 'var(--ink)' }}>{item.callerName || 'Unknown'}</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: os.bg, color: os.color }}>{item.outcome || '—'}</span>
+                    </div>
+                    <div style={{ fontSize: '10px', color: 'var(--muted)', display: 'flex', gap: '10px' }}>
+                      <span>{item.intent || 'General'}</span>
+                      <span style={{ fontFamily: '"IBM Plex Mono",monospace' }}>{(item.timestamp || '').slice(0, 16).replace('T', ' ')}</span>
+                    </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
-          {/* Detail panel */}
-          {selected && (
-            <div style={{ width: '280px', padding: '14px', flexShrink: 0 }}>
-              <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '14px', fontWeight: 700, color: 'var(--ink)', marginBottom: '10px' }}>{selected.callerName || 'Unknown'}</div>
-              {[
-                { label: 'Phone', val: selected.phone },
-                { label: 'Time', val: (selected.timestamp || '').slice(0,16).replace('T',' ') },
-                { label: 'Intent', val: selected.intent },
-                { label: 'Outcome', val: selected.outcome },
-                { label: 'Notes', val: selected.notes },
-              ].map(({ label, val }) => (
-                <div key={label} style={{ marginBottom: '8px' }}>
-                  <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '2px' }}>{label}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--ink)', fontFamily: label === 'Phone' || label === 'Time' ? '"IBM Plex Mono",monospace' : 'inherit' }}>{val || '—'}</div>
-                </div>
-              ))}
-              <button onClick={() => setSelected(null)} style={{ marginTop: '8px', fontSize: '10px', fontWeight: 600, color: 'var(--muted)', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>Close ✕</button>
-            </div>
-          )}
+                {/* Expanded details */}
+                {isOpen && (
+                  <div style={{ padding: '12px 14px 14px 32px', background: 'var(--a1b)', borderTop: '1px solid rgba(61,31,168,0.08)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '10px 20px', marginBottom: item.notes ? '12px' : 0 }}>
+                      {[
+                        { label: 'Phone', val: item.phone, mono: true },
+                        { label: 'Time', val: (item.timestamp || '').slice(0, 16).replace('T', ' '), mono: true },
+                        { label: 'Intent', val: item.intent },
+                        { label: 'Outcome', val: item.outcome },
+                      ].map(({ label, val, mono }) => (
+                        <div key={label}>
+                          <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '2px' }}>{label}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--ink)', fontFamily: mono ? '"IBM Plex Mono",monospace' : 'inherit' }}>{val || '—'}</div>
+                        </div>
+                      ))}
+                    </div>
+                    {item.notes && (
+                      <div>
+                        <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '4px' }}>Transcript / Notes</div>
+                        <div style={{ fontSize: '11px', color: 'var(--ink2)', lineHeight: 1.6, padding: '8px 10px', background: '#fff', borderRadius: '6px', border: '1px solid var(--divider)', whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{item.notes}</div>
+                      </div>
+                    )}
+                    {!item.notes && (
+                      <div style={{ fontSize: '10px', color: 'var(--faint)', fontStyle: 'italic' }}>No transcript or notes recorded for this call.</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </Card>
     </>
@@ -689,7 +747,7 @@ export default function AdminClientSection({ clientId, section, user }: { client
       case 'analytics':   return <AnalyticsSection interactions={interactions} bookings={bookings} emergencies={emergencies} />;
       case 'schedule':    return <ScheduleSection bookings={bookings} />;
       case 'pipeline':    return <PipelineSection interactions={interactions} bookings={bookings} />;
-      case 'emergencies': return <EmergenciesSection emergencies={emergencies} />;
+      case 'emergencies': return <EmergenciesSection emergencies={emergencies} clientId={clientId} />;
       case 'comms':       return <CommsSection interactions={interactions} />;
       case 'revenue':     return <RevenueSection bookings={bookings} />;
       case 'forecast':    return <ForecastSection interactions={interactions} bookings={bookings} />;
