@@ -81,10 +81,6 @@ function StatusBadge({ status }: { status: string }) {
 // ── Section renderers ──────────────────────────────────────────────────────────
 
 function AnalyticsSection({ interactions, bookings, emergencies }: { interactions: any[]; bookings: any[]; emergencies: any[] }) {
-  const days = last30Days();
-  const callsByDay = days.map(d => interactions.filter(i => (i.timestamp || '').startsWith(d)).length);
-  const bookingsByDay = days.map(d => bookings.filter(b => (b.timestamp || '').startsWith(d)).length);
-  const labels = days.map(d => d.slice(5));
 
   const intentMap: Record<string, number> = {};
   interactions.forEach(i => { const k = i.intent || 'Unknown'; intentMap[k] = (intentMap[k] || 0) + 1; });
@@ -111,7 +107,7 @@ function AnalyticsSection({ interactions, bookings, emergencies }: { interaction
       <Card style={{ marginBottom: '16px' }}>
         <CardHdr title="30-Day Call Volume" sub="Calls captured by AI" badge={`${interactions.length} total`} badgeColor="#3D1FA8" />
         <div style={{ padding: '14px', height: '180px' }}>
-          <ActivityLineChart data={callsByDay} labels={labels} color="#3D1FA8" />
+          <ActivityLineChart interactions={interactions} bookings={bookings} mode="month" />
         </div>
       </Card>
 
@@ -119,13 +115,13 @@ function AnalyticsSection({ interactions, bookings, emergencies }: { interaction
         <Card>
           <CardHdr title="Call Intents" sub="What callers ask for" badge={`${Object.keys(intentMap).length} types`} badgeColor="#0A7455" />
           <div style={{ padding: '14px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {intentData.length > 0 ? <DonutChart data={intentData} /> : <div style={{ color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>}
+            {intentData.length > 0 ? <DonutChart data={intentData} total={interactions.length} centerLabel="INTENTS" /> : <div style={{ color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>}
           </div>
         </Card>
         <Card>
           <CardHdr title="Call Outcomes" sub="How calls resolved" badge={`${Object.keys(outcomeMap).length} types`} badgeColor="#C9A84C" />
           <div style={{ padding: '14px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {outcomeData.length > 0 ? <DonutChart data={outcomeData} /> : <div style={{ color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>}
+            {outcomeData.length > 0 ? <DonutChart data={outcomeData} total={interactions.length} centerLabel="OUTCOMES" /> : <div style={{ color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>}
           </div>
         </Card>
       </div>
@@ -447,10 +443,6 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
   const revConfirmed = confirmed.reduce((s, b) => s + parseValue(b.value), 0);
   const avgValue = bookings.length > 0 ? Math.round(revTotal / bookings.length) : 0;
 
-  const days = last30Days();
-  const revByDay = days.map(d => bookings.filter(b => (b.timestamp||'').startsWith(d)).reduce((s, b) => s + parseValue(b.value), 0));
-  const dayLabels = days.map(d => d.slice(5));
-
   const filtered = bookings.filter(b => statusFilter === 'all' || (b.status||'').toLowerCase() === statusFilter);
 
   let running = 0;
@@ -468,7 +460,7 @@ function RevenueSection({ bookings }: { bookings: any[] }) {
       <Card style={{ marginBottom: '16px' }}>
         <CardHdr title="Daily Revenue (30 days)" sub="Booking value captured by AI" badge={fmtCurrency(revTotal)} badgeColor="#0A7455" />
         <div style={{ padding: '14px', height: '160px' }}>
-          <BarChart data={revByDay} labels={dayLabels} color="#0A7455" />
+          <BarChart bookings={bookings} />
         </div>
       </Card>
 
@@ -517,14 +509,9 @@ function ForecastSection({ interactions, bookings }: { interactions: any[]; book
   const days = last30Days();
   const callsByDay = days.map(d => interactions.filter(i => (i.timestamp||'').startsWith(d)).length);
   const revByDay = days.map(d => bookings.filter(b => (b.timestamp||'').startsWith(d)).reduce((s, b) => s + parseValue(b.value), 0));
-  const labels = days.map(d => d.slice(5));
 
   const avgCalls = Math.round(callsByDay.reduce((a, b) => a + b, 0) / 30);
   const avgRev = Math.round(revByDay.reduce((a, b) => a + b, 0) / 30);
-
-  const dowLabels = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-  const dowCalls = new Array(7).fill(0);
-  interactions.forEach(i => { if (i.timestamp) { const d = new Date(i.timestamp).getDay(); dowCalls[d]++; } });
 
   const projCalls30 = avgCalls * 30;
   const projRev30 = avgRev * 30;
@@ -542,13 +529,13 @@ function ForecastSection({ interactions, bookings }: { interactions: any[]; book
         <Card>
           <CardHdr title="Call Volume Trend" sub="Last 30 days" />
           <div style={{ padding: '14px', height: '160px' }}>
-            <ActivityLineChart data={callsByDay} labels={labels} color="#3D1FA8" />
+            <ActivityLineChart interactions={interactions} bookings={bookings} mode="month" />
           </div>
         </Card>
         <Card>
           <CardHdr title="Revenue Trend" sub="Last 30 days" />
           <div style={{ padding: '14px', height: '160px' }}>
-            <ActivityLineChart data={revByDay} labels={labels} color="#0A7455" />
+            <ActivityLineChart interactions={interactions} bookings={bookings} mode="month" />
           </div>
         </Card>
       </div>
@@ -556,7 +543,7 @@ function ForecastSection({ interactions, bookings }: { interactions: any[]; book
       <Card>
         <CardHdr title="Busiest Days of Week" sub="Call volume by day" badge="all time" badgeColor="#C9A84C" />
         <div style={{ padding: '14px', height: '160px' }}>
-          <BarChart data={dowCalls} labels={dowLabels} color="#C9A84C" />
+          <BarChart bookings={bookings} />
         </div>
       </Card>
     </>
