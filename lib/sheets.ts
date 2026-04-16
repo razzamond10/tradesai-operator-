@@ -194,15 +194,16 @@ export interface Booking {
   postcode: string;
   jobType: string;
   scheduledDate: string;
-  status: string;
   calendarEventId: string;
+  bookingDateReadable: string;
+  status: string;
   value: string;
 }
 
 export async function getBookings(sheetId: string): Promise<Booking[]> {
   const tabName = await resolveTabName(sheetId, 'bookings');
-  // Col layout: A=timestamp, B=businessName, C=customerName, D=phone, E=postcode, F=jobType/service, G=scheduledDate, H=calendarEventId, I=status, J=value
-  const rows = await readSheet(sheetId, `'${tabName}'!A2:J`);
+  // Col layout: A=timestamp, B=businessName, C=customerName, D=phone, E=postcode, F=jobType/issue, G=bookingSlot, H=calendarEventId, I=bookingDateReadable, J=status, K=value
+  const rows = await readSheet(sheetId, `'${tabName}'!A2:K`);
   return rows.map((r) => ({
     businessName: r[1] || '',
     timestamp: normTimestamp(r[0] || ''),
@@ -212,8 +213,9 @@ export async function getBookings(sheetId: string): Promise<Booking[]> {
     jobType: r[5] || '',
     scheduledDate: r[6] || '',
     calendarEventId: r[7] || '',
-    status: r[8] || '',
-    value: r[9] || '',
+    bookingDateReadable: r[8] || '',
+    status: r[9] || '',
+    value: r[10] || '',
   }));
 }
 
