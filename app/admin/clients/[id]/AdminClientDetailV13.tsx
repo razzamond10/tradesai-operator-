@@ -469,7 +469,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                   viewHref={`${base}/schedule`}
                 />
                 {/* Desktop table */}
-                <div className="sched-table-wrap" style={{ overflowX: 'auto' }}>
+                <div className="dash-job-table" style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                     <thead>
                       <tr>
@@ -499,23 +499,16 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                     </tbody>
                   </table>
                 </div>
-                {/* Mobile cards */}
-                <div className="sched-cards-wrap" style={{ display: 'none', padding: '8px' }}>
+                {/* Mobile list — name + date only */}
+                <div className="dash-job-cards" style={{ display: 'none' }}>
                   {upcoming.length === 0 ? (
                     <div style={{ padding: '20px', textAlign: 'center', color: 'var(--muted)', fontSize: '11px' }}>No scheduled jobs</div>
-                  ) : upcoming.map((b, i) => {
-                    const sb = statusBadge(b.status);
-                    return (
-                      <div key={i} style={{ padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--divider)', background: '#fff', marginBottom: '8px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-                          <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '11px', fontWeight: 700, color: 'var(--ink2)' }}>{b.scheduledDate || '—'}</span>
-                          <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: sb.bg, color: sb.color }}>{b.status || '—'}</span>
-                        </div>
-                        <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)', marginBottom: '3px' }}>{b.customerName || '—'}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--ink2)' }}>{b.jobType || '—'}</div>
-                      </div>
-                    );
-                  })}
+                  ) : upcoming.map((b, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', borderBottom: '1px solid var(--divider)' }}>
+                      <span style={{ fontWeight: 700, fontSize: '12px', color: 'var(--ink)' }}>{b.customerName || '—'}</span>
+                      <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)' }}>{b.scheduledDate || '—'}</span>
+                    </div>
+                  ))}
                 </div>
               </NavCard>
 
@@ -749,6 +742,8 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
             .donut-legend span { white-space: normal !important; overflow: visible !important; text-overflow: unset !important; }
             .em-table-wrap { display: none !important; }
             .em-cards-wrap { display: block !important; }
+            .dash-job-table { display: none !important; }
+            .dash-job-cards { display: block !important; }
           }
           @media (max-width: 480px) {
             .admin-pipeline-grid { grid-template-columns: repeat(2,1fr) !important; }
