@@ -54,13 +54,13 @@ function Card({ children, style }: { children: React.ReactNode; style?: React.CS
 
 function CardHdr({ title, sub, badge, badgeColor }: { title: string; sub?: string; badge?: string; badgeColor?: string }) {
   return (
-    <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', minHeight: '76px' }}>
-      <div style={{ minWidth: 0 }}>
+    <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px', minHeight: '92px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', minHeight: '60px', flex: 1, minWidth: 0 }}>
         <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>{title}</div>
         {sub && <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>{sub}</div>}
       </div>
       {badge && (
-        <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: badgeColor ? `${badgeColor}18` : 'var(--slate)', color: badgeColor || 'var(--muted)', flexShrink: 0 }}>{badge}</span>
+        <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: badgeColor ? `${badgeColor}18` : 'var(--slate)', color: badgeColor || 'var(--muted)', flexShrink: 0, alignSelf: 'flex-start' }}>{badge}</span>
       )}
     </div>
   );
