@@ -630,7 +630,7 @@ function DowBarChart({ interactions }: { interactions: any[] }) {
     return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
   }, [interactions]);
 
-  return <div style={{ position: 'relative', height: '160px' }}><canvas ref={canvasRef} /></div>;
+  return <div style={{ position: 'relative', height: '150px' }}><canvas ref={canvasRef} /></div>;
 }
 
 function ForecastSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
@@ -691,7 +691,7 @@ function ForecastSection({ interactions, bookings }: { interactions: any[]; book
 
       <Card>
         <CardHdr title="Busiest Days of Week" sub="Call volume by day" badge="all time" badgeColor="#C9A84C" />
-        <div style={{ padding: '14px', height: '160px' }}>
+        <div style={{ padding: '14px 14px 24px' }}>
           <DowBarChart interactions={interactions} />
         </div>
       </Card>
