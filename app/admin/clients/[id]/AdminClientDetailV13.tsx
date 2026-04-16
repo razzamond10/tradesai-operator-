@@ -640,7 +640,8 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
               <>
                 <div style={{ marginBottom: '8px', fontFamily: '"Inter Tight",sans-serif', fontSize: '11px', fontWeight: 700, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '.8px' }}>Emergencies Log</div>
                 <Card style={{ marginBottom: '20px' }}>
-                  <div style={{ overflowX: 'auto' }}>
+                  {/* Desktop table */}
+                  <div className="em-table-wrap" style={{ overflowX: 'auto' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                       <thead>
                         <tr>
@@ -669,6 +670,36 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
                       </tbody>
                     </table>
                   </div>
+                  {/* Mobile cards */}
+                  <div className="em-cards-wrap" style={{ display: 'none', padding: '8px' }}>
+                    {emergencies.map((em, i) => {
+                      const resolved = em.resolved === 'Yes';
+                      return (
+                        <div key={i} style={{
+                          padding: '12px 14px', borderRadius: '8px', marginBottom: '8px',
+                          background: resolved ? '#fff' : 'rgba(192,24,48,0.03)',
+                          border: `1px solid ${resolved ? 'var(--divider)' : 'rgba(192,24,48,0.18)'}`,
+                          borderLeft: `3px solid ${resolved ? 'var(--a3)' : 'var(--a4)'}`,
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <span style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)' }}>{em.callerName || '—'}</span>
+                            <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)' }}>{em.phone || '—'}</span>
+                          </div>
+                          <div style={{ fontSize: '11px', fontWeight: 600, color: '#9A6200', marginBottom: '8px' }}>
+                            {em.type || 'Emergency'}{em.severity ? ` · ${em.severity}` : ''}
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span style={{ fontSize: '10px', fontWeight: 700, color: resolved ? 'var(--a3)' : 'var(--a4)' }}>
+                              {resolved ? '✓ Resolved' : '⚠ Unresolved'}
+                            </span>
+                            <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '9px', color: 'var(--muted)' }}>
+                              {(em.timestamp || '').slice(0, 16).replace('T', ' ')}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </Card>
               </>
             )}
@@ -696,6 +727,8 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
             .donut-card-inner { grid-template-columns: 1fr !important; }
             .donut-legend { width: 100% !important; }
             .donut-legend span { white-space: normal !important; overflow: visible !important; text-overflow: unset !important; }
+            .em-table-wrap { display: none !important; }
+            .em-cards-wrap { display: block !important; }
           }
           @media (max-width: 480px) {
             .admin-pipeline-grid { grid-template-columns: repeat(2,1fr) !important; }
