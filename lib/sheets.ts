@@ -66,6 +66,30 @@ function toSlug(name: string): string {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
 }
 
+/**
+ * Normalise a Google Sheets timestamp to ISO-like "YYYY-MM-DD HH:MM:SS".
+ * Handles: "DD/MM/YYYY HH:MM:SS" (UK Sheets locale), "MM/DD/YYYY ..." (US),
+ * and already-ISO "YYYY-MM-DD ..." strings.
+ */
+function normTimestamp(raw: string): string {
+  if (!raw) return '';
+  // Already starts with YYYY- → keep as-is
+  if (/^\d{4}-/.test(raw)) return raw;
+  // Match D/M/YYYY or DD/MM/YYYY with optional time
+  const m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*(.*)$/);
+  if (m) {
+    const n1 = parseInt(m[1]), n2 = parseInt(m[2]);
+    const year = m[3], rest = m[4] ? ' ' + m[4].trim() : '';
+    let day: number, month: number;
+    if (n1 > 12)      { day = n1; month = n2; } // definitely DD/MM
+    else if (n2 > 12) { day = n2; month = n1; } // definitely MM/DD
+    else              { day = n1; month = n2; } // ambiguous — assume DD/MM (UK)
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${year}-${pad(month)}-${pad(day)}${rest}`;
+  }
+  return raw;
+}
+
 /** Strip leading emoji / non-ASCII characters from a tab name for comparison */
 function normaliseTabName(name: string): string {
   return name.replace(/^[\p{Emoji}\p{So}\s]+/u, '').trim().toLowerCase();
@@ -152,7 +176,7 @@ export async function getInteractions(sheetId: string): Promise<Interaction[]> {
   const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
   return rows.map((r) => ({
     businessName: r[1] || '',
-    timestamp: r[0] || '',
+    timestamp: normTimestamp(r[0] || ''),
     callerName: r[2] || '',
     phone: r[3] || '',
     intent: r[4] || '',
@@ -179,7 +203,7 @@ export async function getBookings(sheetId: string): Promise<Booking[]> {
   const rows = await readSheet(sheetId, `'${tabName}'!A2:H`);
   return rows.map((r) => ({
     businessName: r[1] || '',
-    timestamp: r[0] || '',
+    timestamp: normTimestamp(r[0] || ''),
     customerName: r[2] || '',
     phone: r[3] || '',
     jobType: r[4] || '',
@@ -206,7 +230,7 @@ export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
   const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
   return rows.map((r) => ({
     businessName: r[1] || '',
-    timestamp: r[0] || '',
+    timestamp: normTimestamp(r[0] || ''),
     callerName: r[2] || '',
     phone: r[3] || '',
     type: r[4] || '',

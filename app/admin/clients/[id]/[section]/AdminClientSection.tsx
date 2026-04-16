@@ -10,8 +10,9 @@ import type { JWTPayload } from '@/lib/auth';
 // ── helpers ────────────────────────────────────────────────────────────────────
 
 function parseValue(v: string) {
-  const n = parseFloat((v || '').replace(/[^0-9.]/g, '') || '0');
-  return isNaN(n) ? 0 : n;
+  const n = parseFloat((v || '').replace(/[£$€,\s]/g, '').replace(/[^0-9.]/g, '') || '0');
+  if (isNaN(n) || n < 0 || n > 99999) return 0;
+  return n;
 }
 function fmtCurrency(v: number) {
   return v >= 1000 ? `£${(v / 1000).toFixed(1)}k` : `£${Math.round(v)}`;

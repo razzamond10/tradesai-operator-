@@ -56,27 +56,35 @@ export default function ActivityLineChart({ interactions, bookings, mode }: Prop
         return Math.round(v / 100);
       });
     } else {
-      // month — last 30 days grouped into weeks
-      const weeks: string[] = ['4w ago', '3w ago', '2w ago', 'Last week', 'This week'];
-      labels = weeks;
-      callData = new Array(5).fill(0);
-      bookingData = new Array(5).fill(0);
-      revenueData = new Array(5).fill(0);
-      const now = Date.now();
+      // month — group by actual calendar month from the data (last 6 months that have entries)
+      // Uses YYYY-MM prefix so it works with any data age, not just the last 5 weeks from today
+      const monthMap: Record<string, { calls: number; bookings: number; revenue: number }> = {};
       interactions.forEach(i => {
-        const age = Math.floor((now - new Date(i.timestamp || now).getTime()) / (7 * 86400000));
-        const idx = Math.max(0, 4 - age);
-        if (idx >= 0 && idx < 5) callData[idx]++;
+        const mo = (i.timestamp || '').slice(0, 7);
+        if (mo.length < 7) return;
+        if (!monthMap[mo]) monthMap[mo] = { calls: 0, bookings: 0, revenue: 0 };
+        monthMap[mo].calls++;
       });
       bookings.forEach(b => {
-        const age = Math.floor((now - new Date(b.timestamp || now).getTime()) / (7 * 86400000));
-        const idx = Math.max(0, 4 - age);
-        if (idx >= 0 && idx < 5) {
-          bookingData[idx]++;
-          const v = safeValue(b.value);
-          revenueData[idx] += Math.round(v / 100);
-        }
+        const mo = (b.timestamp || '').slice(0, 7);
+        if (mo.length < 7) return;
+        if (!monthMap[mo]) monthMap[mo] = { calls: 0, bookings: 0, revenue: 0 };
+        monthMap[mo].bookings++;
+        monthMap[mo].revenue += safeValue(b.value);
       });
+      const sortedMonths = Object.keys(monthMap).sort().slice(-6);
+      if (sortedMonths.length === 0) {
+        labels = ['No data']; callData = [0]; bookingData = [0]; revenueData = [0];
+      } else {
+        labels = sortedMonths.map(mo => {
+          const [y, m] = mo.split('-');
+          return new Date(parseInt(y), parseInt(m) - 1, 1)
+            .toLocaleDateString('en-GB', { month: 'short', year: '2-digit' });
+        });
+        callData    = sortedMonths.map(mo => monthMap[mo].calls);
+        bookingData = sortedMonths.map(mo => monthMap[mo].bookings);
+        revenueData = sortedMonths.map(mo => Math.round(monthMap[mo].revenue / 100));
+      }
     }
 
     import('chart.js').then(({ Chart, CategoryScale, LinearScale, PointElement, LineElement, Filler, Tooltip, Legend }) => {

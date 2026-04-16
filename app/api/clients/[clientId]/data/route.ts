@@ -76,6 +76,11 @@ export async function GET(
         interactions: allInteractions.slice(0, 3).map((r) => r.businessName),
         bookings: allBookings.slice(0, 3).map((r) => r.businessName),
       },
+      sampleTimestamps: {
+        interactions: interactions.slice(0, 3).map((r) => r.timestamp),
+        bookings: bookings.slice(0, 3).map((r) => r.timestamp),
+      },
+      sampleValues: bookings.slice(0, 3).map((r) => r.value),
     };
 
     return NextResponse.json({
