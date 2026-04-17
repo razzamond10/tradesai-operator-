@@ -83,7 +83,7 @@ export default function LoginPage() {
           <h1 style={{ color: '#fff', fontSize: '1.4rem', fontWeight: '700', margin: '0 0 0.25rem', letterSpacing: '-0.5px' }}>
             Trades <span style={{ color: '#C9A84C' }}>Ai</span> Operator
           </h1>
-          <p style={{ color: '#888', fontSize: '0.8rem', margin: 0, letterSpacing: '0.5px' }}>ADMIN PORTAL</p>
+          <p style={{ color: '#888', fontSize: '0.8rem', margin: 0, letterSpacing: '0.5px' }}>SIGN IN</p>
         </div>
 
         <form onSubmit={handleSubmit}>
