@@ -232,8 +232,8 @@ export interface Emergency {
 
 export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
   const tabName = await resolveTabName(sheetId, 'emergencies');
-  // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=type, F=severity, G=resolved
-  const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
+  // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=postcode, F=issue, G=smsSentToOwner, H=resolved, I=conversationId
+  const rows = await readSheet(sheetId, `'${tabName}'!A2:H`);
   return rows.map((r) => ({
     businessName: r[1] || '',
     timestamp: normTimestamp(r[0] || ''),
@@ -241,7 +241,7 @@ export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
     phone: r[3] || '',
     type: r[4] || '',
     severity: r[5] || '',
-    resolved: r[6] || '',
+    resolved: r[7] || '',
   }));
 }
 
@@ -250,7 +250,7 @@ export async function resolveEmergency(sheetId: string, rowIndex: number): Promi
   const auth = getWriteAuth();
   const sheets = google.sheets({ version: 'v4', auth });
   const tabName = await resolveTabName(sheetId, 'emergencies');
-  const range = `'${tabName}'!G${rowIndex + 2}`; // +2: skip header row + convert 0-based to 1-based
+  const range = `'${tabName}'!H${rowIndex + 2}`; // +2: skip header row + convert 0-based to 1-based
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
     range,
