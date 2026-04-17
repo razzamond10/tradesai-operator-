@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { sheetsCache } from './cache';
 
 function getAuth() {
   const raw = process.env.GOOGLE_SERVICE_ACCOUNT || '';
@@ -110,27 +111,29 @@ async function resolveTabName(spreadsheetId: string, search: string): Promise<st
 }
 
 export async function getClientConfigs(): Promise<ClientConfig[]> {
-  const spreadsheetId = process.env.MASTER_SHEET_ID!;
-  const tabName = await resolveTabName(spreadsheetId, 'client config');
-  const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:I`);
-  return rows.map((r) => {
-    const businessName = (r[0] || '').trim();
-    const twilioNumber = (r[8] || '').trim();
-    const slug = toSlug(businessName);
-    return {
-      businessName,
-      tradeType: (r[1] || '').trim(),
-      contactName: (r[2] || '').trim(),
-      phone: (r[3] || '').trim(),
-      calendarId: (r[4] || '').trim(),
-      sheetId: (r[5] || '').trim(),
-      botpressId: (r[6] || '').trim(),
-      makeWebhookUrl: (r[7] || '').trim(),
-      twilioNumber,
-      slug,
-      clientId: twilioNumber || slug,
-    };
-  });
+  return sheetsCache.getOrFetch('client_configs', async () => {
+    const spreadsheetId = process.env.MASTER_SHEET_ID!;
+    const tabName = await resolveTabName(spreadsheetId, 'client config');
+    const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:I`);
+    return rows.map((r) => {
+      const businessName = (r[0] || '').trim();
+      const twilioNumber = (r[8] || '').trim();
+      const slug = toSlug(businessName);
+      return {
+        businessName,
+        tradeType: (r[1] || '').trim(),
+        contactName: (r[2] || '').trim(),
+        phone: (r[3] || '').trim(),
+        calendarId: (r[4] || '').trim(),
+        sheetId: (r[5] || '').trim(),
+        botpressId: (r[6] || '').trim(),
+        makeWebhookUrl: (r[7] || '').trim(),
+        twilioNumber,
+        slug,
+        clientId: twilioNumber || slug,
+      };
+    });
+  }, 60_000);
 }
 
 /** Normalise a phone string for comparison: decode %2B, collapse to digits-only with optional leading + */
@@ -141,22 +144,24 @@ function normalisePhone(raw: string): string {
 export async function getClientConfig(
   id: string
 ): Promise<ClientConfig | null> {
-  const configs = await getClientConfigs();
-  const decoded = decodeURIComponent(id);
-  const normalId = decoded.toLowerCase();
-  const normPhone = normalisePhone(id);
-  return configs.find((c) => {
-    if (c.clientId === decoded || c.clientId === id) return true;
-    if (c.twilioNumber) {
-      const t = c.twilioNumber.trim();
-      if (t === decoded || t === normPhone) return true;
-      // strip leading + from both sides and compare digits
-      if (t.replace(/^\+/, '') === normPhone.replace(/^\+/, '')) return true;
-    }
-    if (c.slug === normalId) return true;
-    if (toSlug(c.businessName) === normalId) return true;
-    return false;
-  }) || null;
+  return sheetsCache.getOrFetch(`config:${id}`, async () => {
+    const configs = await getClientConfigs();
+    const decoded = decodeURIComponent(id);
+    const normalId = decoded.toLowerCase();
+    const normPhone = normalisePhone(id);
+    return configs.find((c) => {
+      if (c.clientId === decoded || c.clientId === id) return true;
+      if (c.twilioNumber) {
+        const t = c.twilioNumber.trim();
+        if (t === decoded || t === normPhone) return true;
+        // strip leading + from both sides and compare digits
+        if (t.replace(/^\+/, '') === normPhone.replace(/^\+/, '')) return true;
+      }
+      if (c.slug === normalId) return true;
+      if (toSlug(c.businessName) === normalId) return true;
+      return false;
+    }) || null;
+  }, 60_000);
 }
 
 // ── InteractionsLog ──────────────────────────────────────────────────────────
@@ -171,18 +176,20 @@ export interface Interaction {
 }
 
 export async function getInteractions(sheetId: string): Promise<Interaction[]> {
-  const tabName = await resolveTabName(sheetId, 'interactionslog');
-  // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=intent, F=outcome, G=notes
-  const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
-  return rows.map((r) => ({
-    businessName: r[1] || '',
-    timestamp: normTimestamp(r[0] || ''),
-    callerName: r[2] || '',
-    phone: r[3] || '',
-    intent: r[4] || '',
-    outcome: r[5] || '',
-    notes: r[6] || '',
-  }));
+  return sheetsCache.getOrFetch(`interactions:${sheetId}`, async () => {
+    const tabName = await resolveTabName(sheetId, 'interactionslog');
+    // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=intent, F=outcome, G=notes
+    const rows = await readSheet(sheetId, `'${tabName}'!A2:G`);
+    return rows.map((r) => ({
+      businessName: r[1] || '',
+      timestamp: normTimestamp(r[0] || ''),
+      callerName: r[2] || '',
+      phone: r[3] || '',
+      intent: r[4] || '',
+      outcome: r[5] || '',
+      notes: r[6] || '',
+    }));
+  }, 30_000);
 }
 
 // ── Bookings ──────────────────────────────────────────────────────────────────
@@ -201,22 +208,24 @@ export interface Booking {
 }
 
 export async function getBookings(sheetId: string): Promise<Booking[]> {
-  const tabName = await resolveTabName(sheetId, 'bookings');
-  // Col layout: A=timestamp, B=businessName, C=customerName, D=phone, E=postcode, F=jobType/issue, G=bookingSlot, H=calendarEventId, I=bookingDateReadable, J=status, K=value
-  const rows = await readSheet(sheetId, `'${tabName}'!A2:K`);
-  return rows.map((r) => ({
-    businessName: r[1] || '',
-    timestamp: normTimestamp(r[0] || ''),
-    customerName: r[2] || '',
-    phone: r[3] || '',
-    postcode: r[4] || '',
-    jobType: r[5] || '',
-    scheduledDate: r[6] || '',
-    calendarEventId: r[7] || '',
-    bookingDateReadable: r[8] || '',
-    status: r[9] || '',
-    value: r[10] || '',
-  }));
+  return sheetsCache.getOrFetch(`bookings:${sheetId}`, async () => {
+    const tabName = await resolveTabName(sheetId, 'bookings');
+    // Col layout: A=timestamp, B=businessName, C=customerName, D=phone, E=postcode, F=jobType/issue, G=bookingSlot, H=calendarEventId, I=bookingDateReadable, J=status, K=value
+    const rows = await readSheet(sheetId, `'${tabName}'!A2:K`);
+    return rows.map((r) => ({
+      businessName: r[1] || '',
+      timestamp: normTimestamp(r[0] || ''),
+      customerName: r[2] || '',
+      phone: r[3] || '',
+      postcode: r[4] || '',
+      jobType: r[5] || '',
+      scheduledDate: r[6] || '',
+      calendarEventId: r[7] || '',
+      bookingDateReadable: r[8] || '',
+      status: r[9] || '',
+      value: r[10] || '',
+    }));
+  }, 30_000);
 }
 
 // ── Emergencies ───────────────────────────────────────────────────────────────
@@ -231,18 +240,20 @@ export interface Emergency {
 }
 
 export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
-  const tabName = await resolveTabName(sheetId, 'emergencies');
-  // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=postcode, F=issue, G=smsSentToOwner, H=resolved, I=conversationId
-  const rows = await readSheet(sheetId, `'${tabName}'!A2:H`);
-  return rows.map((r) => ({
-    businessName: r[1] || '',
-    timestamp: normTimestamp(r[0] || ''),
-    callerName: r[2] || '',
-    phone: r[3] || '',
-    type: r[4] || '',
-    severity: r[5] || '',
-    resolved: r[7] || '',
-  }));
+  return sheetsCache.getOrFetch(`emergencies:${sheetId}`, async () => {
+    const tabName = await resolveTabName(sheetId, 'emergencies');
+    // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=postcode, F=issue, G=smsSentToOwner, H=resolved, I=conversationId
+    const rows = await readSheet(sheetId, `'${tabName}'!A2:H`);
+    return rows.map((r) => ({
+      businessName: r[1] || '',
+      timestamp: normTimestamp(r[0] || ''),
+      callerName: r[2] || '',
+      phone: r[3] || '',
+      type: r[4] || '',
+      severity: r[5] || '',
+      resolved: r[7] || '',
+    }));
+  }, 30_000);
 }
 
 /** Mark a single emergency row as resolved. rowIndex is 0-based index in the FULL (unfiltered) emergencies array. */
@@ -270,6 +281,7 @@ export async function resolveEmergencyByKey(sheetId: string, phone: string, time
   const rowIndex = all.findIndex(e => e.phone === phone && e.timestamp === timestamp);
   if (rowIndex < 0) throw new Error(`Emergency not found: phone=${phone} timestamp=${timestamp}`);
   await resolveEmergency(sheetId, rowIndex);
+  sheetsCache.invalidate(`emergencies:${sheetId}`);
 }
 
 // ── KPI helpers ───────────────────────────────────────────────────────────────
