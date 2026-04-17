@@ -4,7 +4,7 @@ import { verifyJWT } from '@/lib/auth';
 import AdminClientSection from './AdminClientSection';
 
 const VALID_SECTIONS = [
-  'analytics', 'schedule', 'pipeline', 'emergencies', 'comms', 'revenue', 'forecast', 'reviews', 'config', 'bookings',
+  'analytics', 'schedule', 'pipeline', 'emergencies', 'comms', 'revenue', 'forecast', 'forecasting', 'reviews', 'config', 'bookings',
   'job-schedule', 'lead-pipeline', 'communications', 'configuration',
 ];
 

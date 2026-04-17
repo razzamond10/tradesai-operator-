@@ -179,7 +179,7 @@ function HourBarChart({ interactions }: { interactions: any[] }) {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayload; clientId: string }) {
+export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { user: JWTPayload; clientId: string; isDemoEmpty?: boolean }) {
   const router = useRouter();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -195,10 +195,12 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
   }, [clientId]);
 
   // ── derived data ─────────────────────────────────────────────────────────────
-  const interactions: any[] = data?.interactions || [];
-  const bookings: any[] = data?.bookings || [];
-  const emergencies: any[] = data?.emergencies || [];
-  const kpis = data?.kpis || { callsToday: 0, bookingsToday: 0, revenue: 0, hotLeads: 0, totalInteractions: 0, totalBookings: 0, emergenciesLogged: 0, conversionRate: 0 };
+  const interactions: any[] = isDemoEmpty ? [] : (data?.interactions || []);
+  const bookings: any[] = isDemoEmpty ? [] : (data?.bookings || []);
+  const emergencies: any[] = isDemoEmpty ? [] : (data?.emergencies || []);
+  const kpis = isDemoEmpty
+    ? { callsToday: 0, bookingsToday: 0, revenue: 0, hotLeads: 0, totalInteractions: 0, totalBookings: 0, emergenciesLogged: 0, conversionRate: 0 }
+    : (data?.kpis || { callsToday: 0, bookingsToday: 0, revenue: 0, hotLeads: 0, totalInteractions: 0, totalBookings: 0, emergenciesLogged: 0, conversionRate: 0 });
 
   // Lead Sources donut — from intent field
   const intentMap: Record<string, number> = {};
@@ -287,7 +289,7 @@ export default function AdminClientDetailV13({ user, clientId }: { user: JWTPayl
           </div>
         )}
 
-        {data && (
+        {(data || isDemoEmpty) && (
           <>
             {/* Section: Today at a glance */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>

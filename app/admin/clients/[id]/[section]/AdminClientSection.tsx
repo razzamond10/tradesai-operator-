@@ -745,6 +745,10 @@ function DowBarChart({ interactions }: { interactions: any[] }) {
 }
 
 function ForecastSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
+  if (interactions.length === 0 && bookings.length === 0) {
+    return <EmptyState icon="📈" title="No forecast data yet" sub="Once calls and bookings come in, projections will appear here." />;
+  }
+
   const days = last30Days();
   const callsByDay = days.map(d => interactions.filter(i => (i.timestamp||'').startsWith(d)).length);
   const revByDay = days.map(d => bookings.filter(b => (b.timestamp||'').startsWith(d)).reduce((s, b) => s + parseValue(b.value), 0));
@@ -1417,7 +1421,8 @@ export default function AdminClientSection({ clientId, section, user, isDemoEmpt
       case 'emergencies': return <EmergenciesSection emergencies={de} clientId={clientId} businessName={businessName} />;
       case 'comms':       return <CommsSection interactions={di} />;
       case 'revenue':     return <RevenueSection bookings={db} businessName={businessName} />;
-      case 'forecast':    return <ForecastSection interactions={di} bookings={db} />;
+      case 'forecast':
+      case 'forecasting': return <ForecastSection interactions={di} bookings={db} />;
       case 'reviews':     return <ReviewsSection interactions={di} />;
       case 'config':      return <ConfigSection config={config} />;
       case 'bookings':        return db.length === 0 ? (
