@@ -1,13 +1,13 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { verifyJWT } from '@/lib/auth';
-import CommsClient from './CommsClient';
+import ClientSection from '@/app/dashboard/[section]/ClientSection';
 
-export default async function CommsPage() {
+export default async function CommsPage({ searchParams }: { searchParams?: Record<string, string> }) {
   const token = cookies().get('tradesai_token')?.value;
   if (!token) redirect('/login');
   const user = await verifyJWT(token);
   if (!user) redirect('/login');
-  if (!user.clientId) redirect('/dashboard');
-  return <CommsClient user={user} />;
+  if (user.role !== 'client' && user.role !== 'admin') redirect('/login');
+  return <ClientSection section="comms" user={user} isDemoEmpty={searchParams?.demo === 'empty'} />;
 }

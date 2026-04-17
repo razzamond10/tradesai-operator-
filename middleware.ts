@@ -31,17 +31,24 @@ export async function middleware(req: NextRequest) {
     return res;
   }
 
-  // Role-based routing: redirect from root portal paths to correct home
-  if (pathname === '/dashboard' || pathname === '/admin' || pathname === '/va') {
-    if (pathname === '/admin' && user.role !== 'admin') {
-      return NextResponse.redirect(new URL(roleHome(user.role), req.url));
-    }
-    if (pathname === '/va' && user.role !== 'va' && user.role !== 'admin') {
-      return NextResponse.redirect(new URL(roleHome(user.role), req.url));
-    }
-    if (pathname === '/dashboard' && user.role !== 'client' && user.role !== 'admin') {
-      return NextResponse.redirect(new URL(roleHome(user.role), req.url));
-    }
+  // Block /admin/** for non-admin users
+  if (pathname.startsWith('/admin') && user.role !== 'admin') {
+    return NextResponse.redirect(new URL(roleHome(user.role), req.url));
+  }
+
+  // Block /va/** for non-va, non-admin users
+  if (pathname.startsWith('/va') && user.role !== 'va' && user.role !== 'admin') {
+    return NextResponse.redirect(new URL(roleHome(user.role), req.url));
+  }
+
+  // Block /dashboard/** for non-client, non-admin users
+  if (pathname.startsWith('/dashboard') && user.role !== 'client' && user.role !== 'admin') {
+    return NextResponse.redirect(new URL(roleHome(user.role), req.url));
+  }
+
+  // Block /api/clients/** for non-admin users
+  if (pathname.startsWith('/api/clients') && user.role !== 'admin') {
+    return NextResponse.redirect(new URL(roleHome(user.role), req.url));
   }
 
   return NextResponse.next();

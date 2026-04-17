@@ -1,13 +1,13 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { verifyJWT } from '@/lib/auth';
-import ReviewsClient from './ReviewsClient';
+import ClientSection from '@/app/dashboard/[section]/ClientSection';
 
-export default async function ReviewsPage() {
+export default async function ReviewsPage({ searchParams }: { searchParams?: Record<string, string> }) {
   const token = cookies().get('tradesai_token')?.value;
   if (!token) redirect('/login');
   const user = await verifyJWT(token);
   if (!user) redirect('/login');
-  if (user.role !== 'client') redirect('/admin');
-  return <ReviewsClient user={user} />;
+  if (user.role !== 'client' && user.role !== 'admin') redirect('/login');
+  return <ClientSection section="reviews" user={user} isDemoEmpty={searchParams?.demo === 'empty'} />;
 }

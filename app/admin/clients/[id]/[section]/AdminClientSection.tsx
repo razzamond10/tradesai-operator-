@@ -150,7 +150,7 @@ function StatusBadge({ status }: { status: string }) {
 
 // ── Section renderers ──────────────────────────────────────────────────────────
 
-function AnalyticsSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
+export function AnalyticsSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
 
   const intentMap: Record<string, number> = {};
   interactions.forEach(i => { const k = i.intent || 'Unknown'; intentMap[k] = (intentMap[k] || 0) + 1; });
@@ -203,7 +203,7 @@ function AnalyticsSection({ interactions, bookings }: { interactions: any[]; boo
   );
 }
 
-function ScheduleSection({ bookings }: { bookings: any[] }) {
+export function ScheduleSection({ bookings }: { bookings: any[] }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [search, setSearch] = useState('');
 
@@ -282,7 +282,7 @@ function ScheduleSection({ bookings }: { bookings: any[] }) {
   );
 }
 
-function PipelineSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
+export function PipelineSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
   const stages = [
     { label: 'New Lead', icon: '📥', key: 'new', color: '#3D1FA8' },
     { label: 'Contacted', icon: '📞', key: 'contacted', color: '#6B3FD0' },
@@ -340,7 +340,7 @@ function PipelineSection({ interactions, bookings }: { interactions: any[]; book
   );
 }
 
-function EmergenciesSection({ emergencies, clientId, businessName = 'client' }: { emergencies: any[]; clientId: string; businessName?: string }) {
+export function EmergenciesSection({ emergencies, clientId, businessName = 'client', isClientView = false }: { emergencies: any[]; clientId: string; businessName?: string; isClientView?: boolean }) {
   const [filter, setFilter] = useState<'all'|'active'|'resolved'>('all');
   const [resolving, setResolving] = useState<Record<number, boolean>>({});
   const [localResolved, setLocalResolved] = useState<Record<number, boolean>>({});
@@ -429,7 +429,7 @@ function EmergenciesSection({ emergencies, clientId, businessName = 'client' }: 
                         {em.phone && (
                           <a href={`tel:${em.phone.replace(/\s/g, '')}`} style={{ padding: '5px 10px', borderRadius: '7px', background: isActive ? 'var(--a4)' : 'var(--slate)', color: isActive ? '#fff' : 'var(--ink)', fontSize: '11px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📞 Call</a>
                         )}
-                        {isActive && (
+                        {isActive && !isClientView && (
                           <button
                             disabled={isResolving || dataIdx < 0}
                             onClick={async () => {
@@ -471,7 +471,7 @@ function EmergenciesSection({ emergencies, clientId, businessName = 'client' }: 
   );
 }
 
-function CommsSection({ interactions }: { interactions: any[] }) {
+export function CommsSection({ interactions }: { interactions: any[] }) {
   const [search, setSearch] = useState('');
   const [outcome, setOutcome] = useState('all');
   const [expandedKey, setExpandedKey] = useState<string | null>(null);
@@ -584,7 +584,7 @@ function CommsSection({ interactions }: { interactions: any[] }) {
   );
 }
 
-function RevenueSection({ bookings, businessName = 'client' }: { bookings: any[]; businessName?: string }) {
+export function RevenueSection({ bookings, businessName = 'client' }: { bookings: any[]; businessName?: string }) {
   const [statusFilter, setStatusFilter] = useState('all');
 
   const revTotal = bookings.reduce((s, b) => s + parseValue(b.value), 0);
@@ -744,7 +744,7 @@ function DowBarChart({ interactions }: { interactions: any[] }) {
   return <div style={{ position: 'relative', height: '150px' }}><canvas ref={canvasRef} /></div>;
 }
 
-function ForecastSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
+export function ForecastSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
   if (interactions.length === 0 && bookings.length === 0) {
     return <EmptyState icon="📈" title="No forecast data yet" sub="Once calls and bookings come in, projections will appear here." />;
   }
@@ -814,7 +814,7 @@ function ForecastSection({ interactions, bookings }: { interactions: any[]; book
   );
 }
 
-function ReviewsSection({ interactions: _interactions }: { interactions: any[] }) {
+export function ReviewsSection({ interactions: _interactions }: { interactions: any[] }) {
   return (
     <Card>
       <div style={{ padding: '60px 24px', textAlign: 'center' }}>
@@ -873,7 +873,7 @@ function ConfigSection({ config }: { config: any }) {
 
 type SortKey = 'date' | 'customer' | 'status' | 'value';
 
-function JobScheduleSection({ bookings }: { bookings: any[] }) {
+export function JobScheduleSection({ bookings }: { bookings: any[] }) {
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<'asc'|'desc'>('asc');
   const [search, setSearch] = useState('');
@@ -995,7 +995,7 @@ function JobScheduleSection({ bookings }: { bookings: any[] }) {
   );
 }
 
-function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
+export function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -1141,7 +1141,7 @@ function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; 
 const COMMS_TABS = ['All', 'Booked', 'Quoted', 'Emergency', 'Follow-up'] as const;
 type CommsTab = typeof COMMS_TABS[number];
 
-function CommunicationsSection({ interactions, businessName = 'client' }: { interactions: any[]; businessName?: string }) {
+export function CommunicationsSection({ interactions, businessName = 'client' }: { interactions: any[]; businessName?: string }) {
   const [tab, setTab] = useState<CommsTab>('All');
   const [search, setSearch] = useState('');
   const [selectedCall, setSelectedCall] = useState<any>(null);
@@ -1315,10 +1315,11 @@ function CommunicationsSection({ interactions, businessName = 'client' }: { inte
   );
 }
 
-function ConfigurationSection({ config }: { config: any }) {
+export function ConfigurationSection({ config, isClientView = false }: { config: any; isClientView?: boolean }) {
   const [showContactMsg, setShowContactMsg] = useState(false);
   if (!config) return <div style={{ padding: '32px', textAlign: 'center', color: 'var(--muted)', fontSize: '12px' }}>No configuration found</div>;
 
+  const HIDDEN_CLIENT_LABELS = new Set(['Sheet ID', 'Webhook URL', 'Client ID']);
   const fields = [
     { label: 'Business Name',  value: config.businessName,    icon: '🏢' },
     { label: 'Trade Type',     value: config.tradeType,       icon: '🔧' },
@@ -1330,7 +1331,7 @@ function ConfigurationSection({ config }: { config: any }) {
     { label: 'Webhook URL',    value: config.makeWebhookUrl,  icon: '🔗', mono: true },
     { label: 'Client ID',      value: config.clientId,        icon: '🔑', mono: true },
     { label: 'Plan Tier',      value: 'Starter',              icon: '⭐' },
-  ].filter(f => f.value);
+  ].filter(f => f.value && !(isClientView && HIDDEN_CLIENT_LABELS.has(f.label)));
 
   return (
     <Card>
@@ -1346,23 +1347,47 @@ function ConfigurationSection({ config }: { config: any }) {
           </div>
         ))}
       </div>
-      <div style={{ padding: '16px', borderTop: '1px solid var(--divider)', marginTop: '4px' }}>
-        <button onClick={() => setShowContactMsg(m => !m)} style={{ padding: '9px 18px', borderRadius: '8px', background: 'var(--a1)', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: '"Inter",sans-serif' }}>
-          ✏️ Edit Configuration
-        </button>
-        {showContactMsg && (
-          <div style={{ marginTop: '10px', padding: '10px 14px', borderRadius: '8px', background: 'var(--a1b)', border: '1px solid rgba(61,31,168,0.15)', fontSize: '12px', color: 'var(--a1)', fontWeight: 500 }}>
-            To update your configuration, please contact support at <strong>admin@tradesaioperator.uk</strong>
-          </div>
-        )}
-      </div>
+      {!isClientView && (
+        <div style={{ padding: '16px', borderTop: '1px solid var(--divider)', marginTop: '4px' }}>
+          <button onClick={() => setShowContactMsg(m => !m)} style={{ padding: '9px 18px', borderRadius: '8px', background: 'var(--a1)', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer', fontFamily: '"Inter",sans-serif' }}>
+            ✏️ Edit Configuration
+          </button>
+          {showContactMsg && (
+            <div style={{ marginTop: '10px', padding: '10px 14px', borderRadius: '8px', background: 'var(--a1b)', border: '1px solid rgba(61,31,168,0.15)', fontSize: '12px', color: 'var(--a1)', fontWeight: 500 }}>
+              To update your configuration, please contact support at <strong>admin@tradesaioperator.uk</strong>
+            </div>
+          )}
+        </div>
+      )}
     </Card>
+  );
+}
+
+// ── Bookings section (extracted for reuse) ─────────────────────────────────────
+
+export function BookingsSection({ bookings, businessName = 'client' }: { bookings: any[]; businessName?: string }) {
+  if (bookings.length === 0) {
+    return <EmptyState icon="📅" title="No bookings yet" sub="Bookings from your AI will appear here as they're scheduled." />;
+  }
+  return (
+    <>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
+        <ExportButton onClick={() => exportCSV(
+          csvFilename('bookings', businessName),
+          ['Date', 'Customer', 'Phone', 'Postcode', 'Issue', 'Status', 'Value (£)'],
+          bookings.map(b => [b.scheduledDate || b.timestamp || '', b.customerName || '', b.phone || '', b.postcode || '', b.jobType || b.issue || '', b.status || '', parseValue(b.value)])
+        )} />
+      </div>
+      <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', padding: '18px' }}>
+        <BookingsCalendar bookings={bookings} />
+      </div>
+    </>
   );
 }
 
 // ── Section meta ───────────────────────────────────────────────────────────────
 
-const SECTION_META: Record<string, { label: string; sub: string }> = {
+export const SECTION_META: Record<string, { label: string; sub: string }> = {
   analytics:   { label: 'Analytics',        sub: 'Performance metrics and call trends'            },
   schedule:    { label: 'Job Schedule',      sub: 'Confirmed bookings and upcoming jobs'           },
   pipeline:    { label: 'Lead Pipeline',     sub: 'All leads tracked through conversion stages'   },
@@ -1381,18 +1406,18 @@ const SECTION_META: Record<string, { label: string; sub: string }> = {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
-export default function AdminClientSection({ clientId, section, user, isDemoEmpty = false }: { clientId: string; section: string; user: JWTPayload; isDemoEmpty?: boolean }) {
+export default function AdminClientSection({ clientId, section, user, isDemoEmpty = false, dataUrl, isClientView = false }: { clientId: string; section: string; user: JWTPayload; isDemoEmpty?: boolean; dataUrl?: string; isClientView?: boolean }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`/api/clients/${encodeURIComponent(clientId)}/data`)
+    fetch(dataUrl || `/api/clients/${encodeURIComponent(clientId)}/data`)
       .then(r => r.json())
       .then(d => { if (d.error) setError(d.error); else setData(d); })
       .catch(() => setError('Failed to load client data'))
       .finally(() => setLoading(false));
-  }, [clientId]);
+  }, [clientId, dataUrl]);
 
   const interactions: any[] = data?.interactions || [];
   const bookings: any[] = data?.bookings || [];
@@ -1418,33 +1443,18 @@ export default function AdminClientSection({ clientId, section, user, isDemoEmpt
       case 'analytics':   return <AnalyticsSection interactions={di} bookings={db} />;
       case 'schedule':    return <ScheduleSection bookings={db} />;
       case 'pipeline':    return <PipelineSection interactions={di} bookings={db} />;
-      case 'emergencies': return <EmergenciesSection emergencies={de} clientId={clientId} businessName={businessName} />;
+      case 'emergencies': return <EmergenciesSection emergencies={de} clientId={clientId} businessName={businessName} isClientView={isClientView} />;
       case 'comms':       return <CommsSection interactions={di} />;
       case 'revenue':     return <RevenueSection bookings={db} businessName={businessName} />;
       case 'forecast':
       case 'forecasting': return <ForecastSection interactions={di} bookings={db} />;
       case 'reviews':     return <ReviewsSection interactions={di} />;
       case 'config':      return <ConfigSection config={config} />;
-      case 'bookings':        return db.length === 0 ? (
-        <EmptyState icon="📅" title="No bookings yet" sub="Bookings from your AI will appear here as they're scheduled." />
-      ) : (
-        <>
-          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '10px' }}>
-            <ExportButton onClick={() => exportCSV(
-              csvFilename('bookings', businessName),
-              ['Date', 'Customer', 'Phone', 'Postcode', 'Issue', 'Status', 'Value (£)'],
-              db.map(b => [b.scheduledDate || b.timestamp || '', b.customerName || '', b.phone || '', b.postcode || '', b.jobType || b.issue || '', b.status || '', parseValue(b.value)])
-            )} />
-          </div>
-          <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', padding: '18px' }}>
-            <BookingsCalendar bookings={db} />
-          </div>
-        </>
-      );
+      case 'bookings':        return <BookingsSection bookings={db} businessName={businessName} />;
       case 'job-schedule':    return <JobScheduleSection bookings={db} />;
       case 'lead-pipeline':   return <LeadPipelineSection interactions={di} bookings={db} />;
       case 'communications':  return <CommunicationsSection interactions={di} businessName={businessName} />;
-      case 'configuration':   return <ConfigurationSection config={config} />;
+      case 'configuration':   return <ConfigurationSection config={config} isClientView={isClientView} />;
       default:                return null;
     }
   }
