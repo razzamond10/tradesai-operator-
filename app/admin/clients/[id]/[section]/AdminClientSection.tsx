@@ -122,6 +122,16 @@ function EmptyState({ icon, title, sub }: { icon: string; title: string; sub?: s
   );
 }
 
+function CallButton({ phone, neutral = false }: { phone: string; neutral?: boolean }) {
+  if (!phone) return null;
+  return (
+    <a href={`tel:${phone.replace(/\s/g, '')}`} onClick={e => e.stopPropagation()}
+      style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 9px', background: neutral ? 'var(--slate)' : 'var(--a3)', color: neutral ? 'var(--ink)' : '#fff', textDecoration: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: 600, flexShrink: 0 }}>
+      📞 Call
+    </a>
+  );
+}
+
 function statusColor(status: string): { bg: string; color: string } {
   const lower = (status || '').toLowerCase();
   if (lower.includes('confirm') || lower.includes('complet') || lower.includes('done') || lower.includes('paid')) return { bg: 'var(--a3b)', color: 'var(--a3)' };
@@ -416,8 +426,8 @@ function EmergenciesSection({ emergencies, clientId, businessName = 'client' }: 
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
-                        {isActive && (
-                          <a href={`tel:${em.phone}`} style={{ padding: '5px 12px', borderRadius: '7px', background: 'var(--a4)', color: '#fff', fontSize: '11px', fontWeight: 700, textDecoration: 'none' }}>📞 Call</a>
+                        {em.phone && (
+                          <a href={`tel:${em.phone.replace(/\s/g, '')}`} style={{ padding: '5px 10px', borderRadius: '7px', background: isActive ? 'var(--a4)' : 'var(--slate)', color: isActive ? '#fff' : 'var(--ink)', fontSize: '11px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📞 Call</a>
                         )}
                         {isActive && (
                           <button
@@ -429,7 +439,7 @@ function EmergenciesSection({ emergencies, clientId, businessName = 'client' }: 
                                 await fetch(`/api/clients/${encodeURIComponent(clientId)}/emergencies/resolve`, {
                                   method: 'POST',
                                   headers: { 'Content-Type': 'application/json' },
-                                  body: JSON.stringify({ rowIndex: dataIdx }),
+                                  body: JSON.stringify({ phone: em.phone, timestamp: em.timestamp }),
                                 });
                                 setLocalResolved(prev => ({ ...prev, [dataIdx]: true }));
                               } finally {
@@ -939,7 +949,12 @@ function JobScheduleSection({ bookings }: { bookings: any[] }) {
                       <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{b._date || '—'}</td>
                       <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b._time || '—'}</td>
                       <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{b.customerName || '—'}</td>
-                      <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{b.phone ? <a href={`tel:${b.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{b.phone}</a> : '—'}</td>
+                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)' }}>{b.phone ? <a href={`tel:${b.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{b.phone}</a> : '—'}</span>
+                          <CallButton phone={b.phone} neutral />
+                        </div>
+                      </td>
                       <td style={{ padding: '8px 12px', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{b.postcode || '—'}</td>
                       <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.jobType || '—'}</td>
                       <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}><StatusBadge status={b.status} /></td>
@@ -961,8 +976,11 @@ function JobScheduleSection({ bookings }: { bookings: any[] }) {
                   </div>
                   <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)', marginBottom: '3px' }}>{b.customerName || '—'}</div>
                   <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '3px' }}>{b.jobType || '—'}</div>
-                  {b.phone && <div style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono",monospace', color: 'var(--muted)', marginBottom: '4px' }}><a href={`tel:${b.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{b.phone}</a></div>}
-                  {parseValue(b.value) > 0 && <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--a3)' }}>£{parseValue(b.value).toLocaleString()}</div>}
+                  {b.phone && <div style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono",monospace', color: 'var(--muted)', marginBottom: '6px' }}><a href={`tel:${b.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{b.phone}</a></div>}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    {parseValue(b.value) > 0 && <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--a3)' }}>£{parseValue(b.value).toLocaleString()}</span>}
+                    <CallButton phone={b.phone} neutral />
+                  </div>
                 </div>
               ))}
             </div>
@@ -1062,7 +1080,12 @@ function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; 
                       <tr key={i} style={{ borderBottom: '1px solid var(--slate)', background: hot ? 'rgba(201,168,76,0.05)' : i%2===0 ? '#fff' : 'var(--bg)', borderLeft: hot ? '3px solid var(--a2)' : '3px solid transparent' }}>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--ink2)', whiteSpace: 'nowrap' }}>{(lead.timestamp||'').slice(0,10) || '—'}</td>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)', whiteSpace: 'nowrap' }}>{hot && <span style={{ marginRight: '4px' }}>🔥</span>}{lead.callerName || '—'}</td>
-                        <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{lead.phone ? <a href={`tel:${lead.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{lead.phone}</a> : '—'}</td>
+                        <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)' }}>{lead.phone ? <a href={`tel:${lead.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{lead.phone}</a> : '—'}</span>
+                            <CallButton phone={lead.phone} neutral />
+                          </div>
+                        </td>
                         <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.intent || '—'}</td>
                         <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{lead.notes || '—'}</td>
                         <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
@@ -1095,7 +1118,10 @@ function LeadPipelineSection({ interactions, bookings }: { interactions: any[]; 
                     <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '6px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                       {lead.intent || '—'}
                     </div>
-                    {lead.phone && <div style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono",monospace', color: 'var(--muted)', marginBottom: '8px' }}><a href={`tel:${lead.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{lead.phone}</a></div>}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                      {lead.phone && <a href={`tel:${lead.phone.replace(/\s/g, '')}`} onClick={e => e.stopPropagation()} style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono",monospace', color: 'var(--muted)', textDecoration: 'none' }}>{lead.phone}</a>}
+                      <CallButton phone={lead.phone} neutral />
+                    </div>
                     <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{os.label}</span>
                   </div>
                 );
@@ -1166,8 +1192,8 @@ function CommunicationsSection({ interactions, businessName = 'client' }: { inte
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search…" style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '11px', outline: 'none', width: '140px', fontFamily: '"Inter",sans-serif' }} />
           <ExportButton onClick={() => exportCSV(
             csvFilename('communications', businessName),
-            ['Timestamp', 'Customer', 'Phone', 'Postcode', 'Issue / Intent', 'Outcome', 'Booking Made', 'Notes'],
-            interactions.map(i => [i.timestamp || '', i.callerName || '', i.phone || '', i.postcode || '', i.intent || '', i.outcome || '', (i.outcome || '').toLowerCase().includes('book') ? 'Yes' : 'No', i.notes || ''])
+            ['Timestamp', 'Customer', 'Phone', 'Issue / Intent', 'Outcome', 'Booking Made', 'Notes'],
+            interactions.map(i => [i.timestamp || '', i.callerName || '', i.phone || '', i.intent || '', i.outcome || '', (i.outcome || '').toLowerCase().includes('book') ? 'Yes' : 'No', i.notes || ''])
           )} />
         </div>
         {filtered.length === 0 ? (
@@ -1179,7 +1205,7 @@ function CommunicationsSection({ interactions, businessName = 'client' }: { inte
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
                   <tr style={{ background: 'var(--slate)' }}>
-                    {['Date', 'Customer Name', 'Phone', 'Issue / Intent', 'Booking Made', 'Status'].map(h => (
+                    {['Date', 'Customer Name', 'Phone', 'Issue / Intent', 'Booking Made', 'Status', ''].map(h => (
                       <th key={h} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px' }}>{h}</th>
                     ))}
                   </tr>
@@ -1200,6 +1226,9 @@ function CommunicationsSection({ interactions, businessName = 'client' }: { inte
                         <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
                           <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{item.outcome || 'Unknown'}</span>
                         </td>
+                        <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                          <CallButton phone={item.phone} neutral />
+                        </td>
                       </tr>
                     );
                   })}
@@ -1219,9 +1248,10 @@ function CommunicationsSection({ interactions, businessName = 'client' }: { inte
                     </div>
                     {item.phone && <div style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono",monospace', color: 'var(--muted)', marginBottom: '4px' }}><a href={`tel:${item.phone.replace(/\s/g, '')}`} onClick={e => e.stopPropagation()} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{item.phone}</a></div>}
                     <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '8px' }}>{item.intent || '—'}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <span style={{ fontSize: '11px', fontWeight: 700, color: booked ? 'var(--a3)' : 'var(--muted)' }}>{booked ? '✓ Booked' : '✗ No booking'}</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{item.outcome || 'Unknown'}</span>
+                      <CallButton phone={item.phone} neutral />
                     </div>
                   </div>
                 );
@@ -1245,7 +1275,10 @@ function CommunicationsSection({ interactions, businessName = 'client' }: { inte
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '18px', fontWeight: 900, color: 'var(--ink)', marginBottom: '4px' }}>{selectedCall.callerName || 'Unknown Caller'}</div>
                 {selectedCall.phone && (
-                  <a href={`tel:${selectedCall.phone.replace(/\s/g, '')}`} style={{ fontSize: '13px', color: 'var(--a1)', fontFamily: '"IBM Plex Mono",monospace', textDecoration: 'none' }}>{selectedCall.phone}</a>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                    <a href={`tel:${selectedCall.phone.replace(/\s/g, '')}`} style={{ fontSize: '13px', color: 'var(--a1)', fontFamily: '"IBM Plex Mono",monospace', textDecoration: 'none' }}>{selectedCall.phone}</a>
+                    <CallButton phone={selectedCall.phone} />
+                  </div>
                 )}
               </div>
               <button onClick={() => setSelectedCall(null)} style={{ background: 'var(--slate)', border: 'none', borderRadius: '8px', width: '32px', height: '32px', cursor: 'pointer', fontSize: '16px', color: 'var(--muted)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>

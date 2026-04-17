@@ -153,9 +153,9 @@ function BookingDrawer({ booking, onClose }: { booking: Booking; onClose: () => 
           padding: '18px 20px', borderBottom: '1px solid var(--divider)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0,
         }}>
-          <div>
+          <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--ink)' }}>{booking.customerName || 'Unknown'}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px', flexWrap: 'wrap' }}>
               <span style={{
                 width: '8px', height: '8px', borderRadius: '50%', background: dot, flexShrink: 0,
                 display: 'inline-block',
@@ -166,12 +166,15 @@ function BookingDrawer({ booking, onClose }: { booking: Booking; onClose: () => 
                 background: STATUS_CHIP_BG[kind],
                 padding: '2px 8px', borderRadius: '10px',
               }}>{booking.status || STATUS_LABEL[kind]}</span>
+              {booking.phone && (
+                <a href={`tel:${booking.phone.replace(/\s/g, '')}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '3px 9px', background: 'var(--a3, #0A7455)', color: '#fff', textDecoration: 'none', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>📞 Call</a>
+              )}
             </div>
           </div>
           <button onClick={onClose} style={{
             background: 'var(--slate)', border: 'none', borderRadius: '8px',
             width: '32px', height: '32px', cursor: 'pointer',
-            fontSize: '16px', color: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '16px', color: 'var(--muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>✕</button>
         </div>
 

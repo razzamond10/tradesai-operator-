@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/auth';
-import { getClientConfig, resolveEmergency } from '@/lib/sheets';
+import { getClientConfig, resolveEmergencyByKey } from '@/lib/sheets';
 
 export async function POST(
   req: NextRequest,
@@ -13,18 +13,19 @@ export async function POST(
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   if (user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
-  let rowIndex: number;
+  let phone: string, timestamp: string;
   try {
     const body = await req.json();
-    rowIndex = body.rowIndex;
-    if (typeof rowIndex !== 'number' || rowIndex < 0) throw new Error();
+    phone = String(body.phone || '').trim();
+    timestamp = String(body.timestamp || '').trim();
+    if (!phone || !timestamp) throw new Error();
   } catch {
-    return NextResponse.json({ error: 'rowIndex (number) required' }, { status: 400 });
+    return NextResponse.json({ error: 'phone and timestamp required' }, { status: 400 });
   }
 
   const config = await getClientConfig(decodeURIComponent(params.clientId));
   if (!config?.sheetId) return NextResponse.json({ error: 'Client not found' }, { status: 404 });
 
-  await resolveEmergency(config.sheetId, rowIndex);
+  await resolveEmergencyByKey(config.sheetId, phone, timestamp);
   return NextResponse.json({ ok: true });
 }

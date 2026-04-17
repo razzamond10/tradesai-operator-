@@ -245,18 +245,31 @@ export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
   }));
 }
 
-/** Mark a single emergency row as resolved (column F = "Yes"). rowIndex is 0-based data index. */
+/** Mark a single emergency row as resolved. rowIndex is 0-based index in the FULL (unfiltered) emergencies array. */
 export async function resolveEmergency(sheetId: string, rowIndex: number): Promise<void> {
   const auth = getWriteAuth();
   const sheets = google.sheets({ version: 'v4', auth });
   const tabName = await resolveTabName(sheetId, 'emergencies');
-  const range = `'${tabName}'!G${rowIndex + 2}`; // col G = resolved; +2 skips header, converts 0-based to 1-based
+  const range = `'${tabName}'!G${rowIndex + 2}`; // +2: skip header row + convert 0-based to 1-based
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
     range,
     valueInputOption: 'RAW',
     requestBody: { values: [['Yes']] },
   });
+}
+
+/**
+ * Resolve an emergency by phone + timestamp composite key.
+ * Reads the FULL sheet (all businesses) to find the correct row index —
+ * avoids the off-by-one bug when the client sends an index into its
+ * businessName-filtered slice rather than the full sheet order.
+ */
+export async function resolveEmergencyByKey(sheetId: string, phone: string, timestamp: string): Promise<void> {
+  const all = await getEmergencies(sheetId);
+  const rowIndex = all.findIndex(e => e.phone === phone && e.timestamp === timestamp);
+  if (rowIndex < 0) throw new Error(`Emergency not found: phone=${phone} timestamp=${timestamp}`);
+  await resolveEmergency(sheetId, rowIndex);
 }
 
 // ── KPI helpers ───────────────────────────────────────────────────────────────
