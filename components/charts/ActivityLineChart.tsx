@@ -138,9 +138,19 @@ export default function ActivityLineChart({ interactions, bookings, range: range
         options: {
           responsive: true, maintainAspectRatio: false,
           layout: { padding: { left: 8, right: 8, top: 8, bottom: 24 } },
-          plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              mode: 'index',
+              intersect: false,
+              callbacks: {
+                title: (items: any[]) => items[0]?.label ?? '',
+                label: (item: any) => ` ${item.dataset.label}: ${item.parsed.y}`,
+              },
+            },
+          },
           scales: {
-            x: { grid: { display: false }, ticks: { display: true, color: '#7468A0', font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 6 } },
+            x: { grid: { display: false }, ticks: { display: true, color: '#7468A0', font: { size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
             y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { display: true, color: '#7468A0', font: { size: 10 }, stepSize: 1 }, beginAtZero: true },
           },
         },

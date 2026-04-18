@@ -209,23 +209,25 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-            {/* Clickable avatar */}
-            <button onClick={() => setProfileOpen(p => !p)} style={{
-              width: '26px', height: '26px', borderRadius: '50%', flexShrink: 0,
-              background: 'linear-gradient(135deg,#C9A84C,#E8C96A)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: '10px', fontWeight: 800, color: '#1A0A3C',
-              fontFamily: '"Inter Tight",sans-serif',
-              border: profileOpen ? '2px solid #E8C96A' : '2px solid transparent',
-              cursor: 'pointer', transition: 'border-color .15s',
-              outline: 'none',
-            }}>{initials}</button>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{adminName}</div>
-              <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>Owner — Admin</div>
-            </div>
+            <button onClick={() => router.push('/admin/account')} className="profile-row-btn" style={{
+              display: 'flex', alignItems: 'center', gap: '9px', flex: 1, minWidth: 0,
+              background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px',
+              borderRadius: '8px', textAlign: 'left', transition: 'background .15s',
+            }}>
+              <div style={{
+                width: '26px', height: '26px', borderRadius: '50%', flexShrink: 0,
+                background: 'linear-gradient(135deg,#C9A84C,#E8C96A)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '10px', fontWeight: 800, color: '#1A0A3C',
+                fontFamily: '"Inter Tight",sans-serif',
+              }}>{initials}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{adminName}</div>
+                <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>Owner — Admin</div>
+              </div>
+            </button>
             <button onClick={logout} disabled={loggingOut} title="Sign out"
-              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '14px', padding: '2px', lineHeight: 1 }}>
+              style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '14px', padding: '2px', lineHeight: 1, flexShrink: 0 }}>
               ⎋
             </button>
           </div>
@@ -234,6 +236,7 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
         <style>{`
           @keyframes pulse{0%,100%{opacity:1}50%{opacity:.2}}
           aside a:hover{background:rgba(255,255,255,0.07)!important;color:rgba(255,255,255,0.9)!important}
+          .profile-row-btn:hover{background:rgba(255,255,255,0.08)!important}
         `}</style>
       </aside>
 

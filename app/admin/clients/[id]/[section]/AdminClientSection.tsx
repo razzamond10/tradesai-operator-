@@ -209,14 +209,58 @@ export function AnalyticsSection({ interactions, bookings, pageRange }: { intera
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
         <Card>
           <CardHdr title="Call Intents" sub="What callers ask for" badge={`${Object.keys(intentMap).length} types`} badgeColor="#0A7455" />
-          <div style={{ padding: '14px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {intentData.length > 0 ? <DonutChart data={intentData} total={fi.length} centerLabel="INTENTS" /> : <div style={{ color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>}
+          <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center', minHeight: '160px' }}>
+            {intentData.length > 0 ? (
+              <>
+                <DonutChart data={intentData} total={fi.length} centerLabel="INTENTS" />
+                <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  {intentData.slice(0, 5).map(s => (
+                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{s.label}</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto', flexShrink: 0 }}>{s.value}</span>
+                    </div>
+                  ))}
+                  {intentData.length > 5 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--faint)', flexShrink: 0 }} />
+                      <span style={{ fontSize: '9.5px', color: 'var(--muted)', flex: 1 }}>Other</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto', flexShrink: 0 }}>{intentData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div style={{ gridColumn: '1/-1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>
+            )}
           </div>
         </Card>
         <Card>
           <CardHdr title="Call Outcomes" sub="How calls resolved" badge={`${Object.keys(outcomeMap).length} types`} badgeColor="#C9A84C" />
-          <div style={{ padding: '14px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {outcomeData.length > 0 ? <DonutChart data={outcomeData} total={fi.length} centerLabel="OUTCOMES" /> : <div style={{ color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>}
+          <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center', minHeight: '160px' }}>
+            {outcomeData.length > 0 ? (
+              <>
+                <DonutChart data={outcomeData} total={fi.length} centerLabel="OUTCOMES" />
+                <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  {outcomeData.slice(0, 5).map(s => (
+                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
+                      <span style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{s.label}</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto', flexShrink: 0 }}>{s.value}</span>
+                    </div>
+                  ))}
+                  {outcomeData.length > 5 && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--faint)', flexShrink: 0 }} />
+                      <span style={{ fontSize: '9.5px', color: 'var(--muted)', flex: 1 }}>Other</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto', flexShrink: 0 }}>{outcomeData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <div style={{ gridColumn: '1/-1', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>
+            )}
           </div>
         </Card>
       </div>
@@ -1520,6 +1564,8 @@ export default function AdminClientSection({ clientId, section, user, isDemoEmpt
             .rev-cards-wrap { display: block !important; }
             .lead-table-wrap { display: none !important; }
             .lead-cards-wrap { display: block !important; }
+            .donut-card-inner { grid-template-columns: 1fr !important; }
+            .donut-legend { flex-direction: row !important; flex-wrap: wrap !important; gap: 6px !important; }
           }
         `}</style>
       </div>
