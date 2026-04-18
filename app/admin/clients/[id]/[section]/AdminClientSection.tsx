@@ -6,6 +6,9 @@ import ActivityLineChart from '@/components/charts/ActivityLineChart';
 import DonutChart from '@/components/charts/DonutChart';
 import BarChart from '@/components/charts/BarChart';
 import BookingsCalendar from '@/components/BookingsCalendar';
+import DateRangeFilter, { useDateRange } from '@/components/DateRangeFilter';
+import ChartRangeOverride from '@/components/ChartRangeOverride';
+import { filterByRange, rangeSubLabel, type DateRange } from '@/lib/dateRange';
 import type { JWTPayload } from '@/lib/auth';
 
 // ── helpers ────────────────────────────────────────────────────────────────────
@@ -150,20 +153,29 @@ function StatusBadge({ status }: { status: string }) {
 
 // ── Section renderers ──────────────────────────────────────────────────────────
 
-export function AnalyticsSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
+export function AnalyticsSection({ interactions, bookings, pageRange }: { interactions: any[]; bookings: any[]; pageRange: DateRange }) {
+  const [chartOverride, setChartOverride] = useState<DateRange | null>(null);
+
+  const fi = filterByRange(interactions, i => i.timestamp, pageRange);
+  const fb = filterByRange(bookings, b => b.timestamp, pageRange);
+  const subLabel = rangeSubLabel(pageRange);
+
+  const chartRange = chartOverride ?? pageRange;
+  const chartI = chartOverride ? filterByRange(interactions, i => i.timestamp, chartOverride) : fi;
+  const chartB = chartOverride ? filterByRange(bookings, b => b.timestamp, chartOverride) : fb;
 
   const intentMap: Record<string, number> = {};
-  interactions.forEach(i => { const k = i.intent || 'Unknown'; intentMap[k] = (intentMap[k] || 0) + 1; });
+  fi.forEach(i => { const k = i.intent || 'Unknown'; intentMap[k] = (intentMap[k] || 0) + 1; });
   const intentColors = ['#3D1FA8','#0A7455','#C9A84C','#C01830','#6B3FD0','#9A6200'];
   const intentData = Object.entries(intentMap).slice(0, 6).map(([label, value], i) => ({ label, value, color: intentColors[i] }));
 
   const outcomeMap: Record<string, number> = {};
-  interactions.forEach(i => { const k = i.outcome || 'Unknown'; outcomeMap[k] = (outcomeMap[k] || 0) + 1; });
+  fi.forEach(i => { const k = i.outcome || 'Unknown'; outcomeMap[k] = (outcomeMap[k] || 0) + 1; });
   const outcomeColors = ['#0A7455','#C9A84C','#C01830','#3D1FA8','#6B3FD0'];
   const outcomeData = Object.entries(outcomeMap).slice(0, 5).map(([label, value], i) => ({ label, value, color: outcomeColors[i] }));
 
-  const convRate = interactions.length > 0 ? Math.round((bookings.length / interactions.length) * 100) : 0;
-  const revTotal = bookings.reduce((s, b) => s + parseValue(b.value), 0);
+  const convRate = fi.length > 0 ? Math.round((fb.length / fi.length) * 100) : 0;
+  const revTotal = fb.reduce((s, b) => s + parseValue(b.value), 0);
 
   if (interactions.length === 0 && bookings.length === 0) {
     return <EmptyState icon="📞" title="No calls yet" sub="Your AI is ready and waiting on the first call." />;
@@ -172,16 +184,25 @@ export function AnalyticsSection({ interactions, bookings }: { interactions: any
   return (
     <>
       <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
-        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📞" label="Total Calls" value={interactions.length} sub="all time" badge="all time" />
-        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="📅" label="Bookings" value={bookings.length} sub="from AI calls" badge="total" />
+        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📞" label="Total Calls" value={fi.length} sub={subLabel} badge={subLabel} />
+        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="📅" label="Bookings" value={fb.length} sub="from AI calls" badge="total" />
         <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="🎯" label="Conversion Rate" value={`${convRate}%`} sub="calls → bookings" badge="rate" />
-        <KPICard stripe="var(--a4)" iconBg="var(--a4b)" icon="💰" label="Total Revenue" value={fmtCurrency(revTotal)} sub="from bookings" badge="value" />
+        <KPICard stripe="var(--a4)" iconBg="var(--a4b)" icon="💰" label="Total Revenue" value={fmtCurrency(revTotal)} sub={subLabel} badge="value" />
       </div>
 
       <Card style={{ marginBottom: '16px' }}>
-        <CardHdr title="30-Day Call Volume" sub="Calls captured by AI" badge={`${interactions.length} total`} badgeColor="#3D1FA8" />
+        <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>Call Volume</div>
+            <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '2px' }}>Calls captured by AI · {subLabel}</div>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: 'rgba(61,31,168,0.1)', color: '#3D1FA8' }}>{fi.length} total</span>
+            <ChartRangeOverride pageRange={pageRange} override={chartOverride} onChange={setChartOverride} />
+          </div>
+        </div>
         <div style={{ padding: '14px' }}>
-          <ActivityLineChart interactions={interactions} bookings={bookings} mode="month" />
+          <ActivityLineChart interactions={chartI} bookings={chartB} range={chartRange} />
         </div>
       </Card>
 
@@ -189,13 +210,13 @@ export function AnalyticsSection({ interactions, bookings }: { interactions: any
         <Card>
           <CardHdr title="Call Intents" sub="What callers ask for" badge={`${Object.keys(intentMap).length} types`} badgeColor="#0A7455" />
           <div style={{ padding: '14px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {intentData.length > 0 ? <DonutChart data={intentData} total={interactions.length} centerLabel="INTENTS" /> : <div style={{ color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>}
+            {intentData.length > 0 ? <DonutChart data={intentData} total={fi.length} centerLabel="INTENTS" /> : <div style={{ color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>}
           </div>
         </Card>
         <Card>
           <CardHdr title="Call Outcomes" sub="How calls resolved" badge={`${Object.keys(outcomeMap).length} types`} badgeColor="#C9A84C" />
           <div style={{ padding: '14px', height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {outcomeData.length > 0 ? <DonutChart data={outcomeData} total={interactions.length} centerLabel="OUTCOMES" /> : <div style={{ color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>}
+            {outcomeData.length > 0 ? <DonutChart data={outcomeData} total={fi.length} centerLabel="OUTCOMES" /> : <div style={{ color: 'var(--muted)', fontSize: '12px' }}>No data yet</div>}
           </div>
         </Card>
       </div>
@@ -429,7 +450,7 @@ export function EmergenciesSection({ emergencies, clientId, businessName = 'clie
                         {em.phone && (
                           <a href={`tel:${em.phone.replace(/\s/g, '')}`} style={{ padding: '5px 10px', borderRadius: '7px', background: isActive ? 'var(--a4)' : 'var(--slate)', color: isActive ? '#fff' : 'var(--ink)', fontSize: '11px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📞 Call</a>
                         )}
-                        {isActive && !isClientView && (
+                        {isActive && (
                           <button
                             disabled={isResolving || dataIdx < 0}
                             onClick={async () => {
@@ -584,21 +605,23 @@ export function CommsSection({ interactions }: { interactions: any[] }) {
   );
 }
 
-export function RevenueSection({ bookings, businessName = 'client' }: { bookings: any[]; businessName?: string }) {
+export function RevenueSection({ bookings, businessName = 'client', pageRange }: { bookings: any[]; businessName?: string; pageRange: DateRange }) {
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const revTotal = bookings.reduce((s, b) => s + parseValue(b.value), 0);
-  // Use partial-match colour check to identify "confirmed/completed" bookings
-  const confirmed = bookings.filter(b => statusColor(b.status).color === 'var(--a3)');
+  const fb = filterByRange(bookings, b => b.timestamp, pageRange);
+  const subLabel = rangeSubLabel(pageRange);
+
+  const revTotal = fb.reduce((s, b) => s + parseValue(b.value), 0);
+  const confirmed = fb.filter(b => statusColor(b.status).color === 'var(--a3)');
   const revConfirmed = confirmed.reduce((s, b) => s + parseValue(b.value), 0);
-  const avgValue = bookings.length > 0 ? Math.round(revTotal / bookings.length) : 0;
+  const avgValue = fb.length > 0 ? Math.round(revTotal / fb.length) : 0;
 
   if (bookings.length === 0) {
     return <EmptyState icon="💷" title="No revenue data yet" sub="Revenue will appear here after your first booking with a quoted value." />;
   }
 
-  const distinctStatuses = [...new Set(bookings.map(b => (b.status || '').trim()).filter(Boolean))];
-  const filtered = bookings.filter(b => statusFilter === 'all' || (b.status || '').trim() === statusFilter);
+  const distinctStatuses = [...new Set(fb.map(b => (b.status || '').trim()).filter(Boolean))];
+  const filtered = fb.filter(b => statusFilter === 'all' || (b.status || '').trim() === statusFilter);
 
   let running = 0;
   const withRunning = [...filtered].map(b => { running += parseValue(b.value); return { ...b, running }; });
@@ -606,16 +629,16 @@ export function RevenueSection({ bookings, businessName = 'client' }: { bookings
   return (
     <>
       <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
-        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💰" label="Total Revenue" value={fmtCurrency(revTotal)} sub="all bookings" />
+        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💰" label="Total Revenue" value={fmtCurrency(revTotal)} sub={subLabel} />
         <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="✅" label="Confirmed Value" value={fmtCurrency(revConfirmed)} sub="confirmed jobs" />
         <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📊" label="Avg Job Value" value={fmtCurrency(avgValue)} sub="per booking" />
-        <KPICard stripe="var(--a4)" iconBg="var(--a4b)" icon="📅" label="Total Bookings" value={bookings.length} sub="all time" />
+        <KPICard stripe="var(--a4)" iconBg="var(--a4b)" icon="📅" label="Total Bookings" value={fb.length} sub={subLabel} />
       </div>
 
       <Card style={{ marginBottom: '16px' }}>
-        <CardHdr title="Daily Revenue (30 days)" sub="Booking value captured by AI" badge={fmtCurrency(revTotal)} badgeColor="#0A7455" />
+        <CardHdr title={`Revenue Trend`} sub={`Booking value · ${subLabel}`} badge={fmtCurrency(revTotal)} badgeColor="#0A7455" />
         <div style={{ padding: '14px', height: '160px' }}>
-          <BarChart bookings={bookings} />
+          <BarChart bookings={fb} />
         </div>
       </Card>
 
@@ -632,7 +655,7 @@ export function RevenueSection({ bookings, businessName = 'client' }: { bookings
           <ExportButton onClick={() => exportCSV(
             csvFilename('revenue', businessName),
             ['Date', 'Customer', 'Phone', 'Issue', 'Status', 'Value (£)'],
-            bookings.map(b => [b.scheduledDate || b.timestamp || '', b.customerName || '', b.phone || '', b.jobType || b.issue || '', b.status || '', parseValue(b.value)])
+            fb.map(b => [b.scheduledDate || b.timestamp || '', b.customerName || '', b.phone || '', b.jobType || b.issue || '', b.status || '', parseValue(b.value)])
           )} />
         </div>
         <>
@@ -744,70 +767,70 @@ function DowBarChart({ interactions }: { interactions: any[] }) {
   return <div style={{ position: 'relative', height: '150px' }}><canvas ref={canvasRef} /></div>;
 }
 
-export function ForecastSection({ interactions, bookings }: { interactions: any[]; bookings: any[] }) {
+export function ForecastSection({ interactions, bookings, pageRange }: { interactions: any[]; bookings: any[]; pageRange: DateRange }) {
   if (interactions.length === 0 && bookings.length === 0) {
     return <EmptyState icon="📈" title="No forecast data yet" sub="Once calls and bookings come in, projections will appear here." />;
   }
 
-  const days = last30Days();
-  const callsByDay = days.map(d => interactions.filter(i => (i.timestamp||'').startsWith(d)).length);
-  const revByDay = days.map(d => bookings.filter(b => (b.timestamp||'').startsWith(d)).reduce((s, b) => s + parseValue(b.value), 0));
+  const fi = filterByRange(interactions, i => i.timestamp, pageRange);
+  const fb = filterByRange(bookings, b => b.timestamp, pageRange);
+  const subLabel = rangeSubLabel(pageRange);
 
-  const totalCalls30 = callsByDay.reduce((a, b) => a + b, 0);
-  const totalRev30   = revByDay.reduce((a, b) => a + b, 0);
-
-  // Use all-time data for averages when the 30-day window has too few points
-  const effectiveCalls = totalCalls30 > 0 ? totalCalls30 : interactions.length;
-  const effectiveDays  = totalCalls30 > 0 ? 30 : Math.max(
-    (() => {
-      const dates = [...new Set(interactions.map(i => (i.timestamp||'').slice(0,10)).filter(Boolean))];
-      if (dates.length < 2) return 1;
-      const span = (new Date(dates[dates.length-1]).getTime() - new Date(dates[0]).getTime()) / 86400000;
-      return Math.max(Math.round(span) + 1, 1);
-    })(),
-    1
+  // Span in days for the selected range
+  const spanDays = Math.max(
+    Math.round((pageRange.to.getTime() - pageRange.from.getTime()) / 86400000) + 1, 1
   );
 
-  const avgCallsRaw = effectiveCalls / effectiveDays;
-  // Show 1 decimal when fractional to avoid rounding to 0
-  const avgCallsDisplay = avgCallsRaw === 0 ? '0' : avgCallsRaw < 1 ? avgCallsRaw.toFixed(1) : String(Math.round(avgCallsRaw));
+  const totalCalls = fi.length;
+  const totalRev   = fb.reduce((s, b) => s + parseValue(b.value), 0);
 
-  const effectiveRev  = totalRev30 > 0 ? totalRev30 : bookings.reduce((s, b) => s + parseValue(b.value), 0);
-  const effectiveRevDays = totalRev30 > 0 ? 30 : Math.max(effectiveDays, 1);
+  // Fall back to all-time data if range has no records
+  const effectiveCalls = totalCalls > 0 ? totalCalls : interactions.length;
+  const effectiveDays  = totalCalls > 0 ? spanDays : Math.max((() => {
+    const dates = [...new Set(interactions.map(i => (i.timestamp||'').slice(0,10)).filter(Boolean))];
+    if (dates.length < 2) return 1;
+    const span = (new Date(dates[dates.length-1]).getTime() - new Date(dates[0]).getTime()) / 86400000;
+    return Math.max(Math.round(span) + 1, 1);
+  })(), 1);
+
+  const effectiveRev     = totalRev > 0 ? totalRev : bookings.reduce((s, b) => s + parseValue(b.value), 0);
+  const effectiveRevDays = totalRev > 0 ? spanDays : effectiveDays;
+
+  const avgCallsRaw = effectiveCalls / effectiveDays;
+  const avgCallsDisplay = avgCallsRaw === 0 ? '0' : avgCallsRaw < 1 ? avgCallsRaw.toFixed(1) : String(Math.round(avgCallsRaw));
   const avgRevRaw = effectiveRev / effectiveRevDays;
 
-  // 30-day projection: extrapolate from observed rate
   const projCalls30 = Math.round(avgCallsRaw * 30);
   const projRev30   = Math.round(avgRevRaw * 30);
 
   return (
     <>
       <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
-        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📞" label="Avg Daily Calls" value={avgCallsDisplay} sub="per day (all-time rate)" />
-        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💰" label="Avg Daily Revenue" value={fmtCurrency(avgRevRaw)} sub="per day (all-time rate)" />
+        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📞" label="Avg Daily Calls" value={avgCallsDisplay} sub={`per day · ${subLabel}`} />
+        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💰" label="Avg Daily Revenue" value={fmtCurrency(avgRevRaw)} sub={`per day · ${subLabel}`} />
         <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📈" label="Projected Calls (30d)" value={projCalls30} sub="at current rate" />
         <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💷" label="Projected Revenue (30d)" value={fmtCurrency(projRev30)} sub="at current rate" />
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
         <Card>
-          <CardHdr title="Call Volume Trend" sub="Last 30 days" />
+          <CardHdr title="Call Volume Trend" sub={subLabel} />
           <div style={{ padding: '14px' }}>
-            <ActivityLineChart interactions={interactions} bookings={bookings} mode="month" />
+            <ActivityLineChart interactions={fi} bookings={fb} range={pageRange} />
           </div>
         </Card>
         <Card>
-          <CardHdr title="Revenue Trend" sub="Last 30 days" />
+          <CardHdr title="Revenue Trend" sub={subLabel} />
           <div style={{ padding: '14px' }}>
-            <ActivityLineChart interactions={interactions} bookings={bookings} mode="month" />
+            <ActivityLineChart interactions={fi} bookings={fb} range={pageRange} />
           </div>
         </Card>
       </div>
 
       <Card>
-        <CardHdr title="Busiest Days of Week" sub="Call volume by day" badge="all time" badgeColor="#C9A84C" />
+        <CardHdr title="Busiest Days of Week" sub={`Call volume by day · ${subLabel}`} badge={subLabel} badgeColor="#C9A84C" />
         <div style={{ padding: '14px 14px 24px' }}>
-          <DowBarChart interactions={interactions} />
+          <DowBarChart interactions={fi} />
         </div>
       </Card>
     </>
@@ -873,17 +896,20 @@ function ConfigSection({ config }: { config: any }) {
 
 type SortKey = 'date' | 'customer' | 'status' | 'value';
 
-export function JobScheduleSection({ bookings }: { bookings: any[] }) {
+export function JobScheduleSection({ bookings, pageRange }: { bookings: any[]; pageRange: DateRange }) {
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<'asc'|'desc'>('asc');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  const parsed = bookings.map(b => {
+  const fb = filterByRange(bookings, b => b.timestamp, pageRange);
+  const subLabel = rangeSubLabel(pageRange);
+
+  const parsed = fb.map(b => {
     const p = parseScheduledDate(b.scheduledDate);
     return { ...b, _date: p?.date || '', _time: p?.time || '' };
   });
-  const distinctStatuses = [...new Set(bookings.map(b => (b.status||'').trim()).filter(Boolean))];
+  const distinctStatuses = [...new Set(fb.map(b => (b.status||'').trim()).filter(Boolean))];
   const filtered = parsed.filter(b => {
     const matchStatus = statusFilter === 'all' || (b.status||'').trim() === statusFilter;
     const matchSearch = !search ||
@@ -910,24 +936,24 @@ export function JobScheduleSection({ bookings }: { bookings: any[] }) {
     return <EmptyState icon="🔧" title="No jobs scheduled" sub="Bookings from your AI will appear here once jobs are confirmed." />;
   }
 
-  const confirmedCount = bookings.filter(b => statusColor(b.status).color === 'var(--a3)').length;
-  const pendingCount   = bookings.filter(b => statusColor(b.status).color === 'var(--a6)').length;
-  const revTotal = bookings.reduce((s, b) => s + parseValue(b.value), 0);
+  const confirmedCount = fb.filter(b => statusColor(b.status).color === 'var(--a3)').length;
+  const pendingCount   = fb.filter(b => statusColor(b.status).color === 'var(--a6)').length;
+  const revTotal = fb.reduce((s, b) => s + parseValue(b.value), 0);
 
   return (
     <>
       <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '16px' }}>
-        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📅" label="Total Bookings" value={bookings.length} sub="all time" />
+        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📅" label="Total Bookings" value={fb.length} sub={subLabel} />
         <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="✅" label="Confirmed / Done" value={confirmedCount} sub="confirmed or completed" />
         <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="⏳" label="Pending" value={pendingCount} sub="awaiting or scheduled" />
-        <KPICard stripe="var(--a5)" iconBg="var(--a5b)" icon="💰" label="Total Value" value={fmtCurrency(revTotal)} sub="from all bookings" />
+        <KPICard stripe="var(--a5)" iconBg="var(--a5b)" icon="💰" label="Total Value" value={fmtCurrency(revTotal)} sub={subLabel} />
       </div>
       <Card>
-        <CardHdr title="Job Schedule" sub="All bookings sorted by scheduled date" badge={`${sorted.length} jobs`} badgeColor="#C9A84C" />
+        <CardHdr title="Job Schedule" sub={`Bookings · ${subLabel}`} badge={`${sorted.length} jobs`} badgeColor="#C9A84C" />
         <div style={{ padding: '10px 12px', borderBottom: '1px solid var(--divider)', display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
-          <button onClick={() => setStatusFilter('all')} style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer', background: statusFilter === 'all' ? 'var(--a2)' : 'var(--slate)', color: statusFilter === 'all' ? '#fff' : 'var(--muted)', fontFamily: '"Inter",sans-serif' }}>All ({bookings.length})</button>
+          <button onClick={() => setStatusFilter('all')} style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer', background: statusFilter === 'all' ? 'var(--a2)' : 'var(--slate)', color: statusFilter === 'all' ? '#fff' : 'var(--muted)', fontFamily: '"Inter",sans-serif' }}>All ({fb.length})</button>
           {distinctStatuses.map(s => (
-            <button key={s} onClick={() => setStatusFilter(s)} style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer', background: statusFilter === s ? 'var(--a2)' : 'var(--slate)', color: statusFilter === s ? '#fff' : 'var(--muted)', fontFamily: '"Inter",sans-serif', textTransform: 'capitalize' }}>{s} ({bookings.filter(b=>(b.status||'').trim()===s).length})</button>
+            <button key={s} onClick={() => setStatusFilter(s)} style={{ padding: '3px 10px', borderRadius: '20px', fontSize: '10px', fontWeight: 700, border: 'none', cursor: 'pointer', background: statusFilter === s ? 'var(--a2)' : 'var(--slate)', color: statusFilter === s ? '#fff' : 'var(--muted)', fontFamily: '"Inter",sans-serif', textTransform: 'capitalize' }}>{s} ({fb.filter(b=>(b.status||'').trim()===s).length})</button>
           ))}
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search name, issue, postcode…" style={{ marginLeft: 'auto', padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '11px', outline: 'none', width: '200px', fontFamily: '"Inter",sans-serif' }} />
         </div>
@@ -1141,10 +1167,13 @@ export function LeadPipelineSection({ interactions, bookings }: { interactions: 
 const COMMS_TABS = ['All', 'Booked', 'Quoted', 'Emergency', 'Follow-up'] as const;
 type CommsTab = typeof COMMS_TABS[number];
 
-export function CommunicationsSection({ interactions, businessName = 'client' }: { interactions: any[]; businessName?: string }) {
+export function CommunicationsSection({ interactions, businessName = 'client', pageRange }: { interactions: any[]; businessName?: string; pageRange: DateRange }) {
   const [tab, setTab] = useState<CommsTab>('All');
   const [search, setSearch] = useState('');
   const [selectedCall, setSelectedCall] = useState<any>(null);
+
+  const fi = filterByRange(interactions, i => i.timestamp, pageRange);
+  const subLabel = rangeSubLabel(pageRange);
 
   function matchTab(i: any, t: CommsTab) {
     if (t === 'All') return true;
@@ -1169,21 +1198,21 @@ export function CommunicationsSection({ interactions, businessName = 'client' }:
     return <EmptyState icon="📞" title="No calls captured yet" sub="AI-handled calls will appear here as they come in." />;
   }
 
-  const sorted = [...interactions].reverse();
+  const sorted = [...fi].reverse();
   const filtered = sorted.filter(i => {
     return matchTab(i, tab) && (!search ||
       (i.callerName||'').toLowerCase().includes(search.toLowerCase()) ||
       (i.phone||'').includes(search) ||
       (i.intent||'').toLowerCase().includes(search.toLowerCase()));
   });
-  const tabCounts = Object.fromEntries(COMMS_TABS.map(t => [t, interactions.filter(i => matchTab(i, t)).length]));
+  const tabCounts = Object.fromEntries(COMMS_TABS.map(t => [t, fi.filter(i => matchTab(i, t)).length]));
 
   return (
     <>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px', marginBottom: '16px' }}>
-        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📞" label="Total Calls" value={interactions.length} sub="all time" />
-        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="📅" label="Bookings Made" value={interactions.filter(bookingMade).length} sub="from AI calls" />
-        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="🕐" label="Today" value={interactions.filter(i=>(i.timestamp||'').startsWith(new Date().toISOString().slice(0,10))).length} sub="calls today" />
+        <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📞" label="Total Calls" value={fi.length} sub={subLabel} />
+        <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="📅" label="Bookings Made" value={fi.filter(bookingMade).length} sub="from AI calls" />
+        <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="🕐" label="Today" value={fi.filter(i=>(i.timestamp||'').startsWith(new Date().toISOString().slice(0,10))).length} sub="calls today" />
       </div>
       <Card>
         <CardHdr title="Full Call Log" sub="All AI-handled interactions" badge={`${filtered.length} shown`} badgeColor="#3D1FA8" />
@@ -1197,7 +1226,7 @@ export function CommunicationsSection({ interactions, businessName = 'client' }:
           <ExportButton onClick={() => exportCSV(
             csvFilename('communications', businessName),
             ['Timestamp', 'Customer', 'Phone', 'Issue / Intent', 'Outcome', 'Booking Made', 'Notes'],
-            interactions.map(i => [i.timestamp || '', i.callerName || '', i.phone || '', i.intent || '', i.outcome || '', (i.outcome || '').toLowerCase().includes('book') ? 'Yes' : 'No', i.notes || ''])
+            fi.map(i => [i.timestamp || '', i.callerName || '', i.phone || '', i.intent || '', i.outcome || '', (i.outcome || '').toLowerCase().includes('book') ? 'Yes' : 'No', i.notes || ''])
           )} />
         </div>
         {filtered.length === 0 ? (
@@ -1407,10 +1436,13 @@ export const SECTION_META: Record<string, { label: string; sub: string }> = {
 
 // ── Main component ─────────────────────────────────────────────────────────────
 
+const SECTIONS_WITH_DATE_FILTER = new Set(['analytics', 'revenue', 'forecast', 'forecasting', 'job-schedule', 'communications']);
+
 export default function AdminClientSection({ clientId, section, user, isDemoEmpty = false, dataUrl, isClientView = false }: { clientId: string; section: string; user: JWTPayload; isDemoEmpty?: boolean; dataUrl?: string; isClientView?: boolean }) {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [pageRange, setPageRange] = useDateRange('month');
 
   useEffect(() => {
     fetch(dataUrl || `/api/clients/${encodeURIComponent(clientId)}/data`)
@@ -1441,20 +1473,20 @@ export default function AdminClientSection({ clientId, section, user, isDemoEmpt
     const di = isDemoEmpty ? [] : interactions;
     const de = isDemoEmpty ? [] : emergencies;
     switch (section) {
-      case 'analytics':   return <AnalyticsSection interactions={di} bookings={db} />;
+      case 'analytics':   return <AnalyticsSection interactions={di} bookings={db} pageRange={pageRange} />;
       case 'schedule':    return <ScheduleSection bookings={db} />;
       case 'pipeline':    return <PipelineSection interactions={di} bookings={db} />;
       case 'emergencies': return <EmergenciesSection emergencies={de} clientId={clientId} businessName={businessName} isClientView={isClientView} />;
       case 'comms':       return <CommsSection interactions={di} />;
-      case 'revenue':     return <RevenueSection bookings={db} businessName={businessName} />;
+      case 'revenue':     return <RevenueSection bookings={db} businessName={businessName} pageRange={pageRange} />;
       case 'forecast':
-      case 'forecasting': return <ForecastSection interactions={di} bookings={db} />;
+      case 'forecasting': return <ForecastSection interactions={di} bookings={db} pageRange={pageRange} />;
       case 'reviews':     return <ReviewsSection interactions={di} />;
       case 'config':      return <ConfigSection config={config} />;
       case 'bookings':        return <BookingsSection bookings={db} businessName={businessName} />;
-      case 'job-schedule':    return <JobScheduleSection bookings={db} />;
+      case 'job-schedule':    return <JobScheduleSection bookings={db} pageRange={pageRange} />;
       case 'lead-pipeline':   return <LeadPipelineSection interactions={di} bookings={db} />;
-      case 'communications':  return <CommunicationsSection interactions={di} businessName={businessName} />;
+      case 'communications':  return <CommunicationsSection interactions={di} businessName={businessName} pageRange={pageRange} />;
       case 'configuration':   return <ConfigurationSection config={config} isClientView={isClientView} />;
       default:                return null;
     }
@@ -1473,6 +1505,9 @@ export default function AdminClientSection({ clientId, section, user, isDemoEmpt
         sub={meta.sub}
       />
       <div style={{ padding: '18px 22px', flex: 1, overflowY: 'auto' }}>
+        {SECTIONS_WITH_DATE_FILTER.has(section) && !loading && !error && (
+          <DateRangeFilter value={pageRange} onChange={setPageRange} />
+        )}
         {renderSection()}
         <style>{`
           @keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}

@@ -11,7 +11,12 @@ export async function POST(
 
   const user = await verifyJWT(token);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (user.role !== 'admin') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (user.role !== 'admin') {
+    // Allow clients to resolve their own client's emergencies
+    if (user.role !== 'client' || decodeURIComponent(user.clientId || '') !== decodeURIComponent(params.clientId)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  }
 
   let phone: string, timestamp: string;
   try {

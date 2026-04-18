@@ -7,6 +7,9 @@ import Topbar from '@/components/Topbar';
 import ActivityLineChart from '@/components/charts/ActivityLineChart';
 import DonutChart from '@/components/charts/DonutChart';
 import BarChart from '@/components/charts/BarChart';
+import DateRangeFilter, { useDateRange } from '@/components/DateRangeFilter';
+import ChartRangeOverride from '@/components/ChartRangeOverride';
+import { filterByRange, rangeSubLabel, type DateRange } from '@/lib/dateRange';
 import type { JWTPayload } from '@/lib/auth';
 
 // ── helpers ────────────────────────────────────────────────────────────────────
@@ -170,7 +173,8 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [chartMode, setChartMode] = useState<'today' | 'week' | 'month'>('month');
+  const [pageRange, setPageRange] = useDateRange('month');
+  const [actOverride, setActOverride] = useState<DateRange | null>(null);
 
   useEffect(() => {
     fetch('/api/dashboard/data')
@@ -184,9 +188,20 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
   const interactions: any[] = isDemoEmpty ? [] : (data?.interactions || []);
   const bookings: any[]     = isDemoEmpty ? [] : (data?.bookings || []);
   const emergencies: any[]  = isDemoEmpty ? [] : (data?.emergencies || []);
-  const kpis = isDemoEmpty
-    ? { callsToday: 0, bookingsToday: 0, revenue: 0, hotLeads: 0, totalInteractions: 0, totalBookings: 0, emergenciesLogged: 0, conversionRate: 0 }
-    : (data?.kpis || { callsToday: 0, bookingsToday: 0, revenue: 0, hotLeads: 0, totalInteractions: 0, totalBookings: 0, emergenciesLogged: 0, conversionRate: 0 });
+
+  const fi = filterByRange(interactions, i => i.timestamp, pageRange);
+  const fb = filterByRange(bookings, b => b.timestamp, pageRange);
+  const subLabel = rangeSubLabel(pageRange);
+
+  const chartRange = actOverride ?? pageRange;
+  const chartI = actOverride ? filterByRange(interactions, i => i.timestamp, actOverride) : fi;
+  const chartB = actOverride ? filterByRange(bookings, b => b.timestamp, actOverride) : fb;
+
+  const rangeInteractions = fi.length;
+  const rangeBookings = fb.length;
+  const rangeRevenue = fb.reduce((s, b) => s + parseValue(b.value), 0);
+  const rangeConvRate = fi.length > 0 ? Math.round((fb.length / fi.length) * 100) : 0;
+  const hotLeads = fi.filter(i => { const o = (i.outcome || '').toLowerCase(); return o === 'booked' || o === 'hot'; }).length;
 
   const intentMap: Record<string, number> = {};
   interactions.forEach(i => { const k = i.intent || 'Unknown'; intentMap[k] = (intentMap[k] || 0) + 1; });
@@ -259,9 +274,11 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
 
         {(data || isDemoEmpty) && (
           <>
+            <DateRangeFilter value={pageRange} onChange={setPageRange} />
+
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
               <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '11px', fontWeight: 700, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '.8px' }}>
-                Today at a glance
+                {subLabel === 'today' ? 'Today at a glance' : `Overview · ${subLabel}`}
               </div>
               <div style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: '"IBM Plex Mono",monospace' }}>
                 {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
@@ -269,10 +286,10 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
             </div>
 
             <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '14px' }}>
-              <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📞" badge={`${kpis.callsToday} today`} label="Total Interactions" value={kpis.totalInteractions} sub="all time calls logged" />
-              <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="✅" badge={`${kpis.bookingsToday} today`} label="Total Bookings" value={kpis.totalBookings} sub="all time confirmed" />
-              <KPICard stripe="var(--a4)" iconBg="var(--a4b)" icon="🚨" badge={openEmergencies.length > 0 ? `${openEmergencies.length} open` : 'All clear'} badgeWarn={openEmergencies.length > 0} label="Emergencies Logged" value={kpis.emergenciesLogged} sub="all time" />
-              <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📈" badge={`${fmtCurrency(revTotal)} revenue`} label="Conversion Rate" value={`${kpis.conversionRate}%`} sub="bookings ÷ calls" />
+              <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📞" badge={subLabel} label="Total Interactions" value={rangeInteractions} sub={`calls · ${subLabel}`} />
+              <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="✅" badge={subLabel} label="Total Bookings" value={rangeBookings} sub={`bookings · ${subLabel}`} />
+              <KPICard stripe="var(--a4)" iconBg="var(--a4b)" icon="🚨" badge={openEmergencies.length > 0 ? `${openEmergencies.length} open` : 'All clear'} badgeWarn={openEmergencies.length > 0} label="Emergencies Logged" value={emergencies.length} sub="all time" />
+              <KPICard stripe="var(--a2)" iconBg="var(--a2b)" icon="📈" badge={`${fmtCurrency(rangeRevenue)} revenue`} label="Conversion Rate" value={`${rangeConvRate}%`} sub="bookings ÷ calls" />
             </div>
 
             {/* Quick Actions */}
@@ -307,22 +324,10 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
                       ))}
                     </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '2px' }}>
-                    {(['today','week','month'] as const).map((m) => (
-                      <button key={m} onClick={() => setChartMode(m)} style={{
-                        padding: '3px 10px', borderRadius: '5px', fontSize: '10px', fontWeight: 600,
-                        border: 'none', cursor: 'pointer',
-                        background: chartMode === m ? 'var(--a1)' : 'var(--slate)',
-                        color: chartMode === m ? '#fff' : 'var(--muted)',
-                        fontFamily: '"Inter",sans-serif', transition: 'all .15s',
-                      }}>
-                        {m.charAt(0).toUpperCase() + m.slice(1)}
-                      </button>
-                    ))}
-                  </div>
+                  <ChartRangeOverride pageRange={pageRange} override={actOverride} onChange={setActOverride} />
                 </div>
                 <div style={{ padding: '12px 14px', minHeight: '200px', overflow: 'hidden', width: '100%' }}>
-                  <ActivityLineChart interactions={interactions} bookings={bookings} mode={chartMode} />
+                  <ActivityLineChart interactions={chartI} bookings={chartB} range={chartRange} />
                 </div>
               </Card>
 
@@ -460,7 +465,7 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
                     { label: 'Conversion Rate', value: `${convRate}%`, pct: convRate, color: 'var(--a3)' },
                     { label: 'Calls (all time)', value: String(interactions.length), pct: Math.min(100, interactions.length * 2), color: 'var(--a1)' },
                     { label: 'Avg Job Value', value: `£${avgValue}`, pct: Math.min(100, Math.round(avgValue / 20)), color: 'var(--a2)' },
-                    { label: 'Hot Leads', value: String(kpis.hotLeads), pct: Math.min(100, kpis.hotLeads * 10), color: 'var(--a4)' },
+                    { label: 'Hot Leads', value: String(hotLeads), pct: Math.min(100, hotLeads * 10), color: 'var(--a4)' },
                   ].map((row) => (
                     <div key={row.label} style={{ marginBottom: '12px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
