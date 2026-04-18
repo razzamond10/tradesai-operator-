@@ -95,7 +95,9 @@ export default function ClientSection({
       />
       <div style={{ padding: '18px 22px', flex: 1, overflowY: 'auto' }}>
         {SECTIONS_WITH_DATE_FILTER.has(section) && !loading && !error && (
-          <DateRangeFilter value={pageRange} onChange={setPageRange} />
+          <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+            <DateRangeFilter value={pageRange} onChange={setPageRange} />
+          </div>
         )}
         {renderSection()}
         <style>{`

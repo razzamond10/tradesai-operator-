@@ -306,7 +306,9 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
 
         {(data || isDemoEmpty) && (
           <>
-            <DateRangeFilter value={pageRange} onChange={setPageRange} />
+            <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+              <DateRangeFilter value={pageRange} onChange={setPageRange} />
+            </div>
 
             {/* Section: Overview */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
@@ -362,7 +364,7 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
 
             {/* Row 1: Line chart + 2 donuts */}
             <div className="admin-dash-row-3" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-              <Card style={{ overflow: 'hidden', maxWidth: '100%' }}>
+              <Card style={{ overflow: 'hidden', maxWidth: '100%', minWidth: 0 }}>
                 <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>Activity Overview</div>
@@ -382,7 +384,7 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
                 </div>
               </Card>
 
-              <NavCard href={`${base}/pipeline`}>
+              <NavCard href={`${base}/pipeline`} style={{ minWidth: 0 }}>
                 <CardHdr title="Lead Sources" sub="Where enquiries originate" viewHref={`${base}/pipeline`} />
                 <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
                   <DonutChart data={srcData} total={interactions.length} centerLabel="CALLS" />
@@ -399,7 +401,7 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
                 </div>
               </NavCard>
 
-              <NavCard href={`${base}/pipeline`}>
+              <NavCard href={`${base}/pipeline`} style={{ minWidth: 0 }}>
                 <CardHdr title="Pipeline Status" sub="Current lead breakdown" viewHref={`${base}/pipeline`} />
                 <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
                   <DonutChart data={pipeData} total={interactions.length} centerLabel="LEADS" />

@@ -186,10 +186,9 @@ export default function ClientShell({ businessName, tradeType, userName, childre
           )}
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
-            <button onClick={() => router.push('/dashboard/account')} className="profile-row-btn" style={{
+            <Link href="/dashboard/account" className="profile-row-btn" style={{
               display: 'flex', alignItems: 'center', gap: '9px', flex: 1, minWidth: 0,
-              background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px',
-              borderRadius: '8px', textAlign: 'left', transition: 'background .15s',
+              padding: '4px 6px', borderRadius: '8px', textDecoration: 'none', transition: 'background .15s',
             }}>
               <div style={{
                 width: '26px', height: '26px', borderRadius: '50%', flexShrink: 0,
@@ -202,7 +201,7 @@ export default function ClientShell({ businessName, tradeType, userName, childre
                 <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'rgba(255,255,255,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{userName}</div>
                 <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)' }}>Client</div>
               </div>
-            </button>
+            </Link>
             <button onClick={logout} disabled={loggingOut} title="Sign out"
               style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: '14px', padding: '2px', lineHeight: 1, flexShrink: 0 }}>
               ⎋

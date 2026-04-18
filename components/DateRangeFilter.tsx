@@ -75,18 +75,21 @@ export default function DateRangeFilter({ value, onChange }: Props) {
       <span style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.6px', marginRight: '2px', whiteSpace: 'nowrap', flexShrink: 0 }}>
         Range:
       </span>
-      <div className="drf-presets" style={{ display: 'flex', gap: '4px', flexWrap: 'nowrap', overflowX: 'auto', flexShrink: 1, minWidth: 0 }}>
+      <div className="drf-presets" style={{ display: 'flex', gap: '5px', flexWrap: 'wrap', flexShrink: 1, minWidth: 0 }}>
         {PRESETS.map(({ key, label }) => {
           const active = value.preset === key;
+          const hideMobile = key === 'quarter' || key === 'year';
           return (
-            <button key={key} onClick={() => onChange(getPresetRange(key))} style={{
-              padding: '4px 11px', borderRadius: '6px', fontSize: '11px', fontWeight: 700,
-              border: active ? 'none' : '1px solid var(--divider)',
-              background: active ? 'var(--a1)' : '#fff',
-              color: active ? '#fff' : 'var(--ink)',
-              cursor: 'pointer', fontFamily: '"Inter",sans-serif',
-              transition: 'all .15s', whiteSpace: 'nowrap', flexShrink: 0,
-            }}>
+            <button key={key} onClick={() => onChange(getPresetRange(key))}
+              className={hideMobile ? 'drf-hide-mobile' : undefined}
+              style={{
+                padding: '4px 11px', borderRadius: '6px', fontSize: '11px', fontWeight: 700,
+                border: active ? 'none' : '1px solid var(--divider)',
+                background: active ? 'var(--a1)' : '#fff',
+                color: active ? '#fff' : 'var(--ink)',
+                cursor: 'pointer', fontFamily: '"Inter",sans-serif',
+                transition: 'all .15s', whiteSpace: 'nowrap', flexShrink: 0,
+              }}>
               {label}
             </button>
           );
@@ -143,7 +146,12 @@ export default function DateRangeFilter({ value, onChange }: Props) {
           {fmtRange(value)}
         </span>
       )}
-      <style>{`.drf-presets::-webkit-scrollbar{display:none}.drf-presets{-ms-overflow-style:none;scrollbar-width:none}`}</style>
+      <style>{`
+        @media (max-width: 768px) {
+          .drf-hide-mobile { display: none !important; }
+          .drf-presets button { font-size: 10px !important; padding: 4px 9px !important; }
+        }
+      `}</style>
     </div>
   );
 }

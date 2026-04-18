@@ -35,18 +35,16 @@ export default function ActivityLineChart({ interactions, bookings, range: range
   );
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<any>(null);
-
-  if (interactions.length === 0 && bookings.length === 0) {
-    return (
-      <div style={NO_DATA_STYLE}>
-        <div style={{ fontSize: '22px' }}>📊</div>
-        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)' }}>No data in this range</div>
-        <div style={{ fontSize: '10px', color: 'var(--faint, #B0A8D0)' }}>Try a wider date range</div>
-      </div>
-    );
-  }
+  // Computed BEFORE hooks so we never skip useEffect (rules-of-hooks)
+  const isEmpty = interactions.length === 0 && bookings.length === 0;
 
   useEffect(() => {
+    // Guard here instead of early-return before hooks — avoids hook-order violation
+    if (isEmpty) {
+      if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
+      return;
+    }
+
     const displayMode = getDisplayMode(range);
     let labels: string[] = [];
     let callData: number[] = [];
@@ -130,13 +128,14 @@ export default function ActivityLineChart({ interactions, bookings, range: range
         data: {
           labels,
           datasets: [
-            { label: 'Calls',         data: callData,    borderColor: '#3D1FA8', backgroundColor: 'rgba(61,31,168,0.06)',  borderWidth: 2, pointRadius: 3, fill: true, tension: 0.4 },
-            { label: 'Bookings',      data: bookingData, borderColor: '#0A7455', backgroundColor: 'rgba(10,116,85,0.05)',  borderWidth: 2, pointRadius: 3, fill: true, tension: 0.4 },
-            { label: 'Revenue ÷100',  data: revenueData, borderColor: '#C9A84C', backgroundColor: 'rgba(201,168,76,0.05)', borderWidth: 2, pointRadius: 3, fill: true, tension: 0.4 },
+            { label: 'Calls',        data: callData,    borderColor: '#3D1FA8', backgroundColor: 'rgba(61,31,168,0.06)',  borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, fill: true, tension: 0.35 },
+            { label: 'Bookings',     data: bookingData, borderColor: '#0A7455', backgroundColor: 'rgba(10,116,85,0.05)',  borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, fill: true, tension: 0.35 },
+            { label: 'Revenue ÷100', data: revenueData, borderColor: '#C9A84C', backgroundColor: 'rgba(201,168,76,0.05)', borderWidth: 2, pointRadius: 0, pointHoverRadius: 5, fill: true, tension: 0.35 },
           ],
         },
         options: {
           responsive: true, maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
           layout: { padding: { left: 8, right: 8, top: 8, bottom: 24 } },
           plugins: {
             legend: { display: false },
@@ -158,7 +157,17 @@ export default function ActivityLineChart({ interactions, bookings, range: range
     });
 
     return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };
-  }, [interactions, bookings, range]);
+  }, [interactions, bookings, range, isEmpty]);
+
+  if (isEmpty) {
+    return (
+      <div style={NO_DATA_STYLE}>
+        <div style={{ fontSize: '22px' }}>📊</div>
+        <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)' }}>No data in this range</div>
+        <div style={{ fontSize: '10px', color: 'var(--faint, #B0A8D0)' }}>Try a wider date range</div>
+      </div>
+    );
+  }
 
   return <div style={{ position: 'relative', width: '100%', height: '240px', overflow: 'hidden' }}><canvas ref={canvasRef} /></div>;
 }
