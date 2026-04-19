@@ -274,7 +274,9 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
 
         {(data || isDemoEmpty) && (
           <>
-            <DateRangeFilter value={pageRange} onChange={setPageRange} />
+            <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
+              <DateRangeFilter value={pageRange} onChange={setPageRange} />
+            </div>
 
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
               <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '11px', fontWeight: 700, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '.8px' }}>
@@ -312,7 +314,7 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
 
             {/* Row 1: Activity + donuts */}
             <div className="admin-dash-row-3" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: '12px', marginBottom: '12px' }}>
-              <Card style={{ overflow: 'hidden', maxWidth: '100%' }}>
+              <Card style={{ overflow: 'hidden', maxWidth: '100%', minWidth: 0 }}>
                 <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                   <div>
                     <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>Activity Overview</div>
@@ -331,16 +333,16 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
                 </div>
               </Card>
 
-              <NavCard href={`${base}/lead-pipeline`}>
+              <NavCard href={`${base}/lead-pipeline`} style={{ minWidth: 0 }}>
                 <CardHdr title="Lead Sources" sub="Where enquiries originate" viewHref={`${base}/lead-pipeline`} />
                 <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
                   <DonutChart data={srcData} total={interactions.length} centerLabel="CALLS" />
                   <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {srcData.slice(0,5).map((s) => (
-                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                        <span style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{s.label}</span>
-                        <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto' }}>{s.value}</span>
+                        <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: '40px' }}>{s.label}</span>
+                        <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{s.value}</span>
                       </div>
                     ))}
                     {srcData.length === 0 && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>No data</span>}
@@ -348,16 +350,16 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
                 </div>
               </NavCard>
 
-              <NavCard href={`${base}/lead-pipeline`}>
+              <NavCard href={`${base}/lead-pipeline`} style={{ minWidth: 0 }}>
                 <CardHdr title="Pipeline Status" sub="Current lead breakdown" viewHref={`${base}/lead-pipeline`} />
                 <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
                   <DonutChart data={pipeData} total={interactions.length} centerLabel="LEADS" />
                   <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {pipeData.slice(0,5).map((s) => (
-                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                        <span style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{s.label}</span>
-                        <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto' }}>{s.value}</span>
+                        <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: '40px' }}>{s.label}</span>
+                        <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{s.value}</span>
                       </div>
                     ))}
                     {pipeData.length === 0 && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>No data</span>}

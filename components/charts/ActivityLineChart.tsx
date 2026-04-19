@@ -25,9 +25,10 @@ interface Props {
   range?: DateRange;
   /** @deprecated use range instead */
   mode?: 'today' | 'week' | 'month';
+  height?: number;
 }
 
-export default function ActivityLineChart({ interactions, bookings, range: rangeProp, mode }: Props) {
+export default function ActivityLineChart({ interactions, bookings, range: rangeProp, mode, height = 240 }: Props) {
   const range: DateRange = rangeProp ?? (
     mode === 'today' ? getPresetRange('today') :
     mode === 'week'  ? getPresetRange('week')  :
@@ -136,7 +137,7 @@ export default function ActivityLineChart({ interactions, bookings, range: range
         options: {
           responsive: true, maintainAspectRatio: false,
           interaction: { mode: 'index', intersect: false },
-          layout: { padding: { left: 8, right: 8, top: 8, bottom: 24 } },
+          layout: { padding: { left: 8, right: 8, top: 8, bottom: 32 } },
           plugins: {
             legend: { display: false },
             tooltip: {
@@ -149,7 +150,7 @@ export default function ActivityLineChart({ interactions, bookings, range: range
             },
           },
           scales: {
-            x: { position: 'bottom', grid: { display: false }, ticks: { display: true, color: '#7468A0', font: { size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
+            x: { position: 'bottom', grid: { display: false }, ticks: { display: true, color: '#7468A0', font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
             y: { position: 'left', grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { display: true, color: '#7468A0', font: { size: 10 }, stepSize: 1 }, beginAtZero: true },
           },
         },
@@ -169,5 +170,5 @@ export default function ActivityLineChart({ interactions, bookings, range: range
     );
   }
 
-  return <div style={{ position: 'relative', width: '100%', height: '240px', overflow: 'hidden' }}><canvas ref={canvasRef} /></div>;
+  return <div style={{ position: 'relative', width: '100%', height: `${height}px`, overflow: 'hidden' }}><canvas ref={canvasRef} /></div>;
 }
