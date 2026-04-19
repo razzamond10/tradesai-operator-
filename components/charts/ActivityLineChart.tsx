@@ -149,8 +149,8 @@ export default function ActivityLineChart({ interactions, bookings, range: range
             },
           },
           scales: {
-            x: { grid: { display: false }, ticks: { display: true, color: '#7468A0', font: { size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
-            y: { grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { display: true, color: '#7468A0', font: { size: 10 }, stepSize: 1 }, beginAtZero: true },
+            x: { position: 'bottom', grid: { display: false }, ticks: { display: true, color: '#7468A0', font: { size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } },
+            y: { position: 'left', grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { display: true, color: '#7468A0', font: { size: 10 }, stepSize: 1 }, beginAtZero: true },
           },
         },
       });

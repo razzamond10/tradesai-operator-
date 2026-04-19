@@ -26,7 +26,7 @@ const css = `
 .kl{font-size:9px;font-weight:700;color:#7468A0;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
 .kv{font-family:"Inter Tight",sans-serif;font-size:30px;font-weight:900;color:#1A0A3C;line-height:1;letter-spacing:-1.5px}
 .ks{font-size:10px;color:#7468A0;margin-top:4px}
-.card{background:#fff;border:1px solid #D8D0F0;border-radius:10px;box-shadow:0 2px 8px rgba(26,10,60,0.10),0 1px 2px rgba(26,10,60,0.05);overflow:hidden}
+.card{background:#fff;border:1px solid #D8D0F0;border-radius:10px;box-shadow:0 2px 8px rgba(26,10,60,0.10),0 1px 2px rgba(26,10,60,0.05);overflow:hidden;min-width:0}
 .card-hdr{padding:11px 14px 10px;border-bottom:1px solid #D8D0F0;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .card-title{font-family:"Inter Tight",sans-serif;font-size:12px;font-weight:800;color:#1A0A3C}
 .card-sub{font-size:9px;color:#7468A0;margin-top:1px}

@@ -215,17 +215,17 @@ export function AnalyticsSection({ interactions, bookings, pageRange }: { intera
                 <DonutChart data={intentData} total={fi.length} centerLabel="INTENTS" />
                 <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                   {intentData.slice(0, 5).map(s => (
-                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                      <span style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{s.label}</span>
-                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto', flexShrink: 0 }}>{s.value}</span>
+                      <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{s.label}</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0 }}>{s.value}</span>
                     </div>
                   ))}
                   {intentData.length > 5 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--faint)', flexShrink: 0 }} />
-                      <span style={{ fontSize: '9.5px', color: 'var(--muted)', flex: 1 }}>Other</span>
-                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto', flexShrink: 0 }}>{intentData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
+                      <span style={{ fontSize: '9.5px', color: 'var(--muted)', flex: 1, minWidth: 0 }}>Other</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0 }}>{intentData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
                     </div>
                   )}
                 </div>
@@ -243,17 +243,17 @@ export function AnalyticsSection({ interactions, bookings, pageRange }: { intera
                 <DonutChart data={outcomeData} total={fi.length} centerLabel="OUTCOMES" />
                 <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                   {outcomeData.slice(0, 5).map(s => (
-                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                      <span style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{s.label}</span>
-                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto', flexShrink: 0 }}>{s.value}</span>
+                      <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{s.label}</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0 }}>{s.value}</span>
                     </div>
                   ))}
                   {outcomeData.length > 5 && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0 }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--faint)', flexShrink: 0 }} />
-                      <span style={{ fontSize: '9.5px', color: 'var(--muted)', flex: 1 }}>Other</span>
-                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto', flexShrink: 0 }}>{outcomeData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
+                      <span style={{ fontSize: '9.5px', color: 'var(--muted)', flex: 1, minWidth: 0 }}>Other</span>
+                      <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0 }}>{outcomeData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
                     </div>
                   )}
                 </div>
@@ -1567,7 +1567,8 @@ export default function AdminClientSection({ clientId, section, user, isDemoEmpt
             .lead-table-wrap { display: none !important; }
             .lead-cards-wrap { display: block !important; }
             .donut-card-inner { grid-template-columns: 1fr !important; }
-            .donut-legend { flex-direction: row !important; flex-wrap: wrap !important; gap: 6px !important; }
+            .donut-legend { width: 100% !important; flex-direction: column !important; gap: 5px !important; padding: 0 4px !important; }
+            .donut-legend span { font-size: 11px !important; }
           }
         `}</style>
       </div>
