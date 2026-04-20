@@ -143,6 +143,11 @@ export default function ActivityLineChart({ interactions, bookings, range: range
             tooltip: {
               mode: 'index',
               intersect: false,
+              position: 'nearest',
+              caretPadding: 12,
+              boxPadding: 4,
+              titleFont: { size: 11 },
+              bodyFont: { size: 11 },
               callbacks: {
                 title: (items: any[]) => items[0]?.label ?? '',
                 label: (item: any) => ` ${item.dataset.label}: ${item.parsed.y}`,

@@ -341,7 +341,7 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
                     {srcData.slice(0,5).map((s) => (
                       <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                        <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: '40px' }}>{s.label}</span>
+                        <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>{s.label}</span>
                         <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{s.value}</span>
                       </div>
                     ))}
@@ -358,7 +358,7 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
                     {pipeData.slice(0,5).map((s) => (
                       <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                        <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: '40px' }}>{s.label}</span>
+                        <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>{s.label}</span>
                         <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{s.value}</span>
                       </div>
                     ))}

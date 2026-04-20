@@ -217,14 +217,14 @@ export function AnalyticsSection({ interactions, bookings, pageRange }: { intera
                   {intentData.slice(0, 5).map(s => (
                     <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                      <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: '40px' }}>{s.label}</span>
+                      <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>{s.label}</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{s.value}</span>
                     </div>
                   ))}
                   {intentData.length > 5 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--faint)', flexShrink: 0 }} />
-                      <span style={{ fontSize: '9.5px', color: 'var(--muted)', flex: '1 1 0', minWidth: '40px' }}>Other</span>
+                      <span style={{ fontSize: '12px', color: 'var(--muted)', flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>Other</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{intentData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
                     </div>
                   )}
@@ -245,14 +245,14 @@ export function AnalyticsSection({ interactions, bookings, pageRange }: { intera
                   {outcomeData.slice(0, 5).map(s => (
                     <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                      <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: '40px' }}>{s.label}</span>
+                      <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>{s.label}</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{s.value}</span>
                     </div>
                   ))}
                   {outcomeData.length > 5 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--faint)', flexShrink: 0 }} />
-                      <span style={{ fontSize: '9.5px', color: 'var(--muted)', flex: '1 1 0', minWidth: '40px' }}>Other</span>
+                      <span style={{ fontSize: '12px', color: 'var(--muted)', flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>Other</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{outcomeData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
                     </div>
                   )}
@@ -477,7 +477,7 @@ export function EmergenciesSection({ emergencies, clientId, businessName = 'clie
                 const isResolving = resolving[dataIdx];
                 return (
                   <div key={origIdx} style={{ padding: '12px 14px', borderRadius: '8px', border: `1px solid ${isActive ? '#F5C0C8' : 'var(--divider)'}`, borderLeft: `4px solid ${isActive ? 'var(--a4)' : 'var(--a3)'}`, background: '#fff' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                    <div className="em-card-inner" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                       <span style={{ fontSize: '20px' }}>{isActive ? '🚨' : '✅'}</span>
                       <div style={{ flex: 1 }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', flexWrap: 'wrap' }}>
@@ -490,7 +490,7 @@ export function EmergenciesSection({ emergencies, clientId, businessName = 'clie
                           {em.timestamp && <span> · {em.timestamp.slice(0, 16).replace('T', ' ')}</span>}
                         </div>
                       </div>
-                      <div style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
+                      <div className="em-actions" style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
                         {em.phone && (
                           <a href={`tel:${em.phone.replace(/\s/g, '')}`} style={{ padding: '5px 10px', borderRadius: '7px', background: isActive ? 'var(--a4)' : 'var(--slate)', color: isActive ? '#fff' : 'var(--ink)', fontSize: '11px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📞 Call</a>
                         )}
@@ -856,7 +856,7 @@ export function ForecastSection({ interactions, bookings, pageRange }: { interac
         <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💷" label="Projected Revenue (30d)" value={fmtCurrency(projRev30)} sub="at current rate" />
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+      <div className="forecast-chart-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
         <Card>
           <CardHdr title="Call Volume Trend" sub={subLabel} />
           <div style={{ padding: '14px', height: '280px' }}>
@@ -865,8 +865,15 @@ export function ForecastSection({ interactions, bookings, pageRange }: { interac
         </Card>
         <Card>
           <CardHdr title="Revenue Trend" sub={subLabel} />
-          <div style={{ padding: '14px', height: '280px' }}>
+          <div style={{ padding: '14px', height: '280px', position: 'relative' }}>
             <ActivityLineChart interactions={fi} bookings={fb} range={pageRange} height={280} />
+            {totalRev === 0 && (
+              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.82)', borderRadius: '8px', gap: '6px', pointerEvents: 'none' }}>
+                <div style={{ fontSize: '20px' }}>💰</div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textAlign: 'center', padding: '0 12px' }}>No revenue yet</div>
+                <div style={{ fontSize: '10px', color: 'var(--faint, #B0A8D0)', textAlign: 'center', padding: '0 16px' }}>Bookings will populate once quoted values are captured</div>
+              </div>
+            )}
           </div>
         </Card>
       </div>
@@ -1569,6 +1576,10 @@ export default function AdminClientSection({ clientId, section, user, isDemoEmpt
             .donut-card-inner { grid-template-columns: 1fr !important; }
             .donut-legend { width: 100% !important; flex-direction: column !important; gap: 5px !important; padding: 0 4px !important; }
             .donut-legend span { font-size: 11px !important; }
+            .em-card-inner { flex-direction: column !important; }
+            .em-actions { width: 100% !important; margin-top: 8px !important; }
+            .em-actions a, .em-actions button { flex: 1 !important; justify-content: center !important; }
+            .forecast-chart-grid { grid-template-columns: 1fr !important; }
           }
         `}</style>
       </div>
