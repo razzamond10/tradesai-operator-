@@ -390,10 +390,10 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
                   <DonutChart data={srcData} total={interactions.length} centerLabel="CALLS" />
                   <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {srcData.slice(0,5).map((s) => (
-                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                        <span style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{s.label}</span>
-                        <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto' }}>{s.value}</span>
+                        <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 44px)' }}>{s.label}</span>
+                        <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto', fontVariantNumeric: 'tabular-nums', minWidth: '24px' }}>{s.value}</span>
                       </div>
                     ))}
                     {srcData.length === 0 && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>No data</span>}
@@ -407,10 +407,10 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
                   <DonutChart data={pipeData} total={interactions.length} centerLabel="LEADS" />
                   <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
                     {pipeData.slice(0,5).map((s) => (
-                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                        <span style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>{s.label}</span>
-                        <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', marginLeft: 'auto' }}>{s.value}</span>
+                        <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 44px)' }}>{s.label}</span>
+                        <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto', fontVariantNumeric: 'tabular-nums', minWidth: '24px' }}>{s.value}</span>
                       </div>
                     ))}
                     {pipeData.length === 0 && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>No data</span>}
