@@ -217,14 +217,14 @@ export function AnalyticsSection({ interactions, bookings, pageRange }: { intera
                   {intentData.slice(0, 5).map(s => (
                     <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                      <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>{s.label}</span>
+                      <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>{s.label}</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{s.value}</span>
                     </div>
                   ))}
                   {intentData.length > 5 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--faint)', flexShrink: 0 }} />
-                      <span style={{ fontSize: '12px', color: 'var(--muted)', flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>Other</span>
+                      <span style={{ fontSize: '12px', color: 'var(--muted)', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>Other</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{intentData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
                     </div>
                   )}
@@ -245,14 +245,14 @@ export function AnalyticsSection({ interactions, bookings, pageRange }: { intera
                   {outcomeData.slice(0, 5).map(s => (
                     <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                      <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>{s.label}</span>
+                      <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>{s.label}</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{s.value}</span>
                     </div>
                   ))}
                   {outcomeData.length > 5 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--faint)', flexShrink: 0 }} />
-                      <span style={{ fontSize: '12px', color: 'var(--muted)', flex: '1 1 auto', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>Other</span>
+                      <span style={{ fontSize: '12px', color: 'var(--muted)', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>Other</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{outcomeData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
                     </div>
                   )}
@@ -479,11 +479,11 @@ export function EmergenciesSection({ emergencies, clientId, businessName = 'clie
                   <div key={origIdx} style={{ padding: '12px 14px', borderRadius: '8px', border: `1px solid ${isActive ? '#F5C0C8' : 'var(--divider)'}`, borderLeft: `4px solid ${isActive ? 'var(--a4)' : 'var(--a3)'}`, background: '#fff' }}>
                     <div className="em-card-inner" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                       <span style={{ fontSize: '20px' }}>{isActive ? '🚨' : '✅'}</span>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', flexWrap: 'wrap' }}>
-                          <span style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '13px', fontWeight: 700, color: 'var(--ink)' }}>{em.callerName || 'Unknown'}</span>
-                          <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: sev.bg, color: sev.color }}>{sev.icon} {em.severity || 'Unknown'}</span>
-                          <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: isActive ? 'var(--a4b)' : 'var(--a3b)', color: isActive ? 'var(--a4)' : 'var(--a3)' }}>{isActive ? '⚠ Unresolved' : '✓ Resolved'}</span>
+                      <div style={{ flex: '1 1 0', minWidth: 0 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px', flexWrap: 'wrap', minWidth: 0, maxWidth: '100%' }}>
+                          <span title={em.callerName || 'Unknown'} style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '13px', fontWeight: 700, color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '100%', minWidth: 0, flex: '1 1 0' }}>{em.callerName || 'Unknown'}</span>
+                          <span title={em.severity || 'Unknown'} style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: sev.bg, color: sev.color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '160px', flexShrink: 1 }}>{sev.icon} {em.severity || 'Unknown'}</span>
+                          <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: isActive ? 'var(--a4b)' : 'var(--a3b)', color: isActive ? 'var(--a4)' : 'var(--a3)', whiteSpace: 'nowrap', flexShrink: 0 }}>{isActive ? '⚠ Unresolved' : '✓ Resolved'}</span>
                         </div>
                         <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
                           <a href={`tel:${(em.phone || '').replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none', fontFamily: '"IBM Plex Mono",monospace' }}>{em.phone || '—'}</a>

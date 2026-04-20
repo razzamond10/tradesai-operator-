@@ -747,8 +747,6 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
             .pipeline-stage-arrow { font-size: 12px !important; }
             .pipeline-stages-row { gap: 2px !important; padding: 10px !important; }
             .donut-card-inner { grid-template-columns: 1fr !important; }
-            .donut-legend { width: 100% !important; }
-            .donut-legend span { white-space: normal !important; overflow: visible !important; text-overflow: unset !important; }
             .em-table-wrap { display: none !important; }
             .em-cards-wrap { display: block !important; }
             .dash-job-table { display: none !important; }
