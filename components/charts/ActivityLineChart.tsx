@@ -37,7 +37,11 @@ export default function ActivityLineChart({ interactions, bookings, range: range
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const chartRef = useRef<any>(null);
   // Computed BEFORE hooks so we never skip useEffect (rules-of-hooks)
-  const isEmpty = interactions.length === 0 && bookings.length === 0;
+  const todayStr = `${range.from.getFullYear()}-${String(range.from.getMonth()+1).padStart(2,'0')}-${String(range.from.getDate()).padStart(2,'0')}`;
+  const isTodayEmpty = range.preset === 'today' &&
+    !interactions.some(i => (i.timestamp || '').startsWith(todayStr)) &&
+    !bookings.some(b => (b.timestamp || '').startsWith(todayStr));
+  const isEmpty = (interactions.length === 0 && bookings.length === 0) || isTodayEmpty;
 
   useEffect(() => {
     // Guard here instead of early-return before hooks — avoids hook-order violation
@@ -123,7 +127,7 @@ export default function ActivityLineChart({ interactions, bookings, range: range
       Chart.register(LineController, PointElement, LineElement, CategoryScale, LinearScale, Filler, Tooltip, Legend);
       if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; }
       if (!canvasRef.current) { return; }
-
+      try {
       chartRef.current = new Chart(canvasRef.current, {
         type: 'line',
         data: {
@@ -160,6 +164,10 @@ export default function ActivityLineChart({ interactions, bookings, range: range
           },
         },
       });
+      } catch (e) {
+        console.error('[ActivityLineChart] Chart.js error:', e);
+        if (chartRef.current) { try { chartRef.current.destroy(); } catch {} chartRef.current = null; }
+      }
     });
 
     return () => { if (chartRef.current) { chartRef.current.destroy(); chartRef.current = null; } };

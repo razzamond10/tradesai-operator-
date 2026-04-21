@@ -209,22 +209,22 @@ export function AnalyticsSection({ interactions, bookings, pageRange }: { intera
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
         <Card>
           <CardHdr title="Call Intents" sub="What callers ask for" badge={`${Object.keys(intentMap).length} types`} badgeColor="#0A7455" />
-          <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center', minHeight: '160px' }}>
+          <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px', alignItems: 'center', minHeight: '160px' }}>
             {intentData.length > 0 ? (
               <>
                 <DonutChart data={intentData} total={fi.length} centerLabel="INTENTS" />
-                <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '100%', flex: 1, minWidth: 0 }}>
                   {intentData.slice(0, 5).map(s => (
                     <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                      <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>{s.label}</span>
+                      <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0 }}>{s.label}</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{s.value}</span>
                     </div>
                   ))}
                   {intentData.length > 5 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--faint)', flexShrink: 0 }} />
-                      <span style={{ fontSize: '12px', color: 'var(--muted)', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>Other</span>
+                      <span style={{ fontSize: '12px', color: 'var(--muted)', flex: '1 1 0', minWidth: 0 }}>Other</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{intentData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
                     </div>
                   )}
@@ -237,22 +237,22 @@ export function AnalyticsSection({ interactions, bookings, pageRange }: { intera
         </Card>
         <Card>
           <CardHdr title="Call Outcomes" sub="How calls resolved" badge={`${Object.keys(outcomeMap).length} types`} badgeColor="#C9A84C" />
-          <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center', minHeight: '160px' }}>
+          <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px', alignItems: 'center', minHeight: '160px' }}>
             {outcomeData.length > 0 ? (
               <>
                 <DonutChart data={outcomeData} total={fi.length} centerLabel="OUTCOMES" />
-                <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '100%', flex: 1, minWidth: 0 }}>
                   {outcomeData.slice(0, 5).map(s => (
                     <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                      <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>{s.label}</span>
+                      <span title={s.label} style={{ fontSize: '12px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0 }}>{s.label}</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{s.value}</span>
                     </div>
                   ))}
                   {outcomeData.length > 5 && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, width: '100%' }}>
                       <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: 'var(--faint)', flexShrink: 0 }} />
-                      <span style={{ fontSize: '12px', color: 'var(--muted)', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 50px)' }}>Other</span>
+                      <span style={{ fontSize: '12px', color: 'var(--muted)', flex: '1 1 0', minWidth: 0 }}>Other</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto' }}>{outcomeData.slice(5).reduce((s, d) => s + d.value, 0)}</span>
                     </div>
                   )}
@@ -485,9 +485,15 @@ export function EmergenciesSection({ emergencies, clientId, businessName = 'clie
                           <span title={em.severity || 'Unknown'} style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: sev.bg, color: sev.color, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '160px', flexShrink: 1 }}>{sev.icon} {em.severity || 'Unknown'}</span>
                           <span style={{ fontSize: '9px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px', background: isActive ? 'var(--a4b)' : 'var(--a3b)', color: isActive ? 'var(--a4)' : 'var(--a3)', whiteSpace: 'nowrap', flexShrink: 0 }}>{isActive ? '⚠ Unresolved' : '✓ Resolved'}</span>
                         </div>
-                        <div style={{ fontSize: '11px', color: 'var(--muted)' }}>
-                          <a href={`tel:${(em.phone || '').replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none', fontFamily: '"IBM Plex Mono",monospace' }}>{em.phone || '—'}</a>
-                          {em.timestamp && <span> · {em.timestamp.slice(0, 16).replace('T', ' ')}</span>}
+                        <div style={{ fontSize: '11px', color: 'var(--muted)', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                          <a href={`tel:${(em.phone || '').replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none', fontFamily: '"IBM Plex Mono",monospace', whiteSpace: 'nowrap' }}>{em.phone || '—'}</a>
+                          {em.timestamp && (() => {
+                            const [datePart, timePart] = em.timestamp.slice(0, 16).split('T');
+                            const [y, m, d] = datePart.split('-');
+                            const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                            const fmt = `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+                            return <span style={{ whiteSpace: 'nowrap' }}>{fmt}{timePart ? ` · ${timePart}` : ''}</span>;
+                          })()}
                         </div>
                       </div>
                       <div className="em-actions" style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
@@ -856,7 +862,7 @@ export function ForecastSection({ interactions, bookings, pageRange }: { interac
         <KPICard stripe="var(--a3)" iconBg="var(--a3b)" icon="💷" label="Projected Revenue (30d)" value={fmtCurrency(projRev30)} sub="at current rate" />
       </div>
 
-      <div className="forecast-chart-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+      <div className="forecast-chart-grid" style={{ display: 'grid', gap: '12px', marginBottom: '12px' }}>
         <Card>
           <CardHdr title="Call Volume Trend" sub={subLabel} />
           <div style={{ padding: '14px', height: '280px' }}>
@@ -868,10 +874,10 @@ export function ForecastSection({ interactions, bookings, pageRange }: { interac
           <div style={{ padding: '14px', height: '280px', position: 'relative' }}>
             <ActivityLineChart interactions={fi} bookings={fb} range={pageRange} height={280} />
             {totalRev === 0 && (
-              <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.82)', borderRadius: '8px', gap: '6px', pointerEvents: 'none' }}>
-                <div style={{ fontSize: '20px' }}>💰</div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)', textAlign: 'center', padding: '0 12px' }}>No revenue yet</div>
-                <div style={{ fontSize: '10px', color: 'var(--faint, #B0A8D0)', textAlign: 'center', padding: '0 16px' }}>Bookings will populate once quoted values are captured</div>
+              <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', background: 'rgba(255,255,255,0.95)', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--divider)', pointerEvents: 'none', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: '18px' }}>💰</div>
+                <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--muted)' }}>No revenue yet</div>
+                <div style={{ fontSize: '10px', color: 'var(--faint, #B0A8D0)' }}>Values populate once bookings are quoted</div>
               </div>
             )}
           </div>
@@ -1564,6 +1570,7 @@ export default function AdminClientSection({ clientId, section, user, isDemoEmpt
         {renderSection()}
         <style>{`
           @keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}
+          .forecast-chart-grid { grid-template-columns: 1fr 1fr; }
           @media (max-width: 768px) {
             .sched-table-wrap { display: none !important; }
             .sched-cards-wrap { display: block !important; }

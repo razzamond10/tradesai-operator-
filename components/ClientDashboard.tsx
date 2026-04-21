@@ -335,13 +335,13 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
 
               <NavCard href={`${base}/lead-pipeline`} style={{ minWidth: 0 }}>
                 <CardHdr title="Lead Sources" sub="Where enquiries originate" viewHref={`${base}/lead-pipeline`} />
-                <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
+                <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px', alignItems: 'center' }}>
                   <DonutChart data={srcData} total={interactions.length} centerLabel="CALLS" />
-                  <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '100%', flex: 1, minWidth: 0 }}>
                     {srcData.slice(0,5).map((s) => (
-                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', minWidth: 0 }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                        <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 44px)' }}>{s.label}</span>
+                        <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0 }}>{s.label}</span>
                         <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto', fontVariantNumeric: 'tabular-nums', minWidth: '24px' }}>{s.value}</span>
                       </div>
                     ))}
@@ -352,13 +352,13 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
 
               <NavCard href={`${base}/lead-pipeline`} style={{ minWidth: 0 }}>
                 <CardHdr title="Pipeline Status" sub="Current lead breakdown" viewHref={`${base}/lead-pipeline`} />
-                <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', alignItems: 'center' }}>
+                <div className="donut-card-inner" style={{ padding: '12px', display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '8px', alignItems: 'center' }}>
                   <DonutChart data={pipeData} total={interactions.length} centerLabel="LEADS" />
-                  <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+                  <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: '5px', width: '100%', flex: 1, minWidth: 0 }}>
                     {pipeData.slice(0,5).map((s) => (
-                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%', minWidth: 0 }}>
                         <div style={{ width: '8px', height: '8px', borderRadius: '2px', background: s.color, flexShrink: 0 }} />
-                        <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0, maxWidth: 'calc(100% - 44px)' }}>{s.label}</span>
+                        <span title={s.label} style={{ fontSize: '9.5px', color: 'var(--ink)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: '1 1 0', minWidth: 0 }}>{s.label}</span>
                         <span style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', flexShrink: 0, marginLeft: 'auto', fontVariantNumeric: 'tabular-nums', minWidth: '24px' }}>{s.value}</span>
                       </div>
                     ))}
@@ -537,7 +537,7 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
           .nav-card-link:hover .nav-card { box-shadow: 0 6px 20px rgba(26,10,60,0.14) !important; border-color: rgba(201,168,76,0.4) !important; }
           @media (max-width: 768px) {
             .dash-content { padding: 12px 16px !important; }
-            .admin-dash-row-3 { grid-template-columns: 1fr !important; }
+            .admin-dash-row-3 { grid-template-columns: 1fr !important; width: 100% !important; }
             .donut-card-inner { grid-template-columns: 1fr !important; }
             .donut-legend { width: 100% !important; }
             .dash-job-table { display: none !important; }
