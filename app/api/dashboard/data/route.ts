@@ -1,3 +1,6 @@
+// Open to all tiers — returns raw client business data (interactions, bookings, emergencies, config).
+// Tier-specific views are rendered client-side and gated at the page layer.
+// For tier-gated endpoints, use withTierGuard() from lib/apiAuth.ts.
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/auth';
 import {
