@@ -10,6 +10,7 @@ import BarChart from '@/components/charts/BarChart';
 import DateRangeFilter, { useDateRange } from '@/components/DateRangeFilter';
 import ChartRangeOverride from '@/components/ChartRangeOverride';
 import { filterByRange, rangeSubLabel, type DateRange } from '@/lib/dateRange';
+import { canAccess, TIER_LABELS, type Tier } from '@/lib/tiers';
 import type { JWTPayload } from '@/lib/auth';
 
 // ── helpers ────────────────────────────────────────────────────────────────────
@@ -189,6 +190,8 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
   const [error, setError] = useState('');
   const [pageRange, setPageRange] = useDateRange('month');
   const [actOverride, setActOverride] = useState<DateRange | null>(null);
+  // Tier switcher — dev/sales demo tool only, does not persist
+  const [demoTier, setDemoTier] = useState<'off' | 'starter' | 'professional' | 'enterprise'>('off');
 
   useEffect(() => {
     fetch(`/api/clients/${encodeURIComponent(clientId)}/data`)
@@ -295,6 +298,69 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
             ⚠ {error}
           </div>
         )}
+
+        {/* ── Tier Switcher — dev/sales demo tool ── */}
+        {(() => {
+          const PAGE_FEATURES: Array<{ key: string; label: string }> = [
+            { key: 'page.analytics',     label: 'Analytics' },
+            { key: 'page.forecasting',   label: 'Forecasting' },
+            { key: 'page.revenueTracker',label: 'Revenue Tracker' },
+            { key: 'page.leadPipeline',  label: 'Lead Pipeline' },
+            { key: 'page.reviews',       label: 'Reviews & Ratings' },
+            { key: 'page.smsThreads',    label: 'SMS Threads' },
+            { key: 'page.invoices',      label: 'Invoices' },
+            { key: 'page.marketplace',   label: 'Marketplace' },
+            { key: 'page.aiInsights',    label: 'AI Insights' },
+            { key: 'page.multiLocation', label: 'Multi-Location' },
+          ];
+          const locked = demoTier !== 'off'
+            ? PAGE_FEATURES.filter(f => !canAccess(demoTier as Tier, f.key))
+            : [];
+          const accessible = demoTier !== 'off'
+            ? PAGE_FEATURES.filter(f => canAccess(demoTier as Tier, f.key))
+            : [];
+          return (
+            <div style={{ marginBottom: '14px', padding: '10px 14px', borderRadius: '8px', background: demoTier !== 'off' ? 'var(--a2b)' : 'var(--slate)', border: demoTier !== 'off' ? '1px solid rgba(201,168,76,0.4)' : '1px solid var(--divider)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: demoTier !== 'off' ? '10px' : '0' }}>
+                <span style={{ fontSize: '10px', fontWeight: 700, color: demoTier !== 'off' ? 'var(--a6)' : 'var(--muted)', flexShrink: 0 }}>
+                  {demoTier !== 'off' ? '🎭 DEMO MODE — not saved to client record' : '🔍 Preview as client tier:'}
+                </span>
+                <select
+                  value={demoTier}
+                  onChange={e => setDemoTier(e.target.value as typeof demoTier)}
+                  style={{ fontSize: '11px', fontWeight: 600, padding: '3px 8px', borderRadius: '6px', border: '1px solid var(--divider)', background: '#fff', color: 'var(--ink)', cursor: 'pointer', fontFamily: '"Inter",sans-serif' }}
+                >
+                  <option value="off">— Admin view (no restriction) —</option>
+                  <option value="starter">Starter — £447/mo</option>
+                  <option value="professional">Professional — £997/mo</option>
+                  <option value="enterprise">Enterprise — £2,197/mo</option>
+                </select>
+              </div>
+              {demoTier !== 'off' && (
+                <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
+                  <div>
+                    <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--a3)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '.8px' }}>✓ Accessible at {TIER_LABELS[demoTier as Tier]}</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      {accessible.map(f => (
+                        <span key={f.key} style={{ fontSize: '9px', fontWeight: 600, padding: '2px 7px', borderRadius: '8px', background: 'var(--a3b)', color: 'var(--a3)' }}>{f.label}</span>
+                      ))}
+                      {accessible.length === 0 && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>—</span>}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--a4)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '.8px' }}>🔒 Locked at {TIER_LABELS[demoTier as Tier]}</div>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      {locked.map(f => (
+                        <span key={f.key} style={{ fontSize: '9px', fontWeight: 600, padding: '2px 7px', borderRadius: '8px', background: 'var(--a4b)', color: 'var(--a4)' }}>{f.label}</span>
+                      ))}
+                      {locked.length === 0 && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>None — all features accessible</span>}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {loading && (
           <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '20px' }}>

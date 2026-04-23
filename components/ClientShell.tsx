@@ -2,48 +2,58 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { canAccess, requiredTierFor, TIER_LABELS, type Tier } from '@/lib/tiers';
 
 interface ClientShellProps {
   businessName?: string;
   tradeType?: string;
   userName: string;
+  planTier?: string;
   children: React.ReactNode;
 }
 
-const CLIENT_NAV = [
+const CLIENT_NAV: Array<{
+  label: string;
+  items: Array<{ label: string; icon: string; href: string; featureKey: string }>;
+}> = [
   {
     label: 'Overview',
     items: [
-      { label: 'Dashboard',         icon: '⊞', href: '/dashboard' },
-      { label: 'Analytics',         icon: '📊', href: '/dashboard/analytics' },
+      { label: 'Dashboard',         icon: '⊞', href: '/dashboard',                featureKey: 'page.dashboard' },
+      { label: 'Analytics',         icon: '📊', href: '/dashboard/analytics',      featureKey: 'page.analytics' },
     ],
   },
   {
     label: 'Operations',
     items: [
-      { label: 'Job Schedule',      icon: '📅', href: '/dashboard/job-schedule' },
-      { label: 'Bookings Calendar', icon: '🗓️', href: '/dashboard/bookings' },
-      { label: 'Lead Pipeline',     icon: '📋', href: '/dashboard/lead-pipeline' },
-      { label: 'Emergencies',       icon: '🚨', href: '/dashboard/emergencies' },
-      { label: 'Communications',    icon: '💬', href: '/dashboard/communications' },
+      { label: 'Job Schedule',      icon: '📅', href: '/dashboard/job-schedule',   featureKey: 'page.jobSchedule' },
+      { label: 'Bookings Calendar', icon: '🗓️', href: '/dashboard/bookings',       featureKey: 'page.bookingsCalendar' },
+      { label: 'Lead Pipeline',     icon: '📋', href: '/dashboard/lead-pipeline',  featureKey: 'page.leadPipeline' },
+      { label: 'Emergencies',       icon: '🚨', href: '/dashboard/emergencies',    featureKey: 'page.emergencies' },
+      { label: 'Communications',    icon: '💬', href: '/dashboard/communications', featureKey: 'page.communications' },
     ],
   },
   {
     label: 'Revenue',
     items: [
-      { label: 'Revenue Tracker',   icon: '💰', href: '/dashboard/revenue' },
-      { label: 'Forecasting',       icon: '📈', href: '/dashboard/forecasting' },
-      { label: 'Reviews & Ratings', icon: '⭐', href: '/dashboard/reviews' },
+      { label: 'Revenue Tracker',   icon: '💰', href: '/dashboard/revenue',        featureKey: 'page.revenueTracker' },
+      { label: 'Forecasting',       icon: '📈', href: '/dashboard/forecasting',    featureKey: 'page.forecasting' },
+      { label: 'Reviews & Ratings', icon: '⭐', href: '/dashboard/reviews',        featureKey: 'page.reviews' },
     ],
   },
   {
     label: 'Account',
     items: [
-      { label: 'Configuration',     icon: '⚙️', href: '/dashboard/configuration' },
-      { label: 'My Account',        icon: '👤', href: '/dashboard/account' },
+      { label: 'Configuration',     icon: '⚙️', href: '/dashboard/configuration', featureKey: 'page.configuration' },
+      { label: 'My Account',        icon: '👤', href: '/dashboard/account',        featureKey: 'page.myAccount' },
     ],
   },
 ];
+
+const TIER_PILL_LABELS: Record<string, string> = {
+  professional: 'Pro',
+  enterprise: 'Ent',
+};
 
 const TRADE_COLORS: Record<string, string> = {
   plumbing: '#3D1FA8', 'gas & heating': '#C01830', electrical: '#9A6200',
@@ -51,9 +61,10 @@ const TRADE_COLORS: Record<string, string> = {
   hvac: '#0A7455', locksmith: '#C9A84C',
 };
 
-export default function ClientShell({ businessName, tradeType, userName, children }: ClientShellProps) {
+export default function ClientShell({ businessName, tradeType, userName, planTier, children }: ClientShellProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const tier = (planTier ?? 'starter') as Tier;
   const [loggingOut, setLoggingOut] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -128,6 +139,16 @@ export default function ClientShell({ businessName, tradeType, userName, childre
               {tradeType}
             </span>
           )}
+          {planTier && (
+            <span style={{
+              display: 'inline-block', marginTop: '4px', marginLeft: tradeType ? '4px' : '0',
+              fontSize: '8px', fontWeight: 700, padding: '1px 6px', borderRadius: '8px',
+              background: 'rgba(201,168,76,0.18)', color: 'rgba(201,168,76,0.85)',
+              border: '1px solid rgba(201,168,76,0.30)',
+            }}>
+              {TIER_LABELS[tier]}
+            </span>
+          )}
         </div>
 
         {/* Nav */}
@@ -139,18 +160,34 @@ export default function ClientShell({ businessName, tradeType, userName, childre
               </div>
               {section.items.map((item) => {
                 const active = isActive(item.href);
+                const locked = !canAccess(tier, item.featureKey);
+                const pillLabel = locked ? (TIER_PILL_LABELS[requiredTierFor(item.featureKey)] ?? 'Pro') : '';
+                const dest = locked
+                  ? `/dashboard/upgrade?feature=${encodeURIComponent(item.featureKey)}`
+                  : item.href;
                 return (
-                  <Link key={item.href} href={item.href} onClick={() => setMobileNavOpen(false)} style={{
+                  <Link key={item.href} href={dest} onClick={() => setMobileNavOpen(false)} style={{
                     display: 'flex', alignItems: 'center', gap: '9px',
                     padding: '7px 10px', borderRadius: '7px', marginBottom: '1px',
                     fontSize: '12px', fontWeight: active ? 600 : 400,
-                    color: active ? '#fff' : 'rgba(255,255,255,0.55)',
+                    color: active ? '#fff' : locked ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.55)',
                     background: active ? 'rgba(106,60,210,0.32)' : 'transparent',
                     textDecoration: 'none', transition: 'all .15s',
                     borderLeft: active ? '2px solid #C9A84C' : '2px solid transparent',
                   }}>
-                    <span style={{ fontSize: '13px', width: '18px', textAlign: 'center' }}>{item.icon}</span>
-                    {item.label}
+                    <span style={{ fontSize: '13px', width: '18px', textAlign: 'center' }}>
+                      {locked ? '🔒' : item.icon}
+                    </span>
+                    <span style={{ flex: 1 }}>{item.label}</span>
+                    {locked && (
+                      <span style={{
+                        fontSize: '8px', fontWeight: 700, padding: '1px 5px', borderRadius: '6px',
+                        background: 'rgba(201,168,76,0.20)', color: 'rgba(201,168,76,0.75)',
+                        border: '1px solid rgba(201,168,76,0.25)', flexShrink: 0, letterSpacing: '0.3px',
+                      }}>
+                        {pillLabel}
+                      </span>
+                    )}
                   </Link>
                 );
               })}

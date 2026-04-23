@@ -8,6 +8,7 @@ export interface JWTPayload {
   name: string;
   role: Role;
   clientId?: string;
+  planTier?: 'starter' | 'professional' | 'enterprise';
 }
 
 function getSecret(): Uint8Array {

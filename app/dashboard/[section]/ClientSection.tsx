@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import ClientShell from '@/components/ClientShell';
 import Topbar from '@/components/Topbar';
 import DateRangeFilter, { useDateRange } from '@/components/DateRangeFilter';
+import UpgradeTeaser from '@/components/UpgradeTeaser';
 import {
   AnalyticsSection,
   ScheduleSection,
@@ -19,9 +20,21 @@ import {
   BookingsSection,
   SECTION_META,
 } from '@/app/admin/clients/[id]/[section]/AdminClientSection';
+import { canAccess, type Tier } from '@/lib/tiers';
 import type { JWTPayload } from '@/lib/auth';
 
 const SECTIONS_WITH_DATE_FILTER = new Set(['analytics', 'revenue', 'forecast', 'forecasting', 'job-schedule', 'communications']);
+
+// Maps section name → featureKey. Sections absent from this map are starter-gated (always open).
+const SECTION_FEATURE_KEY: Record<string, string> = {
+  'analytics':      'page.analytics',
+  'pipeline':       'page.leadPipeline',
+  'lead-pipeline':  'page.leadPipeline',
+  'revenue':        'page.revenueTracker',
+  'forecast':       'page.forecasting',
+  'forecasting':    'page.forecasting',
+  'reviews':        'page.reviews',
+};
 
 export default function ClientSection({
   section,
@@ -36,6 +49,11 @@ export default function ClientSection({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [pageRange, setPageRange] = useDateRange('month');
+
+  const tier = (user.planTier ?? 'starter') as Tier;
+  const featureKey = SECTION_FEATURE_KEY[section];
+  // Admin role always bypasses tier gates
+  const isGated = user.role !== 'admin' && !!featureKey && !canAccess(tier, featureKey);
 
   useEffect(() => {
     fetch('/api/dashboard/data')
@@ -55,6 +73,11 @@ export default function ClientSection({
   const meta = SECTION_META[section] || { label: section, sub: '' };
 
   function renderSection() {
+    // Tier gate — show teaser instead of content
+    if (isGated) {
+      return <UpgradeTeaser featureKey={featureKey!} featureName={meta.label} />;
+    }
+
     if (loading) return (
       <div className="admin-grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px' }}>
         {[1,2,3,4].map(i => <div key={i} style={{ height: '110px', borderRadius: '10px', background: 'rgba(0,0,0,0.05)', animation: 'shimmer 1.5s ease-in-out infinite' }} />)}
@@ -87,6 +110,7 @@ export default function ClientSection({
       businessName={config?.businessName}
       tradeType={config?.tradeType}
       userName={user.name}
+      planTier={user.planTier}
     >
       <Topbar
         breadcrumb={config?.businessName || 'My Business'}
@@ -94,7 +118,7 @@ export default function ClientSection({
         sub={meta.sub}
       />
       <div style={{ padding: '18px 22px', flex: 1, overflowY: 'auto' }}>
-        {SECTIONS_WITH_DATE_FILTER.has(section) && !loading && !error && (
+        {SECTIONS_WITH_DATE_FILTER.has(section) && !loading && !error && !isGated && (
           <div style={{ width: '100%', maxWidth: '100%', overflow: 'hidden' }}>
             <DateRangeFilter value={pageRange} onChange={setPageRange} />
           </div>

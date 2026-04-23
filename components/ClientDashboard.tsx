@@ -249,6 +249,7 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
       businessName={data?.config?.businessName}
       tradeType={data?.config?.tradeType}
       userName={user.name}
+      planTier={user.planTier}
     >
       <Topbar
         breadcrumb={data?.config?.businessName || 'My Business'}
