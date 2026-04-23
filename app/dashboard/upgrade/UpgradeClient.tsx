@@ -1,4 +1,5 @@
 'use client';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ClientShell from '@/components/ClientShell';
 import Topbar from '@/components/Topbar';
@@ -59,11 +60,20 @@ export default function UpgradePage({
   planTier: string;
   userName: string;
 }) {
+  const [config, setConfig] = useState<{ businessName?: string; tradeType?: string } | null>(null);
+
+  useEffect(() => {
+    fetch('/api/dashboard/data')
+      .then(r => r.json())
+      .then(d => { if (d.config) setConfig(d.config); })
+      .catch(() => {});
+  }, []);
+
   const currentTier = (planTier ?? 'starter') as Tier;
   const highlightTier: Tier | null = featureKey ? requiredTierFor(featureKey) as Tier : null;
 
   return (
-    <ClientShell planTier={planTier} userName={userName}>
+    <ClientShell planTier={planTier} userName={userName} businessName={config?.businessName} tradeType={config?.tradeType}>
       <Topbar breadcrumb="Upgrade" page="Upgrade Plan" sub="Unlock more features for your business" />
       <div style={{ padding: '24px 22px', flex: 1, overflowY: 'auto', maxWidth: '1100px', margin: '0 auto', width: '100%' }}>
 
