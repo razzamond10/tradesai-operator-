@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateUser, signJWT } from '@/lib/auth';
+import { getClientStatus } from '@/lib/sheets';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,6 +14,14 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+    }
+
+    // Block paused client accounts before issuing JWT — admin/va are never blocked
+    if (user.role === 'client' && user.clientId) {
+      const status = await getClientStatus(user.clientId);
+      if (status === 'paused') {
+        return NextResponse.json({ error: 'paused' }, { status: 403 });
+      }
     }
 
     const token = await signJWT(user);

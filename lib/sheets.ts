@@ -53,13 +53,19 @@ export interface ClientConfig {
   tradeType: string;
   contactName: string;
   phone: string;
-  calendarId: string;   // col E — Google Calendar ID
-  sheetId: string;      // col F — client data sheet ID
-  botpressId: string;   // col G — Botpress bot ID
-  makeWebhookUrl: string; // col H — Make.com webhook URL
-  twilioNumber: string; // col I — Twilio phone number
-  slug: string;         // URL-safe key derived from businessName
-  clientId: string;     // twilioNumber if present, else slug — used for routing
+  calendarId: string;         // col E
+  sheetId: string;            // col F
+  botpressId: string;         // col G
+  makeWebhookUrl: string;     // col H
+  twilioNumber: string;       // col I
+  businessHoursStart: string; // col J
+  businessHoursEnd: string;   // col K
+  emergencyNumber: string;    // col L
+  upsellEnabled: string;      // col M
+  notes: string;              // col N
+  status: 'active' | 'paused'; // col O
+  slug: string;               // URL-safe key derived from businessName
+  clientId: string;           // twilioNumber if present, else slug — used for routing
 }
 
 /** Generate a URL-safe slug from a business name, e.g. "Ryan's Plumbing Services" → "ryans-plumbing-services" */
@@ -114,11 +120,12 @@ export async function getClientConfigs(): Promise<ClientConfig[]> {
   return sheetsCache.getOrFetch('client_configs', async () => {
     const spreadsheetId = process.env.MASTER_SHEET_ID!;
     const tabName = await resolveTabName(spreadsheetId, 'client config');
-    const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:I`);
+    const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:O`);
     return rows.map((r) => {
       const businessName = (r[0] || '').trim();
       const twilioNumber = (r[8] || '').trim();
       const slug = toSlug(businessName);
+      const rawStatus = (r[14] || '').trim().toLowerCase();
       return {
         businessName,
         tradeType: (r[1] || '').trim(),
@@ -129,6 +136,12 @@ export async function getClientConfigs(): Promise<ClientConfig[]> {
         botpressId: (r[6] || '').trim(),
         makeWebhookUrl: (r[7] || '').trim(),
         twilioNumber,
+        businessHoursStart: (r[9] || '').trim(),
+        businessHoursEnd: (r[10] || '').trim(),
+        emergencyNumber: (r[11] || '').trim(),
+        upsellEnabled: (r[12] || '').trim(),
+        notes: (r[13] || '').trim(),
+        status: rawStatus === 'paused' ? 'paused' : 'active',
         slug,
         clientId: twilioNumber || slug,
       };
@@ -162,6 +175,56 @@ export async function getClientConfig(
       return false;
     }) || null;
   }, 60_000);
+}
+
+// ── Account status ────────────────────────────────────────────────────────────
+
+export async function getClientStatus(clientId: string): Promise<'active' | 'paused'> {
+  const config = await getClientConfig(clientId);
+  return config?.status ?? 'active';
+}
+
+export async function setClientStatus(clientId: string, status: 'active' | 'paused'): Promise<void> {
+  const auth = getWriteAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  const spreadsheetId = process.env.MASTER_SHEET_ID!;
+  const tabName = await resolveTabName(spreadsheetId, 'client config');
+
+  // Read raw rows to find the correct sheet row number
+  const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:O`);
+  const decoded = decodeURIComponent(clientId);
+  const normalId = decoded.toLowerCase();
+  const normPhone = normalisePhone(clientId);
+
+  let rowIndex = -1;
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    const businessName = (r[0] || '').trim();
+    const twilioNumber = (r[8] || '').trim();
+    const slug = toSlug(businessName);
+    const cId = twilioNumber || slug;
+    if (cId === decoded || cId === clientId) { rowIndex = i; break; }
+    if (twilioNumber) {
+      const t = twilioNumber.trim();
+      if (t === decoded || t === normPhone) { rowIndex = i; break; }
+      if (t.replace(/^\+/, '') === normPhone.replace(/^\+/, '')) { rowIndex = i; break; }
+    }
+    if (slug === normalId || toSlug(businessName) === normalId) { rowIndex = i; break; }
+  }
+
+  if (rowIndex < 0) throw new Error(`Client not found: ${clientId}`);
+
+  const sheetRow = rowIndex + 2; // +1 for 1-based, +1 for header row
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `'${tabName}'!O${sheetRow}`,
+    valueInputOption: 'RAW',
+    requestBody: { values: [[status]] },
+  });
+
+  // Invalidate both the list cache and any per-client cache entries
+  sheetsCache.invalidate('client_configs');
+  sheetsCache.invalidatePrefix('config:');
 }
 
 // ── InteractionsLog ──────────────────────────────────────────────────────────

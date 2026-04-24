@@ -193,6 +193,12 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
   // Tier switcher — dev/sales demo tool only, does not persist
   const [demoTier, setDemoTier] = useState<'off' | 'starter' | 'professional' | 'enterprise'>('off');
 
+  // Account status kill switch
+  const [accountStatus, setAccountStatus] = useState<'active' | 'paused'>('active');
+  const [statusLoading, setStatusLoading] = useState(false);
+  const [showPauseModal, setShowPauseModal] = useState(false);
+  const [statusToast, setStatusToast] = useState<string | null>(null);
+
   useEffect(() => {
     fetch(`/api/clients/${encodeURIComponent(clientId)}/data`)
       .then((r) => r.json())
@@ -200,6 +206,32 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
       .catch(() => setError('Failed to load client data'))
       .finally(() => setLoading(false));
   }, [clientId]);
+
+  useEffect(() => {
+    if (data?.config?.status) setAccountStatus(data.config.status as 'active' | 'paused');
+  }, [data]);
+
+  async function toggleStatus() {
+    setShowPauseModal(false);
+    setStatusLoading(true);
+    const next: 'active' | 'paused' = accountStatus === 'active' ? 'paused' : 'active';
+    try {
+      const res = await fetch(`/api/admin/clients/${encodeURIComponent(clientId)}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: next }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? 'Failed');
+      setAccountStatus(next);
+      setStatusToast(next === 'paused' ? 'Account paused.' : 'Account resumed.');
+    } catch (e: any) {
+      setStatusToast(`Error: ${e.message}`);
+    } finally {
+      setStatusLoading(false);
+      setTimeout(() => setStatusToast(null), 4000);
+    }
+  }
 
   // ── derived data ─────────────────────────────────────────────────────────────
   const interactions: any[] = isDemoEmpty ? [] : (data?.interactions || []);
@@ -298,6 +330,25 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
             ⚠ {error}
           </div>
         )}
+
+        {/* ── Account Status ── */}
+        <div style={{ marginBottom: '14px', padding: '10px 14px', borderRadius: '8px', background: '#fff', border: '1px solid var(--divider)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{ width: '8px', height: '8px', borderRadius: '50%', flexShrink: 0, background: accountStatus === 'active' ? 'var(--a3)' : 'var(--a4)' }} />
+            <span style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '11px', fontWeight: 700, color: 'var(--ink)' }}>Account Status</span>
+            <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: accountStatus === 'active' ? 'var(--a3b)' : 'var(--a4b)', color: accountStatus === 'active' ? 'var(--a3)' : 'var(--a4)' }}>
+              {accountStatus === 'active' ? 'Active' : 'Paused'}
+            </span>
+            {statusToast && <span style={{ fontSize: '10px', color: 'var(--muted)' }}>{statusToast}</span>}
+          </div>
+          <button
+            onClick={() => setShowPauseModal(true)}
+            disabled={statusLoading}
+            style={{ fontSize: '10px', fontWeight: 700, padding: '5px 12px', borderRadius: '6px', border: 'none', cursor: statusLoading ? 'not-allowed' : 'pointer', opacity: statusLoading ? 0.6 : 1, background: accountStatus === 'active' ? 'var(--a4)' : 'var(--a3)', color: '#fff', fontFamily: '"Inter",sans-serif' }}
+          >
+            {statusLoading ? '…' : accountStatus === 'active' ? 'Pause Account' : 'Resume Account'}
+          </button>
+        </div>
 
         {/* ── Tier Switcher — dev/sales demo tool ── */}
         {(() => {
@@ -822,6 +873,36 @@ export default function AdminClientDetailV13({ user, clientId, isDemoEmpty }: { 
             .admin-pipeline-grid { grid-template-columns: repeat(2,1fr) !important; }
           }
         `}</style>
+
+        {/* ── Pause / Resume confirmation modal ── */}
+        {showPauseModal && (
+          <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+            <div style={{ background: '#fff', borderRadius: '12px', padding: '24px', maxWidth: '380px', width: '100%', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+              <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '15px', fontWeight: 700, color: 'var(--ink)', marginBottom: '8px' }}>
+                {accountStatus === 'active' ? 'Pause this account?' : 'Resume this account?'}
+              </div>
+              <p style={{ fontSize: '12px', color: 'var(--muted)', marginBottom: '20px', lineHeight: 1.5, margin: '0 0 20px' }}>
+                {accountStatus === 'active'
+                  ? 'This will block the client from logging in immediately. They will see a "temporarily paused" message.'
+                  : 'This will restore login access for the client immediately.'}
+              </p>
+              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                <button
+                  onClick={() => setShowPauseModal(false)}
+                  style={{ fontSize: '11px', fontWeight: 600, padding: '7px 14px', borderRadius: '6px', border: '1px solid var(--divider)', background: '#fff', color: 'var(--ink)', cursor: 'pointer', fontFamily: '"Inter",sans-serif' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={toggleStatus}
+                  style={{ fontSize: '11px', fontWeight: 700, padding: '7px 14px', borderRadius: '6px', border: 'none', background: accountStatus === 'active' ? 'var(--a4)' : 'var(--a3)', color: '#fff', cursor: 'pointer', fontFamily: '"Inter",sans-serif' }}
+                >
+                  {accountStatus === 'active' ? 'Yes, pause account' : 'Yes, resume account'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </AdminClientShell>
   );

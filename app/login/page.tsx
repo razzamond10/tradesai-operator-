@@ -133,11 +133,14 @@ export default function LoginPage() {
 
           {error && (
             <div style={{
-              background: 'rgba(220,50,50,0.12)', border: '1px solid rgba(220,50,50,0.3)',
+              background: error === 'paused' ? 'rgba(201,168,76,0.12)' : 'rgba(220,50,50,0.12)',
+              border: error === 'paused' ? '1px solid rgba(201,168,76,0.3)' : '1px solid rgba(220,50,50,0.3)',
               borderRadius: '8px', padding: '0.65rem 1rem', marginBottom: '1rem',
-              color: '#ff8080', fontSize: '0.85rem',
+              color: error === 'paused' ? '#C9A84C' : '#ff8080', fontSize: '0.85rem',
             }}>
-              {error}
+              {error === 'paused'
+                ? 'Your account is temporarily paused. Please contact support at admin@tradesaioperator.uk.'
+                : error}
             </div>
           )}
 
