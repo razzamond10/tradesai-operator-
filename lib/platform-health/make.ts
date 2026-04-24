@@ -116,15 +116,19 @@ export async function checkMake(): Promise<VendorHealth> {
           const usageJson = await usageRes.json();
           rawData.usage = usageJson;
           // Make API returns usage under several possible paths — try the most common ones
-          const ops =
-            usageJson?.organizationUsage?.operations?.current ??
-            usageJson?.organizationUsage?.operations ??
-            usageJson?.usage?.operations ??
-            usageJson?.operations?.current ??
-            usageJson?.operations ??
-            null;
-          if (ops !== null && ops !== undefined) {
-            usageThisMonth = Number(ops);
+          const usageArray: Array<{ date?: string; operations?: number }> | undefined =
+            usageJson?.usage?.data ?? usageJson?.data;
+
+          if (Array.isArray(usageArray)) {
+            const now = new Date();
+            const yearMonth = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
+            let monthTotal = 0;
+            for (const entry of usageArray) {
+              if (typeof entry?.date === 'string' && entry.date.startsWith(yearMonth)) {
+                monthTotal += Number(entry.operations ?? 0);
+              }
+            }
+            usageThisMonth = monthTotal;
           }
         }
       } catch {

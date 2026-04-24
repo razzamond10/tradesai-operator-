@@ -66,10 +66,14 @@ export async function checkVercel(): Promise<VendorHealth> {
     let usageThisMonth: number | null = null;
     try {
       const teamId: string | undefined = json?.user?.defaultTeamId ?? json?.defaultTeamId;
-      const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
+      const startOfMonth = new Date();
+      startOfMonth.setUTCDate(1);
+      startOfMonth.setUTCHours(0, 0, 0, 0);
+      const startOfMonthMs = startOfMonth.getTime();
+
       const deploymentsUrl = teamId
-        ? `https://api.vercel.com/v6/deployments?teamId=${encodeURIComponent(teamId)}&limit=100&since=${startOfMonth}`
-        : `https://api.vercel.com/v6/deployments?limit=100&since=${startOfMonth}`;
+        ? `https://api.vercel.com/v6/deployments?teamId=${encodeURIComponent(teamId)}&since=${startOfMonthMs}&limit=100`
+        : `https://api.vercel.com/v6/deployments?since=${startOfMonthMs}&limit=100`;
 
       const depRes = await fetch(deploymentsUrl, {
         headers: { Authorization: `Bearer ${token}` },
@@ -77,8 +81,12 @@ export async function checkVercel(): Promise<VendorHealth> {
       if (depRes.ok) {
         const depJson = await depRes.json();
         rawData.deployments = depJson;
-        const list: unknown[] = depJson?.deployments ?? depJson?.data ?? [];
-        usageThisMonth = list.length;
+        const list: Array<{ createdAt?: number }> = depJson?.deployments ?? depJson?.data ?? [];
+        // Safety: filter client-side in case Vercel ignored the since param
+        const thisMonthList = list.filter(
+          (d) => typeof d?.createdAt === 'number' && d.createdAt >= startOfMonthMs
+        );
+        usageThisMonth = thisMonthList.length;
       }
     } catch {
       // Non-fatal — usageThisMonth stays null

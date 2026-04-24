@@ -108,12 +108,14 @@ function VendorCard({ vendor }: { vendor: VendorHealth }) {
 
         {/* Balance / usage — main figure */}
         <div>
-          {balanceStr !== null ? (
+          {balanceStr !== null && balanceStr !== undefined ? (
             <p className="text-3xl font-bold text-slate-900 leading-tight">{balanceStr}</p>
-          ) : vendor.usageThisMonth !== null ? (
+          ) : vendor.usageThisMonth !== null && vendor.usageThisMonth !== undefined ? (
             <p className="text-3xl font-bold text-slate-900 leading-tight">
               {vendor.usageThisMonth.toLocaleString()}
-              <span className="text-base font-normal text-slate-500 ml-1">ops this month</span>
+              <span className="text-base font-normal text-slate-500 ml-1">
+                {vendor.vendor === 'vercel' ? 'deployments' : 'ops'} this month
+              </span>
             </p>
           ) : (
             <p className="text-3xl font-bold text-slate-400">—</p>
