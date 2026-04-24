@@ -15,7 +15,7 @@ export async function checkTwilio(): Promise<VendorHealth> {
       usageThisMonth: null,
       lastChecked,
       errorMessage: 'TWILIO_ACCOUNT_SID or TWILIO_AUTH_TOKEN env var not set',
-      topUpUrl: 'https://console.twilio.com/billing/recharge',
+      topUpUrl: 'https://console.twilio.com/us1/billing/manage-billing/billing-overview',
       rawData: null,
     };
   }
@@ -46,7 +46,7 @@ export async function checkTwilio(): Promise<VendorHealth> {
           res.status === 401 || res.status === 403
             ? 'API credentials invalid or account suspended'
             : `Unexpected response: HTTP ${res.status}`,
-        topUpUrl: 'https://console.twilio.com/billing/recharge',
+        topUpUrl: 'https://console.twilio.com/us1/billing/manage-billing/billing-overview',
         rawData,
       };
     }
@@ -71,7 +71,7 @@ export async function checkTwilio(): Promise<VendorHealth> {
       usageThisMonth: null,
       lastChecked,
       errorMessage: null,
-      topUpUrl: 'https://console.twilio.com/billing/recharge',
+      topUpUrl: 'https://console.twilio.com/us1/billing/manage-billing/billing-overview',
       rawData,
     };
   } catch (err: any) {
@@ -84,7 +84,7 @@ export async function checkTwilio(): Promise<VendorHealth> {
       usageThisMonth: null,
       lastChecked,
       errorMessage: err?.message ?? 'Network error',
-      topUpUrl: 'https://console.twilio.com/billing/recharge',
+      topUpUrl: 'https://console.twilio.com/us1/billing/manage-billing/billing-overview',
       rawData,
     };
   }

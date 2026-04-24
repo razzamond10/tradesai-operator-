@@ -62,7 +62,7 @@ export async function checkVercel(): Promise<VendorHealth> {
     const json = await res.json().catch(() => ({}));
     rawData = json;
 
-    // Step 2 — count deployments this calendar month
+    // Step 2 — count deployments this calendar month (paginated, max 5 pages)
     let usageThisMonth: number | null = null;
     try {
       const teamId: string | undefined = json?.user?.defaultTeamId ?? json?.defaultTeamId;
@@ -71,23 +71,33 @@ export async function checkVercel(): Promise<VendorHealth> {
       startOfMonth.setUTCHours(0, 0, 0, 0);
       const startOfMonthMs = startOfMonth.getTime();
 
-      const deploymentsUrl = teamId
-        ? `https://api.vercel.com/v6/deployments?teamId=${encodeURIComponent(teamId)}&since=${startOfMonthMs}&limit=100`
-        : `https://api.vercel.com/v6/deployments?since=${startOfMonthMs}&limit=100`;
+      const allDeployments: Array<{ createdAt?: number }> = [];
+      let untilCursor: string | undefined;
 
-      const depRes = await fetch(deploymentsUrl, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (depRes.ok) {
+      for (let page = 0; page < 5; page++) {
+        const params = new URLSearchParams({ since: String(startOfMonthMs), limit: '100' });
+        if (teamId) params.set('teamId', teamId);
+        if (untilCursor) params.set('until', untilCursor);
+
+        const depRes = await fetch(`https://api.vercel.com/v6/deployments?${params}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!depRes.ok) break;
+
         const depJson = await depRes.json();
-        rawData.deployments = depJson;
-        const list: Array<{ createdAt?: number }> = depJson?.deployments ?? depJson?.data ?? [];
-        // Safety: filter client-side in case Vercel ignored the since param
-        const thisMonthList = list.filter(
-          (d) => typeof d?.createdAt === 'number' && d.createdAt >= startOfMonthMs
-        );
-        usageThisMonth = thisMonthList.length;
+        const batch: Array<{ createdAt?: number }> = depJson?.deployments ?? depJson?.data ?? [];
+        allDeployments.push(...batch);
+
+        if (batch.length < 100 || !depJson?.pagination?.next) break;
+        untilCursor = String(depJson.pagination.next);
       }
+
+      const thisMonthList = allDeployments.filter(
+        (d) => typeof d?.createdAt === 'number' && d.createdAt >= startOfMonthMs
+      );
+      usageThisMonth = thisMonthList.length;
+      rawData.deploymentsFetched = allDeployments.length;
+      rawData.deploymentsThisMonth = usageThisMonth;
     } catch {
       // Non-fatal — usageThisMonth stays null
     }

@@ -114,7 +114,7 @@ function VendorCard({ vendor }: { vendor: VendorHealth }) {
             <p className="text-3xl font-bold text-slate-900 leading-tight">
               {vendor.usageThisMonth.toLocaleString()}
               <span className="text-base font-normal text-slate-500 ml-1">
-                {vendor.vendor === 'vercel' ? 'deployments' : 'ops'} this month
+                {vendor.vendor === 'vercel' ? 'deployments this month' : vendor.vendor === 'retell' ? 'calls today' : 'ops this month'}
               </span>
             </p>
           ) : (
@@ -240,18 +240,6 @@ export default function PlatformHealthClient({ adminName }: { adminName: string 
           }}>
             <Activity size={14} color="rgba(255,255,255,0.85)" />
             Platform Health
-          </Link>
-          <Link href="/admin/settings" style={{
-            display: 'flex', alignItems: 'center', gap: '9px',
-            padding: '7px 10px', borderRadius: '7px',
-            fontSize: '12px', fontWeight: 400,
-            color: 'rgba(255,255,255,0.55)',
-            background: 'transparent',
-            textDecoration: 'none',
-            borderLeft: '2px solid transparent',
-          }}>
-            <span style={{ fontSize: '13px', width: '18px', textAlign: 'center' }}>⚙️</span>
-            Platform Settings
           </Link>
         </nav>
 

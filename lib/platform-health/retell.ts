@@ -28,7 +28,7 @@ export async function checkRetell(): Promise<VendorHealth> {
         Authorization: `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ limit: 1 }),
+      body: JSON.stringify({ limit: 100 }),
     });
 
     rawData = { status: res.status };
@@ -66,13 +66,21 @@ export async function checkRetell(): Promise<VendorHealth> {
     const json = await res.json().catch(() => ({}));
     rawData = json;
 
+    const callsArray: Array<{ start_timestamp?: number }> = Array.isArray(json) ? json : (json?.calls ?? []);
+    const todayStart = new Date();
+    todayStart.setUTCHours(0, 0, 0, 0);
+    const todayStartMs = todayStart.getTime();
+    const callsToday = callsArray.filter(
+      (c) => typeof c?.start_timestamp === 'number' && c.start_timestamp >= todayStartMs
+    ).length;
+
     return {
       vendor: 'retell',
       displayName: 'Retell AI',
       status: 'healthy',
       balance: null, // Retell doesn't expose balance via API
       currency: 'USD',
-      usageThisMonth: null,
+      usageThisMonth: callsToday,
       lastChecked,
       errorMessage: null,
       topUpUrl: 'https://dashboard.retellai.com/billing',
