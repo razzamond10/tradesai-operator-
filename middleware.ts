@@ -12,8 +12,51 @@ function isPublic(pathname: string): boolean {
   return false;
 }
 
+// Paths that belong to the portal app (not marketing content)
+function isAppPath(pathname: string): boolean {
+  if (pathname.startsWith('/admin')) return true;
+  if (pathname.startsWith('/dashboard')) return true;
+  if (pathname.startsWith('/va')) return true;
+  if (pathname.startsWith('/login')) return true;
+  if (pathname.startsWith('/api')) return true;
+  if (pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/logo')) return true;
+  if (pathname.match(/\.(ico|png|jpg|jpeg|svg|mp3|webp|woff2?)$/)) return true;
+  return false;
+}
+
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
+
+  // ── Hostname-based routing ──────────────────────────────────────────────────
+  const hostname = req.headers.get('host') || '';
+  const isMarketingDomain = hostname === 'tradesaioperator.uk' || hostname === 'www.tradesaioperator.uk';
+  const isAppDomain = hostname === 'app.tradesaioperator.uk';
+  const isPreview = hostname.includes('vercel.app') || hostname.includes('localhost');
+
+  if (!isPreview) {
+    if (isMarketingDomain) {
+      // App routes visited on the marketing domain → redirect to app subdomain
+      if (
+        pathname.startsWith('/admin') ||
+        pathname.startsWith('/dashboard') ||
+        pathname.startsWith('/va') ||
+        pathname.startsWith('/login') ||
+        pathname.startsWith('/api/auth')
+      ) {
+        return NextResponse.redirect(`https://app.tradesaioperator.uk${pathname}`);
+      }
+      // Marketing content (landing, privacy, terms, assets) → serve directly, no JWT needed
+      return NextResponse.next();
+    }
+
+    if (isAppDomain) {
+      // Marketing content visited on the app subdomain → redirect to login
+      if (!isAppPath(pathname)) {
+        return NextResponse.redirect(new URL('/login', req.url));
+      }
+    }
+  }
+  // ── End hostname routing ────────────────────────────────────────────────────
 
   if (isPublic(pathname)) return NextResponse.next();
 
