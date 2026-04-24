@@ -1,7 +1,24 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Activity } from 'lucide-react';
 import type { JWTPayload } from '@/lib/auth';
+import type { VendorHealth } from '@/lib/platform-health/types';
+
+type OverallStatus = VendorHealth['status'];
+
+const HEALTH_DOT: Record<OverallStatus, string> = {
+  healthy: '#22C55E',
+  warning:  '#F59E0B',
+  critical: '#EF4444',
+  unknown:  '#9CA3AF',
+};
+const HEALTH_LABEL: Record<OverallStatus, string> = {
+  healthy: 'All Systems OK',
+  warning:  'Action Needed',
+  critical: 'Urgent',
+  unknown:  'Checking...',
+};
 
 interface ClientConfig {
   businessName: string;
@@ -31,7 +48,22 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
   const [loggingOut, setLoggingOut] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [lastActive, setLastActive] = useState<Record<string, string>>({});
+  const [healthLoading, setHealthLoading] = useState(true);
+  const [healthStatus, setHealthStatus] = useState<OverallStatus>('unknown');
+  const [healthVendors, setHealthVendors] = useState<VendorHealth[]>([]);
+  const [healthError, setHealthError] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetch('/api/platform-health')
+      .then((r) => { if (!r.ok) throw new Error('non-ok'); return r.json(); })
+      .then((d) => {
+        setHealthStatus(d.overallStatus ?? 'unknown');
+        setHealthVendors(d.vendors ?? []);
+      })
+      .catch(() => setHealthError(true))
+      .finally(() => setHealthLoading(false));
+  }, []);
 
   useEffect(() => {
     fetch('/api/clients')
@@ -198,11 +230,11 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
 
         {/* KPI cards */}
         <div className="admin-portfolio-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '14px', marginBottom: '28px' }}>
+
+          {/* Cards 1 & 2 — static */}
           {[
-            { stripe: 'var(--a1)', iconBg: 'var(--a1b)', icon: '👥', label: 'Total Clients', value: loading ? '—' : clients.length, sub: 'registered accounts', badge: loading ? '…' : `${clients.length} accounts` },
-            { stripe: 'var(--a3)', iconBg: 'var(--a3b)', icon: '📞', label: 'AI Lines Active', value: loading ? '—' : activeLines, sub: 'with Twilio numbers', badge: 'AI answering' },
-            { stripe: 'var(--a2)', iconBg: 'var(--a2b)', icon: '⚡', label: 'System Status', value: 'Live', sub: 'Sheets · Twilio · AI', badge: 'All green' },
-            { stripe: 'var(--a4)', iconBg: 'var(--a4b)', icon: '🏗️', label: 'Trade Types', value: loading ? '—' : tradeSet.size, sub: 'different trades', badge: 'Active' },
+            { stripe: 'var(--a1)', iconBg: 'var(--a1b)', icon: '👥', label: 'Total Clients',   value: loading ? '—' : clients.length, sub: 'registered accounts',  badge: loading ? '…' : `${clients.length} accounts` },
+            { stripe: 'var(--a3)', iconBg: 'var(--a3b)', icon: '📞', label: 'AI Lines Active', value: loading ? '—' : activeLines,     sub: 'with Twilio numbers', badge: 'AI answering' },
           ].map((k) => (
             <div key={k.label} style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', overflow: 'hidden' }}>
               <div style={{ height: '3px', background: k.stripe }} />
@@ -217,6 +249,86 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
               </div>
             </div>
           ))}
+
+          {/* Card 3 — Platform Health (live, clickable) */}
+          {(() => {
+            const stripeColor = healthLoading || healthError ? '#9CA3AF' : HEALTH_DOT[healthStatus];
+            return (
+              <div
+                onClick={() => router.push('/admin/platform-health')}
+                style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', overflow: 'hidden', cursor: 'pointer' }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = '0 4px 16px rgba(26,10,60,0.14)'; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.boxShadow = 'var(--shadow-s)'; }}
+              >
+                <div style={{ height: '3px', background: stripeColor }} />
+                <div style={{ padding: '16px' }}>
+                  {healthLoading ? (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                        <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#EDE8FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Activity size={15} color="#3D1FA8" />
+                        </div>
+                        <div style={{ width: '48px', height: '14px', borderRadius: '8px', background: 'rgba(0,0,0,0.06)', animation: 'shimmer 1.5s ease-in-out infinite' }} />
+                      </div>
+                      <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'var(--muted)', marginBottom: '6px' }}>Platform Health</div>
+                      <div style={{ width: '72%', height: '20px', borderRadius: '6px', background: 'rgba(0,0,0,0.06)', marginBottom: '10px', animation: 'shimmer 1.5s ease-in-out infinite' }} />
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        {[0,1,2,3].map((i) => (
+                          <div key={i} style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'rgba(0,0,0,0.08)', animation: 'shimmer 1.5s ease-in-out infinite' }} />
+                        ))}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                        <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: '#EDE8FF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Activity size={15} color="#3D1FA8" />
+                        </div>
+                        <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: '#EDE8FF', color: '#3D1FA8' }}>
+                          {healthError ? 'UNAVAILABLE' : healthStatus.toUpperCase()}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'var(--muted)', marginBottom: '6px' }}>Platform Health</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '7px', marginBottom: '8px' }}>
+                        <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: stripeColor, flexShrink: 0 }} />
+                        <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '16px', fontWeight: 900, color: 'var(--ink)', lineHeight: 1.1 }}>
+                          {healthError ? 'Unavailable' : HEALTH_LABEL[healthStatus]}
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'flex-end', gap: '6px' }}>
+                        {healthVendors.map((v) => (
+                          <div key={v.vendor} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                            <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: HEALTH_DOT[v.status] }} title={v.displayName} />
+                            <span style={{ fontSize: '7px', color: 'var(--muted)' }}>{v.vendor === 'retell' ? 'Rtel' : v.vendor === 'twilio' ? 'Twil' : v.vendor === 'make' ? 'Make' : 'Vcl'}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* Card 4 — Trade Types (static) */}
+          {(() => {
+            const k = { stripe: 'var(--a4)', iconBg: 'var(--a4b)', icon: '🏗️', label: 'Trade Types', value: loading ? '—' : tradeSet.size, sub: 'different trades', badge: 'Active' };
+            return (
+              <div style={{ background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', overflow: 'hidden' }}>
+                <div style={{ height: '3px', background: k.stripe }} />
+                <div style={{ padding: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                    <div style={{ width: '30px', height: '30px', borderRadius: '8px', background: k.iconBg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px' }}>{k.icon}</div>
+                    <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: k.iconBg, color: k.stripe }}>{k.badge}</span>
+                  </div>
+                  <div style={{ fontSize: '10.5px', fontWeight: 600, color: 'var(--muted)', marginBottom: '4px' }}>{k.label}</div>
+                  <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '32px', fontWeight: 900, color: 'var(--ink)', lineHeight: 1.1 }}>{k.value}</div>
+                  <div style={{ fontSize: '10px', color: 'var(--muted)', marginTop: '4px' }}>{k.sub}</div>
+                </div>
+              </div>
+            );
+          })()}
+
         </div>
 
         {error && (

@@ -62,13 +62,35 @@ export async function checkVercel(): Promise<VendorHealth> {
     const json = await res.json().catch(() => ({}));
     rawData = json;
 
+    // Step 2 — count deployments this calendar month
+    let usageThisMonth: number | null = null;
+    try {
+      const teamId: string | undefined = json?.user?.defaultTeamId ?? json?.defaultTeamId;
+      const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1).getTime();
+      const deploymentsUrl = teamId
+        ? `https://api.vercel.com/v6/deployments?teamId=${encodeURIComponent(teamId)}&limit=100&since=${startOfMonth}`
+        : `https://api.vercel.com/v6/deployments?limit=100&since=${startOfMonth}`;
+
+      const depRes = await fetch(deploymentsUrl, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (depRes.ok) {
+        const depJson = await depRes.json();
+        rawData.deployments = depJson;
+        const list: unknown[] = depJson?.deployments ?? depJson?.data ?? [];
+        usageThisMonth = list.length;
+      }
+    } catch {
+      // Non-fatal — usageThisMonth stays null
+    }
+
     return {
       vendor: 'vercel',
       displayName: 'Vercel',
       status: 'healthy',
       balance: null,
       currency: 'USD',
-      usageThisMonth: null,
+      usageThisMonth,
       lastChecked,
       errorMessage: null,
       topUpUrl: 'https://vercel.com/account/billing',

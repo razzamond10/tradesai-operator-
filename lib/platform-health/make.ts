@@ -104,9 +104,36 @@ export async function checkMake(): Promise<VendorHealth> {
       };
     }
 
-    const used      = Number(org.operations ?? 0);
+    const orgId = org.id as number | undefined;
+
+    // Step 3 — fetch organisation usage for ops-used-this-month
+    let usageThisMonth: number | null = org.operations > 0 ? Number(org.operations) : null;
+
+    if (orgId) {
+      try {
+        const usageRes = await fetch(`${BASE}/organizations/${orgId}/usage`, { headers });
+        if (usageRes.ok) {
+          const usageJson = await usageRes.json();
+          rawData.usage = usageJson;
+          // Make API returns usage under several possible paths — try the most common ones
+          const ops =
+            usageJson?.organizationUsage?.operations?.current ??
+            usageJson?.organizationUsage?.operations ??
+            usageJson?.usage?.operations ??
+            usageJson?.operations?.current ??
+            usageJson?.operations ??
+            null;
+          if (ops !== null && ops !== undefined) {
+            usageThisMonth = Number(ops);
+          }
+        }
+      } catch {
+        // Non-fatal — keep usageThisMonth from orgs response
+      }
+    }
+
     const limit     = Number(org.operationsLimit ?? org.plan?.operations ?? 0);
-    const remaining = limit > 0 ? limit - used : null;
+    const remaining = limit > 0 ? limit - (usageThisMonth ?? 0) : null;
     const pctRemain = limit > 0 ? (remaining! / limit) * 100 : null;
 
     let status: VendorHealth['status'] = 'healthy';
@@ -121,7 +148,7 @@ export async function checkMake(): Promise<VendorHealth> {
       status,
       balance: null,
       currency: 'USD',
-      usageThisMonth: used > 0 ? used : null,
+      usageThisMonth,
       lastChecked,
       errorMessage: null,
       topUpUrl: 'https://eu1.make.com/profile/subscription',

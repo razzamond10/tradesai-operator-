@@ -2,7 +2,6 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { Activity } from 'lucide-react';
 
 interface AdminClientShellProps {
   clientId: string;
@@ -173,29 +172,6 @@ export default function AdminClientShell({ clientId, clientName, tradeType, admi
             </div>
           ))}
 
-          {/* ── SYSTEM section (global, not client-scoped) ── */}
-          <div>
-            <div style={{ fontSize: '8.5px', fontWeight: 700, color: 'rgba(255,255,255,0.22)', letterSpacing: '2px', textTransform: 'uppercase', padding: '8px 8px 3px', marginTop: '8px' }}>
-              System
-            </div>
-            {(() => {
-              const active = pathname === '/admin/platform-health';
-              return (
-                <Link href="/admin/platform-health" style={{
-                  display: 'flex', alignItems: 'center', gap: '9px',
-                  padding: '7px 10px', borderRadius: '7px', marginBottom: '1px',
-                  fontSize: '12px', fontWeight: active ? 600 : 400,
-                  color: active ? '#fff' : 'rgba(255,255,255,0.55)',
-                  background: active ? 'rgba(106,60,210,0.32)' : 'transparent',
-                  textDecoration: 'none', transition: 'all .15s',
-                  borderLeft: active ? '2px solid #C9A84C' : '2px solid transparent',
-                }}>
-                  <Activity size={14} color={active ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.55)'} />
-                  Platform Health
-                </Link>
-              );
-            })()}
-          </div>
         </nav>
 
         {/* User + profile dropdown + logout */}
