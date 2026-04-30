@@ -1,13 +1,24 @@
 'use client';
-import { useState, FormEvent } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, FormEvent, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
+
+function ResetToast({ onToast }: { onToast: (msg: string) => void }) {
+  const params = useSearchParams();
+  useEffect(() => {
+    if (params.get('reset') === '1') {
+      onToast('Password reset successfully. Please sign in with your new password.');
+    }
+  }, [params, onToast]);
+  return null;
+}
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
@@ -86,6 +97,10 @@ export default function LoginPage() {
           <p style={{ color: '#888', fontSize: '0.8rem', margin: 0, letterSpacing: '0.5px' }}>SIGN IN</p>
         </div>
 
+        <Suspense fallback={null}>
+          <ResetToast onToast={setToast} />
+        </Suspense>
+
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1rem' }}>
             <label style={{ display: 'block', color: '#ccc', fontSize: '0.8rem', fontWeight: '600', marginBottom: '0.4rem', letterSpacing: '0.5px' }}>
@@ -109,7 +124,7 @@ export default function LoginPage() {
             />
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
+          <div style={{ marginBottom: '0.5rem' }}>
             <label style={{ display: 'block', color: '#ccc', fontSize: '0.8rem', fontWeight: '600', marginBottom: '0.4rem', letterSpacing: '0.5px' }}>
               PASSWORD
             </label>
@@ -130,6 +145,23 @@ export default function LoginPage() {
               onBlur={(e) => (e.target.style.borderColor = 'rgba(201,168,76,0.25)')}
             />
           </div>
+
+          <div style={{ textAlign: 'right', marginBottom: '1.25rem' }}>
+            <a href="/forgot-password" style={{ color: '#888', fontSize: '0.8rem', textDecoration: 'none' }}>
+              Forgot password?
+            </a>
+          </div>
+
+          {toast && (
+            <div style={{
+              background: 'rgba(80,200,120,0.1)',
+              border: '1px solid rgba(80,200,120,0.3)',
+              borderRadius: '8px', padding: '0.65rem 1rem', marginBottom: '1rem',
+              color: '#6ee7a0', fontSize: '0.85rem',
+            }}>
+              {toast}
+            </div>
+          )}
 
           {error && (
             <div style={{
