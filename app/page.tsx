@@ -278,21 +278,34 @@ export default function Landing() {
           <h3 style={{ fontSize: '2rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Works With Your Existing Tools</h3>
           <p style={{ color: '#bbb', fontSize: '1rem' }}>Seamless integration with your calendar, phone, and CRM</p>
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+        {/* Row 1: three columns */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
           {[
             { category: 'Calendar & Scheduling', items: [{ name: 'Google Calendar', status: 'Live' }, { name: 'Microsoft Outlook', status: 'Coming' }, { name: 'Apple Calendar', status: 'Coming' }] },
-            { category: 'Communication', items: [{ name: 'Twilio (SMS, Voice, WhatsApp)', status: 'Live' }, { name: 'Google Voice', status: 'Compatible' }] },
-            { category: 'Data & CRM', items: [{ name: 'Google Sheets', status: 'Live' }, { name: 'Zapier (1000+ apps)', status: 'Live' }, { name: 'Custom API', status: 'Available' }] },
-            { category: 'Field Service & Trades', items: [{ name: 'Google Maps', status: 'Live' }, { name: 'Stripe (invoicing)', status: 'Coming' }] }
+            { category: 'Communication', items: [{ name: 'Twilio (SMS + Voice)', status: 'Live' }, { name: 'WhatsApp Business', status: 'Coming' }, { name: 'Google Voice', status: 'Compatible' }] },
+            { category: 'Data & CRM', items: [{ name: 'Google Sheets', status: 'Live' }, { name: 'Zapier (1000+ apps)', status: 'Coming' }, { name: 'QuickBooks', status: 'Coming' }, { name: 'Xero', status: 'Coming' }] },
           ].map((group, idx) => (
             <div key={idx} style={{ padding: '2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '12px' }}>
               <h4 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#00d4ff', margin: '0 0 1.5rem 0' }}>{group.category}</h4>
               {group.items.map((item, iidx) => (
                 <div key={iidx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem 0', borderBottom: iidx < group.items.length - 1 ? '1px solid rgba(0,180,255,0.1)' : 'none' }}>
                   <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0 }}>{item.name}</p>
-                  <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.7rem', background: item.status === 'Live' ? 'rgba(0,180,255,0.2)' : item.status === 'Coming' ? 'rgba(180,175,55,0.2)' : 'rgba(100,100,100,0.2)', color: item.status === 'Live' ? '#00d4ff' : item.status === 'Coming' ? '#d4af37' : '#999', borderRadius: '4px', fontWeight: '600' }}>{item.status}</span>
+                  <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.7rem', background: item.status === 'Live' ? 'rgba(0,180,255,0.2)' : item.status === 'Coming' ? 'rgba(180,175,55,0.2)' : item.status === 'On Request' ? 'rgba(120,80,200,0.2)' : 'rgba(100,100,100,0.2)', color: item.status === 'Live' ? '#00d4ff' : item.status === 'Coming' ? '#d4af37' : item.status === 'On Request' ? '#a78bfa' : '#999', borderRadius: '4px', fontWeight: '600' }}>{item.status}</span>
                 </div>
               ))}
+            </div>
+          ))}
+        </div>
+        {/* Row 2: full-width Field Service & Trades */}
+        <div style={{ padding: '2rem', background: 'linear-gradient(135deg, rgba(50,30,80,0.3) 0%, rgba(30,10,60,0.3) 100%)', border: '1px solid rgba(100,150,200,0.15)', borderRadius: '12px' }}>
+          <h4 style={{ fontSize: '1.1rem', fontWeight: '800', color: '#00d4ff', margin: '0 0 1.5rem 0' }}>Field Service & Trades</h4>
+          {[
+            { name: 'Stripe (invoicing & payments)', status: 'Coming' },
+            { name: 'Custom integrations (Enterprise)', status: 'On Request' },
+          ].map((item, iidx, arr) => (
+            <div key={iidx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.8rem 0', borderBottom: iidx < arr.length - 1 ? '1px solid rgba(0,180,255,0.1)' : 'none' }}>
+              <p style={{ fontSize: '0.95rem', color: '#ddd', margin: 0 }}>{item.name}</p>
+              <span style={{ fontSize: '0.75rem', padding: '0.3rem 0.7rem', background: item.status === 'Coming' ? 'rgba(180,175,55,0.2)' : 'rgba(120,80,200,0.2)', color: item.status === 'Coming' ? '#d4af37' : '#a78bfa', borderRadius: '4px', fontWeight: '600' }}>{item.status}</span>
             </div>
           ))}
         </div>
