@@ -70,7 +70,7 @@ export default function PrivacyPage() {
             <strong style={{ color: '#fff' }}>TradesAI Operator Ltd</strong> is the data controller for personal data processed through our platform. We are registered in England and Wales under Companies House number <strong style={{ color: '#fff' }}>17114582</strong>, registered office at <strong style={{ color: '#fff' }}>5 Brayford Square, London, E1 0SG</strong>.
           </p>
           <p style={P}>
-            ICO registration number: <strong style={{ color: '#fff' }}>{'${ICO_REG_NUMBER}'}</strong> (registration pending — to be updated on receipt).
+            ICO registration number: registration pending — to be updated on receipt.
           </p>
           <p style={P}>Data protection contact: <a href="mailto:admin@tradesaioperator.uk" style={{ color: CYAN }}>admin@tradesaioperator.uk</a></p>
 
