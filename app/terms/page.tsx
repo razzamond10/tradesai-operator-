@@ -1,203 +1,216 @@
-'use client';
+import Link from 'next/link';
+import Footer from '@/components/Footer';
+
+const BG   = 'linear-gradient(135deg, #050209 0%, #0f0520 20%, #1a0f35 40%, #2d1550 60%, #1f0f3a 80%, #0a0512 100%)';
+const CYAN = '#00d4ff';
+const GOLD = '#d4af37';
+
+const sections = [
+  { id: 'definitions',    title: '1. Definitions' },
+  { id: 'service',        title: '2. Service Description' },
+  { id: 'subscription',   title: '3. Subscription & Billing' },
+  { id: 'cancellation',   title: '4. Cancellation' },
+  { id: 'refunds',        title: '5. Refund Policy' },
+  { id: 'acceptable-use', title: '6. Acceptable Use' },
+  { id: 'liability',      title: '7. Liability Cap' },
+  { id: 'availability',   title: '8. Service Availability' },
+  { id: 'data-ip',        title: '9. Data Ownership & IP' },
+  { id: 'changes',        title: '10. Changes to Terms' },
+  { id: 'governing-law',  title: '11. Governing Law' },
+  { id: 'contact',        title: '12. Contact' },
+];
+
+const H2 = { fontSize: '1.35rem', fontWeight: '700', color: CYAN, margin: '2.5rem 0 1rem', scrollMarginTop: '5rem' } as const;
+const P  = { color: '#ccc', lineHeight: '1.8', marginBottom: '1rem' } as const;
+const LI = { color: '#ccc', lineHeight: '1.8', marginBottom: '0.4rem' } as const;
 
 export default function TermsPage() {
+  const updated = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0a0e27 0%, #1a1540 100%)', color: '#e0e0e0', padding: '3rem 2rem' }}>
-      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: '800', marginBottom: '2rem', color: '#fff' }}>Terms & Conditions</h1>
-        <p style={{ color: '#aaa', marginBottom: '2rem', fontSize: '0.95rem' }}>Last updated: April 11, 2026</p>
+    <div style={{ minHeight: '100vh', background: BG, color: '#fff', fontFamily: 'system-ui,-apple-system,sans-serif' }}>
 
-        <div style={{ background: 'rgba(0,212,255,0.1)', border: '2px solid rgba(0,212,255,0.4)', borderRadius: '10px', padding: '1.5rem', marginBottom: '2.5rem' }}>
-          <p style={{ lineHeight: '1.8', margin: '0', fontWeight: '600' }}>
-            <strong>IMPORTANT:</strong> By submitting the signup form, creating an account, or using TradesAI Operator services, you acknowledge that you have read, understood, and agree to be bound by all terms and conditions set out below. Your continued use of the Service constitutes acceptance of these Terms.
-          </p>
-        </div>
+      {/* Header */}
+      <header style={{ padding: '1rem 2rem', borderBottom: '1px solid rgba(0,212,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', maxWidth: '1200px', margin: '0 auto' }}>
+        <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', textDecoration: 'none' }}>
+          <img src="/logo.jpg" alt="TradesAI Operator" style={{ height: '36px', borderRadius: '6px' }} />
+          <span style={{ fontWeight: '800', fontSize: '1rem', color: '#fff' }}>Trades <span style={{ color: GOLD }}>Ai</span> Operator</span>
+        </Link>
+        <Link href="/" style={{ color: CYAN, fontSize: '0.85rem', textDecoration: 'none' }}>← Back to home</Link>
+      </header>
 
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>1. Agreement to Terms & Service Acceptance</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            This Terms & Conditions Agreement constitutes a legal and binding contract between you (the "Client" or "Customer") and TradesAI Operator, operated by Raymond Sovereign Ltd ("Company", "we", "us", "our", "Provider"). By completing the signup process, submitting payment information, or accessing the Service in any manner, you represent that you are authorised to enter into this binding contract on behalf of your business and that you accept all terms contained herein without reservation or modification.
-          </p>
-        </section>
+      {/* TOC + Content */}
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '3rem 2rem', display: 'flex', gap: '4rem', alignItems: 'flex-start' }}>
 
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>2. Service Description</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            TradesAI Operator provides an artificial intelligence-powered virtual receptionist service for small to medium-sized UK trade businesses. The Service includes: 24/7 AI call reception, voice configuration, Google Calendar integration, auto-logging to Google Sheets, SMS confirmations, emergency detection, compliance certificate management, and intelligent lead scoring.
-          </p>
-        </section>
+        {/* Sticky TOC */}
+        <aside className="legal-toc" style={{ width: '210px', flexShrink: 0, position: 'sticky', top: '5rem', display: 'none' }}>
+          <p style={{ fontSize: '0.7rem', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#555', marginBottom: '0.75rem' }}>Contents</p>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
+            {sections.map(s => (
+              <a key={s.id} href={`#${s.id}`} style={{ fontSize: '0.82rem', color: '#777', textDecoration: 'none', padding: '0.25rem 0', lineHeight: 1.45 }}>
+                {s.title}
+              </a>
+            ))}
+          </nav>
+        </aside>
 
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#ff4444' }}>3. Subscription Fees & Billing</h2>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Setup Fee (Non-Refundable in All Circumstances)</h3>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            A one-time setup fee of £1,197.00 GBP is required upon subscription. This fee covers bespoke system configuration, AI voice customisation, Google Calendar and Sheets integration, Twilio phone provisioning, API setup, and initial onboarding. The setup fee is non-refundable without exception, whether you cancel within the initial 7-day period, during your subscription, or upon termination for any reason (including service dissatisfaction or early cancellation).
+        {/* Main content */}
+        <main style={{ flex: 1, maxWidth: '720px' }}>
+          <h1 style={{ fontSize: '2.2rem', fontWeight: '800', marginBottom: '0.5rem', letterSpacing: '-0.5px' }}>Terms of Service</h1>
+          <p style={{ color: '#555', fontSize: '0.85rem', marginBottom: '2.5rem' }}>Last updated: {updated} · TradesAI Operator Ltd (Companies House 17114582)</p>
+
+          <div style={{ background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.2)', borderRadius: '8px', padding: '1rem 1.25rem', marginBottom: '2.5rem' }}>
+            <p style={{ ...P, marginBottom: 0, fontSize: '0.88rem' }}>
+              By creating an account or using the TradesAI Operator platform you agree to these Terms. Please read them carefully before proceeding.
+            </p>
+          </div>
+
+          {/* 1. Definitions */}
+          <h2 id="definitions" style={H2}>1. Definitions</h2>
+          <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
+            <li style={LI}><strong style={{ color: '#fff' }}>Company / We / Us:</strong> TradesAI Operator Ltd, Companies House 17114582, 5 Brayford Square, London, E1 0SG.</li>
+            <li style={LI}><strong style={{ color: '#fff' }}>Customer / You:</strong> The trade business that has subscribed to the Service.</li>
+            <li style={LI}><strong style={{ color: '#fff' }}>End User:</strong> Any individual who contacts your business via the AI receptionist (callers, enquirers).</li>
+            <li style={LI}><strong style={{ color: '#fff' }}>Service:</strong> The TradesAI Operator platform, including the AI receptionist, portal, APIs, and all related features.</li>
+            <li style={LI}><strong style={{ color: '#fff' }}>Subscription Fee:</strong> The monthly recurring charge for access to the Service.</li>
+          </ul>
+
+          {/* 2. Service Description */}
+          <h2 id="service" style={H2}>2. Service Description</h2>
+          <p style={P}>
+            TradesAI Operator provides a 24/7 AI receptionist service for UK trade businesses (plumbers, electricians, HVAC engineers, roofers, and 40+ other trades). The Service handles inbound calls, captures enquiries, books appointments into Google Calendar, logs interactions to Google Sheets, sends SMS confirmations via Twilio, detects emergencies, and provides a management portal for the Customer.
+          </p>
+          <p style={P}>
+            The Service is a software platform. We are not a licensed trade business and we provide no trade services directly. The Customer remains solely responsible for all trade work carried out for End Users.
           </p>
 
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Monthly Subscription</h3>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            The Service costs £447.00 GBP per calendar month, billed in advance on your billing anniversary. Your subscription requires a 12-month Initial Term commitment.
-          </p>
-        </section>
+          {/* 3. Subscription & Billing */}
+          <h2 id="subscription" style={H2}>3. Subscription & Billing</h2>
 
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#ff4444' }}>4. Cancellation Policy & Refund Terms - CRITICAL</h2>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>14-Day Refund Period (Risk-Free Trial)</h3>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            You may cancel your subscription within 14 calendar days of initial payment and receive a full refund of your monthly subscription fees (£447.00) by emailing admin@tradesaioperator.uk with your business name and account email. <strong>The one-time setup fee (£1,197.00) is non-refundable in all circumstances</strong>. This 14-day window is your risk-free trial period to test the Service.
+          <p style={{ ...P, fontWeight: '600', color: '#e0e0e0', marginBottom: '0.5rem' }}>Setup fee (one-time, non-refundable after onboarding starts):</p>
+          <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
+            <li style={LI}>£1,197 — covers bespoke AI configuration, Twilio provisioning, Google integrations, and onboarding.</li>
+            <li style={LI}>Non-refundable once the onboarding process has commenced.</li>
+          </ul>
+
+          <p style={{ ...P, fontWeight: '600', color: '#e0e0e0', marginBottom: '0.5rem' }}>Monthly subscription (billed in advance):</p>
+          <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
+            <li style={LI}><strong style={{ color: '#fff' }}>Starter</strong> — £447 / month (currently available)</li>
+            <li style={LI}><strong style={{ color: '#fff' }}>Professional</strong> — £997 / month (launching October 2026)</li>
+            <li style={LI}><strong style={{ color: '#fff' }}>Enterprise</strong> — £2,197 / month (launching October 2026)</li>
+          </ul>
+
+          <p style={P}>All fees are quoted exclusive of VAT. Where applicable, VAT will be added at the prevailing UK rate. Payment is due on the billing anniversary each month. Failure to pay within 14 days may result in service suspension.</p>
+
+          {/* 4. Cancellation */}
+          <h2 id="cancellation" style={H2}>4. Cancellation</h2>
+          <p style={P}>
+            Either party may cancel the subscription by providing <strong style={{ color: '#fff' }}>30 days' written notice via email</strong> to <a href="mailto:admin@tradesaioperator.uk" style={{ color: CYAN }}>admin@tradesaioperator.uk</a>. Notice must include your business name and registered account email address.
+          </p>
+          <p style={P}>
+            Upon cancellation, your account remains active until the end of the current billing period. No further charges are taken after the notice period expires. Access to the portal and all Service features ceases at the end of the final billing period.
+          </p>
+          <p style={P}>
+            We may terminate your access immediately and without notice if you materially breach these Terms, fail to pay fees outstanding for more than 30 days, or use the Service for any unlawful purpose.
           </p>
 
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Cancellation After Day 14: £500 Early Termination Fee</h3>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            After the 14-day refund period expires, you are committed to a 12-month Initial Term. If you request cancellation at any point after day 14 and before the end of month 1, a £500 early termination fee applies (in addition to your remaining subscription obligations). This fee covers our onboarding, system provisioning, and team allocation costs. Your remaining monthly fees for the full 12-month term become immediately due and payable in full.
+          {/* 5. Refund Policy */}
+          <h2 id="refunds" style={H2}>5. Refund Policy</h2>
+          <p style={P}>
+            Monthly subscription fees are non-refundable except where the Service has experienced <strong style={{ color: '#fff' }}>documented downtime exceeding 10% of total hours in a calendar month</strong> (i.e. less than 90% availability in that month). In that case, the Customer is entitled to a pro-rata refund for the affected period only.
+          </p>
+          <p style={P}>
+            To claim a downtime refund, the Customer must submit a written request with supporting evidence within 14 days of the affected month. Refund claims are assessed against our server monitoring records. Refunds are issued to the original payment method within 14 business days of approval.
+          </p>
+          <p style={P}>
+            The one-time setup fee is non-refundable after onboarding has commenced, regardless of the reason for cancellation.
           </p>
 
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Cancellation After Month 1: Non-Refundable Commitment</h3>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            After 30 days from initial payment, the service becomes non-refundable. You remain bound by the full 12-month Initial Term. Any attempted early termination after month 1 will result in all remaining 12-month fees becoming immediately due. No partial refunds or credits are issued for unused portions of the subscription.
+          {/* 6. Acceptable Use */}
+          <h2 id="acceptable-use" style={H2}>6. Acceptable Use</h2>
+          <p style={P}>You agree not to:</p>
+          <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
+            <li style={LI}>Use the Service for any unlawful, fraudulent, or deceptive purpose.</li>
+            <li style={LI}>Collect or process End User data beyond what is necessary to deliver trade services.</li>
+            <li style={LI}>Reverse-engineer, decompile, or attempt to extract the source code of any part of the platform.</li>
+            <li style={LI}>Resell, sublicense, or transfer access to any third party without written consent.</li>
+            <li style={LI}>Use the Service in a manner that could harm, overload, or impair its availability for other customers.</li>
+            <li style={LI}>Misrepresent the AI receptionist as a human to End Users in a manner that violates applicable law.</li>
+          </ul>
+          <p style={P}>
+            You are responsible for ensuring that your use of the Service complies with all applicable UK regulations, including GDPR, the Consumer Rights Act 2015, and any trade-specific licensing requirements (Gas Safe, NICEIC, etc.).
           </p>
 
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '600', marginBottom: '0.8rem', color: '#d4af37' }}>Renewal Terms (12-Month Cycles)</h3>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            Upon completion of the Initial 12-Month Term, your subscription automatically renews for successive 12-month periods at the then-current monthly rate, unless you provide written cancellation notice at least 30 days before the renewal date. Renewal subscriptions may be cancelled with 30 days' written notice, with all remaining fees for the current 12-month cycle due and payable.
+          {/* 7. Liability Cap */}
+          <h2 id="liability" style={H2}>7. Limitation of Liability</h2>
+          <p style={P}>
+            To the fullest extent permitted by law, our total aggregate liability to you for all claims arising under or in connection with these Terms shall not exceed the total fees paid by you to us in the <strong style={{ color: '#fff' }}>12 months immediately preceding the event giving rise to the claim</strong>.
           </p>
-        </section>
+          <p style={P}>
+            We shall not be liable for any indirect, consequential, special, or exemplary loss, including loss of revenue, loss of profit, loss of business opportunity, or damage to reputation, even if we have been advised of the possibility of such loss.
+          </p>
+          <p style={P}>
+            Nothing in these Terms limits liability for death or personal injury caused by negligence, fraud, or any other liability that cannot be excluded by law.
+          </p>
 
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>5. Your Obligations</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            You agree to: provide accurate business information, comply with all UK trade regulations (Gas Safe, NICEIC, NAPIT, TrustMark), obtain customer consent before logging their data, maintain confidentiality of credentials, not reverse-engineer the Service, not use it for unlawful purposes, and monitor your account for unauthorised access.
+          {/* 8. Service Availability */}
+          <h2 id="availability" style={H2}>8. Service Availability</h2>
+          <p style={P}>
+            We target <strong style={{ color: '#fff' }}>99% availability</strong> for the platform, measured monthly. This is a target, not a contractual SLA guarantee. No financial penalty applies for failure to meet the 99% target at the Starter tier.
           </p>
-        </section>
+          <p style={P}>
+            Downtime may occur due to scheduled maintenance (notified in advance where possible), failures of third-party infrastructure (Retell AI, Twilio, Google, Vercel), force majeure events, or security incidents requiring immediate intervention.
+          </p>
+          <p style={P}>
+            We will use reasonable endeavours to restore service promptly and to notify affected Customers of significant outages via email.
+          </p>
 
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>6. Data Ownership & Privacy</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            You own all customer data. The Company processes data on your behalf via Google Sheets and Google Calendar (your own accounts). We comply with UK GDPR. Upon termination, you have 30 days to export data before deletion.
+          {/* 9. Data Ownership & IP */}
+          <h2 id="data-ip" style={H2}>9. Data Ownership & Intellectual Property</h2>
+          <p style={{ ...P, fontWeight: '600', color: '#e0e0e0', marginBottom: '0.5rem' }}>Your data:</p>
+          <p style={P}>
+            The Customer retains full ownership of all data inputted into the Service, including End User data (call records, bookings, transcripts). We process this data on your behalf as a data processor under UK GDPR. See our <Link href="/privacy" style={{ color: CYAN }}>Privacy Policy</Link> for full details.
           </p>
-        </section>
 
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>7. AI & Emergency Limitations</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            <strong>AI Limitations:</strong> While highly capable, Claude Haiku AI may misunderstand accents or complex requests. The Company does not guarantee error-free performance.
+          <p style={{ ...P, fontWeight: '600', color: '#e0e0e0', marginBottom: '0.5rem' }}>Our intellectual property:</p>
+          <p style={P}>
+            TradesAI Operator Ltd retains all rights, title, and interest in and to the platform, including all software, AI models, algorithms, APIs, designs, trademarks, and documentation. No rights in our IP are transferred by these Terms. The limited licence granted to use the Service is non-exclusive, non-transferable, and terminates when your subscription ends.
           </p>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            <strong>Emergency Detection:</strong> The AI detects common emergency keywords and alerts you via SMS. However, it may fail to detect some emergencies. You must maintain manual emergency response procedures as backup. We are not liable for failure to detect genuine emergencies.
-          </p>
-        </section>
 
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>8. Service Availability</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            We aim for 99.5% uptime but do not guarantee uninterrupted service. Downtime may occur due to maintenance, third-party failures (Google, Twilio, Anthropic, ElevenLabs), or security incidents. No refunds are issued for downtime.
+          {/* 10. Changes to Terms */}
+          <h2 id="changes" style={H2}>10. Changes to These Terms</h2>
+          <p style={P}>
+            We may update these Terms from time to time. Where changes are material, we will provide <strong style={{ color: '#fff' }}>at least 30 days' notice by email</strong> to your registered address before the new Terms take effect. Continued use of the Service after the effective date constitutes acceptance of the revised Terms.
           </p>
-        </section>
+          <p style={P}>
+            If you do not accept revised Terms, you may cancel your subscription in accordance with Section 4 before the effective date, and we will issue a pro-rata refund for any unused prepaid period.
+          </p>
 
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>9. Warranties & Disclaimers</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            <strong>Limited Warranty:</strong> The Service will perform substantially in accordance with our published documentation. If it materially fails, we will remediate the issue or refund monthly fees for the affected month only.
+          {/* 11. Governing Law */}
+          <h2 id="governing-law" style={H2}>11. Governing Law</h2>
+          <p style={P}>
+            These Terms are governed by and construed in accordance with the laws of England and Wales. Both parties submit to the exclusive jurisdiction of the courts of England and Wales for the resolution of any dispute arising under or in connection with these Terms.
           </p>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            <strong>Disclaimer:</strong> EXCEPT AS ABOVE, THE SERVICE IS PROVIDED "AS IS" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+          <p style={P}>
+            We encourage good-faith discussion to resolve any dispute before formal legal action. Where a dispute cannot be resolved informally, either party may refer the matter to the courts.
           </p>
-        </section>
 
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>10. Limitation of Liability</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            <strong>Cap on Liability:</strong> Our total liability shall not exceed the fees you paid in the 12 months preceding the claim.
-          </p>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            <strong>Exclusion of Damages:</strong> WE ARE NOT LIABLE FOR INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING LOST REVENUE, LOST PROFITS, OR LOSS OF BUSINESS OPPORTUNITIES.
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>11. Termination for Cause</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            We may terminate your access immediately if you violate these Terms, fail to pay within 30 days, use the Service for unlawful purposes, or breach security obligations. Upon termination for cause, no refunds are issued.
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>12. Governing Law</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            These Terms are governed by English law. Both parties submit to exclusive jurisdiction of English courts. Good faith dispute resolution required before legal action.
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>13. Contact</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            <strong>TradesAI Operator Ltd</strong><br />
-            Email: admin@tradesaioperator.uk<br />
-            Web: https://tradesaioperator.com<br />
-            Registered Office: Virtual UK Office, London
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>14. Severability</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            If any provision of this Agreement is found to be invalid, unenforceable, or illegal by a court of competent jurisdiction, that provision shall be severed from this Agreement and the remaining provisions shall continue in full force and effect. The parties shall negotiate in good faith to replace the severed provision with a valid provision that achieves the original economic and legal intent.
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>15. Entire Agreement</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            This Agreement, including all referenced documentation and schedules, constitutes the entire agreement between you and the Company regarding the Service and supersedes all prior negotiations, representations, and agreements, whether written or oral. No additional terms, conditions, or representations shall be effective unless expressly agreed in writing and signed by both parties.
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>16. Assignment & Transfer</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            You may not assign, transfer, sublicense, or delegate any rights or obligations under this Agreement without the Company's prior written consent. Any attempted assignment without consent is void. The Company may assign this Agreement to any successor, affiliate, or third party in connection with a merger, acquisition, or sale of assets, with written notice to you.
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>17. Force Majeure</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            Neither party shall be liable for failure to perform its obligations under this Agreement if such failure results from circumstances beyond its reasonable control, including natural disasters, war, terrorism, pandemics, government actions, or infrastructure failures of third-party providers (Google, Twilio, Anthropic, ElevenLabs). The affected party shall notify the other party of the force majeure event and use reasonable efforts to resume performance.
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>18. No Third-Party Beneficiaries</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            This Agreement is for the sole benefit of you and the Company. No third party, including your customers, employees, or partners, has any rights or claims under this Agreement, except as expressly stated herein.
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>19. Notice & Communication</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            Any legal notice, demand, or communication required under this Agreement must be sent in writing to the other party. For you to contact the Company, send written notice to: admin@tradesaioperator.uk. For the Company to contact you, we will use your registered email address or phone number on file. Notices are deemed received: (a) upon personal delivery, (b) 3 business days after email transmission if no bounce-back occurs, or (c) 5 business days after postal mail delivery.
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>20. Waiver</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            The failure of either party to enforce any provision of this Agreement does not constitute a waiver of that provision or any other provision. A waiver must be in writing and signed by the party granting the waiver. No single or partial exercise of a right shall preclude any further exercise of that right or the exercise of any other right under this Agreement.
-          </p>
-        </section>
-
-        <section style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '1rem', color: '#00d4ff' }}>21. Survival</h2>
-          <p style={{ lineHeight: '1.8', marginBottom: '1rem' }}>
-            The following provisions survive termination or expiration of this Agreement: Subscription Fees (unpaid fees remain due), Limitation of Liability, Indemnification, Intellectual Property, Governing Law, Dispute Resolution, and any provision that by its nature is intended to survive termination. All other provisions terminate upon the end of your subscription, except as required by law.
-          </p>
-        </section>
-
-        <div style={{ borderTop: '1px solid rgba(100,180,220,0.2)', paddingTop: '2rem', marginTop: '3rem', textAlign: 'center', color: '#666', fontSize: '0.85rem' }}>
-          <p><strong>NOTICE:</strong> By signing up for TradesAI Operator, you acknowledge that you have read and agree to be bound by all terms contained herein. These are binding legal terms. Preliminary version effective April 11, 2026.</p>
-        </div>
+          {/* 12. Contact */}
+          <h2 id="contact" style={H2}>12. Contact</h2>
+          <div style={{ paddingLeft: '1rem', borderLeft: `2px solid rgba(0,212,255,0.3)` }}>
+            <p style={{ ...P, marginBottom: '0.25rem' }}><strong style={{ color: '#fff' }}>TradesAI Operator Ltd</strong></p>
+            <p style={{ ...P, marginBottom: '0.25rem' }}>5 Brayford Square, London, E1 0SG</p>
+            <p style={{ ...P, marginBottom: 0 }}><a href="mailto:admin@tradesaioperator.uk" style={{ color: CYAN }}>admin@tradesaioperator.uk</a></p>
+          </div>
+        </main>
       </div>
+
+      <Footer />
+
+      <style>{`
+        @media (min-width: 900px) { .legal-toc { display: block !important; } }
+        @media (max-width: 640px) { header { padding: 0.75rem 1rem !important; } }
+      `}</style>
     </div>
   );
 }

@@ -443,7 +443,7 @@ export default function Landing() {
           <span>•</span>
           <span>💷 Transparent Pricing</span>
         </div>
-        <p style={{ color: '#555', fontSize: '0.8rem' }}>© 2026 Trades Ai Operator. All rights reserved. | <a href="/terms" style={{ color: '#00d4ff', textDecoration: 'none' }}>Terms & Conditions</a> | <a href="/privacy" style={{ color: '#00d4ff', textDecoration: 'none' }}>Privacy</a> | Designed for UK trade businesses only.</p>
+        <p style={{ color: '#555', fontSize: '0.8rem' }}>© 2026 Trades Ai Operator. All rights reserved. | <a href="/terms" style={{ color: '#00d4ff', textDecoration: 'none' }}>Terms & Conditions</a> | <a href="/privacy" style={{ color: '#00d4ff', textDecoration: 'none' }}>Privacy</a> | <a href="/cookies" style={{ color: '#00d4ff', textDecoration: 'none' }}>Cookie Policy</a> | Designed for UK trade businesses only.</p>
       </section>
 
       <style>{`
