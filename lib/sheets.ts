@@ -227,6 +227,54 @@ export async function setClientStatus(clientId: string, status: 'active' | 'paus
   sheetsCache.invalidatePrefix('config:');
 }
 
+// Soft-delete a client account (GDPR erasure request — 30-day grace period)
+export async function requestClientDeletion(
+  clientId: string
+): Promise<{ scheduledAt: string }> {
+  const auth = getWriteAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  const spreadsheetId = process.env.MASTER_SHEET_ID!;
+  const tabName = await resolveTabName(spreadsheetId, 'client config');
+
+  const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:O`);
+  const decoded = decodeURIComponent(clientId);
+  const normalId = decoded.toLowerCase();
+  const normPhone = normalisePhone(clientId);
+
+  let rowIndex = -1;
+  for (let i = 0; i < rows.length; i++) {
+    const r = rows[i];
+    const businessName = (r[0] || '').trim();
+    const twilioNumber = (r[8] || '').trim();
+    const slug = toSlug(businessName);
+    const cId = twilioNumber || slug;
+    if (cId === decoded || cId === clientId) { rowIndex = i; break; }
+    if (twilioNumber) {
+      const t = twilioNumber.trim();
+      if (t === decoded || t === normPhone) { rowIndex = i; break; }
+      if (t.replace(/^\+/, '') === normPhone.replace(/^\+/, '')) { rowIndex = i; break; }
+    }
+    if (slug === normalId || toSlug(businessName) === normalId) { rowIndex = i; break; }
+  }
+
+  if (rowIndex < 0) throw new Error(`Client not found: ${clientId}`);
+
+  const scheduledAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+  const sheetRow = rowIndex + 2;
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `'${tabName}'!O${sheetRow}`,
+    valueInputOption: 'RAW',
+    requestBody: { values: [[`pending_deletion:${scheduledAt}`]] },
+  });
+
+  sheetsCache.invalidate('client_configs');
+  sheetsCache.invalidatePrefix('config:');
+
+  return { scheduledAt };
+}
+
 // ── InteractionsLog ──────────────────────────────────────────────────────────
 export interface Interaction {
   businessName: string;
