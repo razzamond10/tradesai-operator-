@@ -182,7 +182,7 @@ export default function PrivacyPage() {
           </p>
           <div style={{ paddingLeft: '1rem', borderLeft: `2px solid rgba(0,212,255,0.3)`, marginBottom: '1.5rem' }}>
             <p style={{ ...P, marginBottom: '0.25rem' }}><strong style={{ color: '#fff' }}>Information Commissioner's Office (ICO)</strong></p>
-            <p style={{ ...P, marginBottom: '0.25rem' }}><a href="https://ico.org.uk/concerns/" target="_blank" rel="noopener noreferrer" style={{ color: CYAN }}>ico.org.uk/concerns</a></p>
+            <p style={{ ...P, marginBottom: '0.25rem' }}><a href="https://ico.org.uk/make-a-complaint/" target="_blank" rel="noopener noreferrer" style={{ color: CYAN }}>ico.org.uk/make-a-complaint</a></p>
             <p style={{ ...P, marginBottom: 0 }}>0303 123 1113</p>
           </div>
           <p style={P}>We would appreciate the opportunity to address concerns directly before an ICO referral.</p>
