@@ -99,7 +99,7 @@ export default function PrivacyPage() {
           <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
             <li style={LI}><strong style={{ color: '#fff' }}>Active service data</strong> (call logs, bookings, transcripts): 12 months from creation, then purged.</li>
             <li style={LI}><strong style={{ color: '#fff' }}>Account and billing records:</strong> 6 years from the end of the relevant tax year (HMRC requirement).</li>
-            <li style={LI}><strong style={{ color: '#fff' }}>Call recordings:</strong> Subject to Retell AI's own retention policy — see retellai.com/privacy.</li>
+            <li style={LI}><strong style={{ color: '#fff' }}>Call recordings:</strong> Subject to Retell AI's own retention policy — see <a href="https://www.retellai.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: CYAN }}>retellai.com/legal/privacy-policy</a>.</li>
             <li style={LI}><strong style={{ color: '#fff' }}>GDPR request logs:</strong> 3 years to demonstrate compliance.</li>
           </ul>
 

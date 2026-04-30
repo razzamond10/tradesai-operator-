@@ -121,7 +121,7 @@ export default function CookiesPage() {
           <ul style={{ paddingLeft: '1.5rem', marginBottom: '1.5rem' }}>
             <li style={LI}><a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: CYAN }}>Vercel Privacy Policy</a></li>
             <li style={LI}><a href="https://www.twilio.com/legal/privacy" target="_blank" rel="noopener noreferrer" style={{ color: CYAN }}>Twilio Privacy Policy</a></li>
-            <li style={LI}><a href="https://retellai.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: CYAN }}>Retell AI Privacy Policy</a></li>
+            <li style={LI}><a href="https://www.retellai.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: CYAN }}>Retell AI Privacy Policy</a></li>
           </ul>
 
           {/* 4. Your Choices */}
