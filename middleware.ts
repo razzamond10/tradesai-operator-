@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/jwt';
 
-const PUBLIC_PATHS = ['/', '/login', '/privacy', '/terms'];
+const PUBLIC_PATHS = ['/', '/login', '/privacy', '/terms', '/cookies'];
 const API_AUTH_PATHS = ['/api/auth'];
 
 function isPublic(pathname: string): boolean {
