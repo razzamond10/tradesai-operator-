@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       const appUrl = process.env.APP_URL || 'https://app.tradesaioperator.uk';
       const resetUrl = `${appUrl}/reset-password?token=${plaintextToken}`;
 
-      await sendPasswordResetEmail(email, resetUrl).catch((err) => {
+      await sendPasswordResetEmail({ to: email, resetUrl }).catch((err) => {
         console.error('Failed to send reset email:', err);
       });
     }
