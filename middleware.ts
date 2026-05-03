@@ -49,6 +49,8 @@ export async function middleware(req: NextRequest) {
     }
 
     if (isAppDomain) {
+      // Public paths (login, forgot-password, reset-password, etc.) are always served
+      if (isPublic(pathname)) return NextResponse.next();
       // Marketing content visited on the app subdomain → redirect to login
       if (!isAppPath(pathname)) {
         return NextResponse.redirect(new URL('/login', req.url));
