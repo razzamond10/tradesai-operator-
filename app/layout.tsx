@@ -1,11 +1,15 @@
+import * as Sentry from '@sentry/nextjs';
 import type { Metadata } from 'next';
 import './globals.css';
 import CookieBanner from '@/components/CookieBanner';
 
-export const metadata: Metadata = {
-  title: 'TradesAI Operator - 24/7 AI Receptionist for UK Trade Businesses',
-  description: 'Never miss a call. 24/7 AI receptionist for plumbers, electricians, HVAC, roofers, and 40+ trades.',
-};
+export function generateMetadata(): Metadata {
+  return {
+    title: 'TradesAI Operator - 24/7 AI Receptionist for UK Trade Businesses',
+    description: 'Never miss a call. 24/7 AI receptionist for plumbers, electricians, HVAC, roofers, and 40+ trades.',
+    other: { ...Sentry.getTraceData() },
+  };
+}
 
 export default function RootLayout({
   children,
