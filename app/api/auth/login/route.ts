@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateUser, signJWT } from '@/lib/auth';
 import { getClientStatus } from '@/lib/sheets';
+import { checkLimit, incrementLimit, clearLimit } from '@/lib/rateLimit';
 
 export async function POST(req: NextRequest) {
   try {
+    const ip =
+      req.headers.get('x-forwarded-for')?.split(',')[0].trim() ?? 'anonymous';
+
+    const { allowed } = checkLimit(ip);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Too many attempts. Try again in 15 minutes.' },
+        { status: 429, headers: { 'Retry-After': '900' } },
+      );
+    }
+
     const { email, password } = await req.json();
 
     if (!email || !password) {
@@ -13,6 +25,7 @@ export async function POST(req: NextRequest) {
     const user = await validateUser(email.toLowerCase().trim(), password);
 
     if (!user) {
+      incrementLimit(ip);
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
@@ -23,6 +36,8 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'paused' }, { status: 403 });
       }
     }
+
+    clearLimit(ip);
 
     const token = await signJWT(user);
 
