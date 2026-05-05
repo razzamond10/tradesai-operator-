@@ -6,6 +6,7 @@ const PUBLIC_PATHS = ['/', '/login', '/privacy', '/terms', '/cookies', '/forgot-
 function isPublic(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true;
   if (pathname.startsWith('/api/auth')) return true;
+  if (pathname.startsWith('/api/voice')) return true;
   if (pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/logo')) return true;
   if (pathname.match(/\.(ico|png|jpg|jpeg|svg|mp3|webp|woff2?)$/)) return true;
   return false;
