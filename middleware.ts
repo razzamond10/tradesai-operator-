@@ -49,6 +49,17 @@ export async function middleware(req: NextRequest) {
     }
 
     if (isAppDomain) {
+      // Root path on app subdomain: redirect based on auth state
+      if (pathname === '/') {
+        const token = req.cookies.get('tradesai_token')?.value;
+        if (token) {
+          try {
+            const user = await verifyJWT(token);
+            if (user) return NextResponse.redirect(new URL(roleHome(user.role), req.url));
+          } catch {}
+        }
+        return NextResponse.redirect(new URL('/login', req.url));
+      }
       // Public paths (login, forgot-password, reset-password, etc.) are always served
       if (isPublic(pathname)) return NextResponse.next();
       // Marketing content visited on the app subdomain → redirect to login
