@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/jwt';
 import { getClientConfig, getInteractions, getBookings, getEmergencies, logInteraction } from '@/lib/sheets';
+import { logAudit, getRequestMeta } from '@/lib/audit';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,6 +33,18 @@ export async function GET(req: NextRequest) {
       outcome: 'completed',
       notes: 'GDPR data export requested via portal',
     }).catch(() => {/* non-fatal */});
+
+    const { ip, user_agent } = getRequestMeta(req);
+    logAudit({
+      actor_email: user.email,
+      actor_role: user.role as 'admin' | 'client',
+      action: 'gdpr.export',
+      target: user.email,
+      client_id: user.clientId,
+      ip,
+      user_agent,
+      result: 'success',
+    });
 
     const exportDate = new Date().toISOString().slice(0, 10);
     const payload = JSON.stringify({

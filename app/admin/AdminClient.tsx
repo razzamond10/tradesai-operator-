@@ -180,6 +180,7 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
                 {[
                   { label: 'My Account', icon: '👤', href: '/admin/account' },
                   { label: 'Platform Settings', icon: '⚙️', href: '/admin/settings' },
+                  { label: 'Audit Log', icon: '🛡', href: '/admin/audit' },
                 ].map(item => (
                   <button key={item.label} onClick={() => { setProfileOpen(false); router.push(item.href); }} style={{
                     display: 'flex', alignItems: 'center', gap: '9px', width: '100%',

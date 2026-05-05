@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { userExists } from '@/lib/auth';
 import { countRecentResets, createPasswordReset } from '@/lib/passwordReset';
 import { sendPasswordResetEmail } from '@/lib/email';
+import { logAudit, getRequestMeta } from '@/lib/audit';
 
 export const dynamic = 'force-dynamic';
 
@@ -41,6 +42,17 @@ export async function POST(req: NextRequest) {
         console.error('Failed to send reset email:', err);
       });
     }
+
+    const { ip, user_agent } = getRequestMeta(req);
+    logAudit({
+      actor_email: email,
+      actor_role: 'anonymous',
+      action: 'password.reset.requested',
+      target: email,
+      ip,
+      user_agent,
+      result: 'success',
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {

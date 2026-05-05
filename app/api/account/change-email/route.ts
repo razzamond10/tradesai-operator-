@@ -3,6 +3,7 @@ import { verifyJWT } from '@/lib/jwt';
 import { countRecentChanges, createEmailChange } from '@/lib/emailChange';
 import { sendChangeEmailVerification } from '@/lib/email';
 import { getAdminUsers } from '@/lib/passwordReset';
+import { logAudit, getRequestMeta } from '@/lib/audit';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,6 +57,18 @@ export async function POST(req: NextRequest) {
       verifyUrl,
       currentEmail,
       newEmail: trimmed,
+    });
+
+    const { ip, user_agent } = getRequestMeta(req);
+    logAudit({
+      actor_email: user.email,
+      actor_role: user.role as 'admin' | 'client',
+      action: 'email.change.requested',
+      target: trimmed,
+      ip,
+      user_agent,
+      result: 'success',
+      metadata: { old_email: currentEmail },
     });
 
     return NextResponse.json({ ok: true });

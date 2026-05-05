@@ -3,6 +3,7 @@ import { validateUser, signJWT } from '@/lib/auth';
 import { getClientStatus } from '@/lib/sheets';
 import { checkLimit, incrementLimit, clearLimit } from '@/lib/rateLimit';
 import { SESSION_DURATIONS } from '@/lib/jwt';
+import { logAudit, getRequestMeta } from '@/lib/audit';
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,10 +24,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
     }
 
-    const user = await validateUser(email.toLowerCase().trim(), password);
+    const { ip: auditIp, user_agent } = getRequestMeta(req);
+    const normalEmail = email.toLowerCase().trim();
+    const user = await validateUser(normalEmail, password);
 
     if (!user) {
       incrementLimit(ip);
+      logAudit({
+        actor_email: normalEmail,
+        actor_role: 'anonymous',
+        action: 'login.failed',
+        target: normalEmail,
+        ip: auditIp,
+        user_agent,
+        result: 'failure',
+        metadata: { reason: 'wrong_password' },
+      });
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
@@ -39,6 +52,16 @@ export async function POST(req: NextRequest) {
     }
 
     clearLimit(ip);
+
+    logAudit({
+      actor_email: user.email,
+      actor_role: user.role as 'admin' | 'client',
+      action: 'login.success',
+      target: user.email,
+      ip: auditIp,
+      user_agent,
+      result: 'success',
+    });
 
     const duration = rememberMe ? SESSION_DURATIONS.long : SESSION_DURATIONS.short;
     const token = await signJWT(user, duration);

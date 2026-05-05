@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/jwt';
 import { setClientStatus } from '@/lib/sheets';
+import { logAudit, getRequestMeta } from '@/lib/audit';
 
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   try {
@@ -20,6 +21,18 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
 
     await setClientStatus(clientId, status);
+
+    const { ip, user_agent } = getRequestMeta(req);
+    logAudit({
+      actor_email: session.email,
+      actor_role: 'admin',
+      action: status === 'paused' ? 'account.paused' : 'account.resumed',
+      target: clientId,
+      client_id: clientId,
+      ip,
+      user_agent,
+      result: 'success',
+    });
 
     return NextResponse.json({ clientId, status, timestamp: new Date().toISOString() });
   } catch (err: any) {

@@ -6,6 +6,7 @@ import {
   upsertAdminUserPassword,
 } from '@/lib/passwordReset';
 import { userExists } from '@/lib/auth';
+import { logAudit, getRequestMeta } from '@/lib/audit';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,8 +34,20 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await findAndValidateResetToken(token);
+    const { ip, user_agent } = getRequestMeta(req);
 
     if (!result.valid) {
+      const reason = result.error === 'expired' ? 'expired' : 'invalid_token';
+      logAudit({
+        actor_email: result.email || 'anonymous',
+        actor_role: 'anonymous',
+        action: 'password.reset.completed',
+        target: result.email || 'unknown',
+        ip,
+        user_agent,
+        result: 'failure',
+        metadata: { reason },
+      });
       const msg =
         result.error === 'expired' ? 'This reset link has expired. Please request a new one.' :
         result.error === 'used'    ? 'This reset link has already been used. Please request a new one.' :
@@ -51,6 +64,16 @@ export async function POST(req: NextRequest) {
 
     await upsertAdminUserPassword(result.email, name, role, passwordHash);
     await markTokenUsed(result.rowIndex);
+
+    logAudit({
+      actor_email: result.email,
+      actor_role: (role as 'admin' | 'client') || 'anonymous',
+      action: 'password.reset.completed',
+      target: result.email,
+      ip,
+      user_agent,
+      result: 'success',
+    });
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/jwt';
 import { getClientConfig, requestClientDeletion, logInteraction } from '@/lib/sheets';
+import { logAudit, getRequestMeta } from '@/lib/audit';
 
 export const dynamic = 'force-dynamic';
 
@@ -38,8 +39,18 @@ export async function DELETE(req: NextRequest) {
       notes: `GDPR deletion requested. Scheduled purge: ${scheduledAt}. 30-day grace period applies.`,
     }).catch(() => {/* non-fatal */});
 
-    // TODO: Send confirmation email to client at config.email / user.email
-    // No email pattern currently exists in the codebase — implement as separate task.
+    const { ip, user_agent } = getRequestMeta(req);
+    logAudit({
+      actor_email: user.email,
+      actor_role: user.role as 'admin' | 'client',
+      action: 'gdpr.delete',
+      target: user.email,
+      client_id: user.clientId,
+      ip,
+      user_agent,
+      result: 'success',
+      metadata: { scheduledAt },
+    });
 
     return NextResponse.json({
       ok: true,
