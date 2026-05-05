@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ClientShell from '@/components/ClientShell';
 import Topbar from '@/components/Topbar';
+import ChangeEmailSection from '@/components/ChangeEmailSection';
 
 function StatCard({ icon, label, value, sub, stripe }: { icon: string; label: string; value: string | number; sub: string; stripe: string }) {
   return (
@@ -97,6 +98,14 @@ export default function ClientAccountClient({ user }: { user: { email: string; n
           <StatCard icon="📞" label="Total Calls" value={totalCalls.toLocaleString()} sub="captured by AI" stripe="var(--a1)" />
           <StatCard icon="📅" label="Total Bookings" value={totalBookings.toLocaleString()} sub="confirmed via AI" stripe="var(--a3)" />
           <StatCard icon="🚨" label="Emergencies" value={totalEmergencies.toLocaleString()} sub="flagged and handled" stripe="var(--a4)" />
+        </div>
+
+        {/* Change email */}
+        <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '11px', fontWeight: 700, color: 'var(--a1)', textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: '10px' }}>
+          Change Email
+        </div>
+        <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', padding: '24px 28px', marginBottom: '20px' }}>
+          <ChangeEmailSection currentEmail={user.email} />
         </div>
 
         {/* Change password */}

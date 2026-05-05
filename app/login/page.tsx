@@ -3,13 +3,22 @@ import { useState, FormEvent, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 
-function ResetToast({ onToast }: { onToast: (msg: string) => void }) {
+function ResetToast({ onToast, onError }: { onToast: (msg: string) => void; onError: (msg: string) => void }) {
   const params = useSearchParams();
   useEffect(() => {
     if (params.get('reset') === '1') {
       onToast('Password reset successfully. Please sign in with your new password.');
     }
-  }, [params, onToast]);
+    if (params.get('email_changed') === 'true') {
+      onToast('Email address updated. Please sign in with your new email.');
+    }
+    const err = params.get('error');
+    if (err === 'expired_link') {
+      onError('That verification link has expired. Please request a new email change.');
+    } else if (err === 'invalid_link') {
+      onError('That verification link is invalid or has already been used.');
+    }
+  }, [params, onToast, onError]);
   return null;
 }
 
@@ -99,7 +108,7 @@ export default function LoginPage() {
         </div>
 
         <Suspense fallback={null}>
-          <ResetToast onToast={setToast} />
+          <ResetToast onToast={setToast} onError={setError} />
         </Suspense>
 
         <form onSubmit={handleSubmit}>

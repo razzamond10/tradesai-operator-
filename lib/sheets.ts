@@ -507,3 +507,41 @@ export async function getClientByTwilioNumber(twilioNumber: string): Promise<Cli
     ('+44' + c.twilioNumber.replace(/^0/, '')) === twilioNumber
   ) || null;
 }
+
+// ── AdminUsers ────────────────────────────────────────────────────────────────
+
+/** Update a user's email address (column A) in AdminUsers.
+ *  Throws 'Email already taken' if newEmail exists in another row.
+ *  Throws 'User not found' if currentEmail has no matching row. */
+export async function updateAdminUserEmail(currentEmail: string, newEmail: string): Promise<void> {
+  const current = currentEmail.toLowerCase().trim();
+  const next = newEmail.toLowerCase().trim();
+  const spreadsheetId = process.env.MASTER_SHEET_ID!;
+
+  // Read AdminUsers rows: A=email, B=name, C=role, D=passwordHash
+  const rows = await readSheet(spreadsheetId, "'AdminUsers'!A2:D");
+  const users = rows.map((r, i) => ({
+    email: (r[0] || '').trim().toLowerCase(),
+    rowIndex: i,
+  }));
+
+  if (users.some((u) => u.email === next)) {
+    throw new Error('Email already taken');
+  }
+
+  const target = users.find((u) => u.email === current);
+  if (!target) {
+    throw new Error('User not found');
+  }
+
+  const auth = getWriteAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  const sheetRow = target.rowIndex + 2; // +1 header +1 1-based
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId,
+    range: `'AdminUsers'!A${sheetRow}`,
+    valueInputOption: 'RAW',
+    requestBody: { values: [[next]] },
+  });
+}

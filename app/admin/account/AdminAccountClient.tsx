@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ChangeEmailSection from '@/components/ChangeEmailSection';
 
 function fmtCurrency(v: number) {
   if (v >= 1_000_000) return `£${(v / 1_000_000).toFixed(1)}m`;
@@ -125,6 +126,14 @@ export default function AdminAccountClient({ user }: { user: { email: string; na
               <StatCard icon="💰" label="Total Revenue" value={fmtCurrency(stats?.totalRevenue ?? 0)} sub="booked via AI, all clients" stripe="#C9A84C" />
             </>
           )}
+        </div>
+
+        {/* Change email */}
+        <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '11px', fontWeight: 700, color: '#3D1FA8', textTransform: 'uppercase', letterSpacing: '.8px', marginBottom: '10px' }}>
+          Change Email
+        </div>
+        <div style={{ background: '#fff', borderRadius: '12px', border: '1px solid #D8D0F0', boxShadow: '0 2px 10px rgba(26,10,60,0.07)', padding: '24px 28px', marginBottom: '20px' }}>
+          <ChangeEmailSection currentEmail={user.email} />
         </div>
 
         {/* Change password */}
