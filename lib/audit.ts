@@ -46,9 +46,12 @@ export interface AuditEvent {
 /**
  * Fire-and-forget audit log writer.
  * NEVER throws — audit failure must never break the caller.
+ * Uses Promise.race with 2s timeout so the write completes before
+ * the serverless function exits (setImmediate is dropped on Vercel).
  */
 export async function logAudit(event: AuditEvent): Promise<void> {
-  setImmediate(async () => {
+  console.log('[audit] logAudit called for:', event.action);
+  const writePromise = (async () => {
     try {
       const auth = getWriteAuth();
       const sheets = google.sheets({ version: 'v4', auth });
@@ -72,10 +75,16 @@ export async function logAudit(event: AuditEvent): Promise<void> {
         valueInputOption: 'RAW',
         requestBody: { values: [row] },
       });
+      console.log('[audit] wrote row:', event.action);
     } catch (err) {
-      console.error('[audit] write failed', err);
+      console.error('[audit] write failed:', err);
     }
-  });
+  })();
+
+  await Promise.race([
+    writePromise,
+    new Promise<void>(resolve => setTimeout(resolve, 2000)),
+  ]);
 }
 
 export function getRequestMeta(req: Request): { ip: string; user_agent: string } {
