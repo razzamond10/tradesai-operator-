@@ -5,7 +5,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { logInteraction } from '@/lib/sheets';
+import { logInteraction, getClientByTwilioNumber } from '@/lib/sheets';
+import { validateTwilioSignature } from '@/lib/twilioVerify';
+import { cleanForSheets } from '@/lib/sheetsSafe';
 
 function xml(content: string) {
   return new NextResponse(content, {
@@ -20,12 +22,17 @@ function escXml(s: string) {
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
+  if (!validateTwilioSignature(req, body)) {
+    console.warn('[FOLLOW-UP] Invalid Twilio signature, rejecting');
+    return new NextResponse('', { status: 403 });
+  }
   const params = Object.fromEntries(new URLSearchParams(body));
 
   const { searchParams } = new URL(req.url);
   const from = searchParams.get('from') || params['From'] || '';
   const callSid = searchParams.get('sid') || params['CallSid'] || '';
-  const sheetId = searchParams.get('sheet') || '';
+  const client = await getClientByTwilioNumber(params['To'] || '');
+  const sheetId = client?.sheetId || '';
 
   const speechResult = params['SpeechResult'] || '';
 
@@ -38,10 +45,10 @@ export async function POST(req: NextRequest) {
       logInteraction(sheetId, {
         timestamp: new Date().toISOString(),
         callerName: 'Caller',
-        phone: from,
+        phone: cleanForSheets(from),
         intent: 'Follow-up',
         outcome: 'Additional info provided',
-        notes: additionalNote + ` | SID: ${callSid}`,
+        notes: cleanForSheets(additionalNote + ` | SID: ${callSid}`),
       }).catch((err) => console.error('[FOLLOW-UP] Sheet log failed:', err));
     }
   }

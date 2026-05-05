@@ -6,7 +6,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { logInteraction } from '@/lib/sheets';
+import { logInteraction, getClientByTwilioNumber } from '@/lib/sheets';
+import { validateTwilioSignature } from '@/lib/twilioVerify';
+import { cleanForSheets } from '@/lib/sheetsSafe';
 
 function xml(content: string) {
   return new NextResponse(content, {
@@ -71,13 +73,18 @@ function detectIntent(speech: string): { intent: string; response: string; outco
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
+  if (!validateTwilioSignature(req, body)) {
+    console.warn('[GATHER] Invalid Twilio signature, rejecting');
+    return new NextResponse('', { status: 403 });
+  }
   const params = Object.fromEntries(new URLSearchParams(body));
 
   const { searchParams } = new URL(req.url);
   const to = searchParams.get('to') || params['To'] || '';
   const from = searchParams.get('from') || params['From'] || '';
   const callSid = searchParams.get('sid') || params['CallSid'] || '';
-  const sheetId = searchParams.get('sheet') || '';
+  const client = await getClientByTwilioNumber(params['To'] || '');
+  const sheetId = client?.sheetId || '';
 
   const speechResult = params['SpeechResult'] || '';
   const confidence = params['Confidence'] || '0';
@@ -92,10 +99,10 @@ export async function POST(req: NextRequest) {
     logInteraction(sheetId, {
       timestamp: new Date().toISOString(),
       callerName: 'Caller',
-      phone: from,
+      phone: cleanForSheets(from),
       intent,
       outcome,
-      notes: `Speech: "${speechResult}" | Confidence: ${confidence} | SID: ${callSid}`,
+      notes: cleanForSheets(`Speech: "${speechResult}" | Confidence: ${confidence} | SID: ${callSid}`),
     }).catch((err) => console.error('[GATHER] Sheet log failed:', err));
   }
 
@@ -104,7 +111,7 @@ export async function POST(req: NextRequest) {
   const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
   <Say voice="Polly.Emma-Neural" language="en-GB">${safeResponse}</Say>
-  <Gather input="speech" action="/api/voice/follow-up?to=${encodeURIComponent(to)}&amp;from=${encodeURIComponent(from)}&amp;sid=${encodeURIComponent(callSid)}&amp;sheet=${encodeURIComponent(sheetId)}" method="POST" speechTimeout="3" timeout="8">
+  <Gather input="speech" action="/api/voice/follow-up?to=${encodeURIComponent(to)}&amp;from=${encodeURIComponent(from)}&amp;sid=${encodeURIComponent(callSid)}" method="POST" speechTimeout="3" timeout="8">
     <Say voice="Polly.Emma-Neural" language="en-GB">Is there anything else I can help you with?</Say>
   </Gather>
   <Say voice="Polly.Emma-Neural" language="en-GB">Thanks for calling. Have a great day. Goodbye.</Say>

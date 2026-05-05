@@ -10,6 +10,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getClientByTwilioNumber } from '@/lib/sheets';
+import { validateTwilioSignature } from '@/lib/twilioVerify';
 
 function xml(content: string) {
   return new NextResponse(content, {
@@ -23,8 +24,11 @@ function escXml(s: string) {
 }
 
 export async function POST(req: NextRequest) {
-  // Parse form-encoded body Twilio sends
   const body = await req.text();
+  if (!validateTwilioSignature(req, body)) {
+    console.warn('[VOICE] Invalid Twilio signature, rejecting');
+    return new NextResponse('', { status: 403 });
+  }
   const params = Object.fromEntries(new URLSearchParams(body));
 
   const to = params['To'] || '';
@@ -55,8 +59,8 @@ export async function POST(req: NextRequest) {
   }
 
   const safeName = escXml(businessName);
-  const gatherUrl = `/api/voice/gather?to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&sid=${encodeURIComponent(callSid)}&sheet=${encodeURIComponent(clientSheetId)}`;
-  const statusUrl = `/api/voice/status?to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&sid=${encodeURIComponent(callSid)}&sheet=${encodeURIComponent(clientSheetId)}`;
+  const gatherUrl = `/api/voice/gather?to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&sid=${encodeURIComponent(callSid)}`;
+  const statusUrl = `/api/voice/status?to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&sid=${encodeURIComponent(callSid)}`;
 
   const twiml = `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
