@@ -20,6 +20,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -30,7 +31,7 @@ export default function LoginPage() {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, rememberMe }),
       });
 
       const data = await res.json();
@@ -146,7 +147,16 @@ export default function LoginPage() {
             />
           </div>
 
-          <div style={{ textAlign: 'right', marginBottom: '1.25rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                style={{ accentColor: '#C9A84C', width: '14px', height: '14px', cursor: 'pointer' }}
+              />
+              <span style={{ color: '#888', fontSize: '0.8rem' }}>Remember me for 30 days</span>
+            </label>
             <a href="/forgot-password" style={{ color: '#888', fontSize: '0.8rem', textDecoration: 'none' }}>
               Forgot password?
             </a>

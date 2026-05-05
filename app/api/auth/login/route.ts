@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validateUser, signJWT } from '@/lib/auth';
 import { getClientStatus } from '@/lib/sheets';
 import { checkLimit, incrementLimit, clearLimit } from '@/lib/rateLimit';
+import { SESSION_DURATIONS } from '@/lib/jwt';
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,7 +17,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { email, password } = await req.json();
+    const { email, password, rememberMe = false } = await req.json();
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password required' }, { status: 400 });
@@ -39,14 +40,15 @@ export async function POST(req: NextRequest) {
 
     clearLimit(ip);
 
-    const token = await signJWT(user);
+    const duration = rememberMe ? SESSION_DURATIONS.long : SESSION_DURATIONS.short;
+    const token = await signJWT(user, duration);
 
     const response = NextResponse.json({ ok: true, role: user.role, name: user.name });
     response.cookies.set('tradesai_token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
-      maxAge: 60 * 60 * 8, // 8 hours
+      maxAge: duration,
       path: '/',
     });
 
