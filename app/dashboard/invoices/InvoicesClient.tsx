@@ -5,6 +5,13 @@ import ClientShell from '@/components/ClientShell';
 import Topbar from '@/components/Topbar';
 import type { Invoice } from '@/lib/invoices';
 
+function fmtUKDate(iso: string): string {
+  if (!iso) return '—';
+  const [y, m, d] = iso.split('-');
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y}`;
+}
+
 type User = { email: string; name: string; role: string; clientId?: string; planTier?: string };
 
 const STATUS_COLORS: Record<string, { bg: string; color: string; label: string }> = {
@@ -126,8 +133,8 @@ export default function InvoicesClient({ user }: { user: User }) {
                     >
                       <td style={{ padding: '12px 14px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: 'var(--ink)' }}>{inv.invoiceId}</td>
                       <td style={{ padding: '12px 14px', color: 'var(--ink)' }}>{inv.customerName}</td>
-                      <td style={{ padding: '12px 14px', color: 'var(--muted)' }}>{inv.issueDate}</td>
-                      <td style={{ padding: '12px 14px', color: inv.status === 'overdue' ? '#DC2626' : 'var(--muted)', fontWeight: inv.status === 'overdue' ? 700 : 400 }}>{inv.dueDate}</td>
+                      <td style={{ padding: '12px 14px', color: 'var(--muted)' }}>{fmtUKDate(inv.issueDate)}</td>
+                      <td style={{ padding: '12px 14px', color: inv.status === 'overdue' ? '#DC2626' : 'var(--muted)', fontWeight: inv.status === 'overdue' ? 700 : 400 }}>{fmtUKDate(inv.dueDate)}</td>
                       <td style={{ padding: '12px 14px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: 'var(--ink)' }}>{fmt(inv.total)}</td>
                       <td style={{ padding: '12px 14px' }}><StatusBadge status={inv.status} /></td>
                       <td style={{ padding: '12px 14px', textAlign: 'right' }}>
