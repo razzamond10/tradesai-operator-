@@ -69,7 +69,8 @@ export const GET = withTierGuard('page.invoices', async (req: NextRequest, sessi
           <View style={{ flex: 1 }}>
             <Text style={styles.sectionHdr}>Bill To</Text>
             <Text style={{ fontFamily: 'Helvetica-Bold', marginBottom: 2 }}>{invoice.customerName}</Text>
-            {invoice.customerEmail ? <Text style={{ color: '#6B7280' }}>{invoice.customerEmail}</Text> : null}
+            {invoice.customerPhone ? <View style={styles.row}><Text style={styles.label}>Phone</Text><Text style={styles.value}>{invoice.customerPhone}</Text></View> : null}
+            {invoice.customerAddress ? <View style={styles.row}><Text style={styles.label}>Address</Text><Text style={styles.value}>{invoice.customerAddress}</Text></View> : null}
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.sectionHdr}>Dates</Text>
@@ -102,7 +103,7 @@ export const GET = withTierGuard('page.invoices', async (req: NextRequest, sessi
               <Text style={{ color: '#6B7280' }}>Subtotal</Text>
               <Text>{fmt(invoice.subtotal)}</Text>
             </View>
-            {invoice.vatRate > 0 && (
+            {invoice.vatAmount > 0 && (
               <View style={styles.totalRow}>
                 <Text style={{ color: '#6B7280' }}>VAT ({invoice.vatRate}%)</Text>
                 <Text>{fmt(invoice.vatAmount)}</Text>

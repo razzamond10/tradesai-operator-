@@ -39,7 +39,8 @@ export default function InvoiceDetailClient({ invoiceId, user }: { invoiceId: st
 
   // Edit state mirrors invoice fields
   const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
   const [issueDate, setIssueDate] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [notes, setNotes] = useState('');
@@ -63,7 +64,8 @@ export default function InvoiceDetailClient({ invoiceId, user }: { invoiceId: st
 
   function populateEdit(inv: Invoice) {
     setCustomerName(inv.customerName);
-    setCustomerEmail(inv.customerEmail);
+    setCustomerPhone(inv.customerPhone);
+    setCustomerAddress(inv.customerAddress);
     setIssueDate(inv.issueDate);
     setDueDate(inv.dueDate);
     setNotes(inv.notes);
@@ -88,7 +90,7 @@ export default function InvoiceDetailClient({ invoiceId, user }: { invoiceId: st
     const res = await fetch(`/api/invoices/${invoiceId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ customerName, customerEmail, issueDate, dueDate, notes, lineItems: lines, vatRate }),
+      body: JSON.stringify({ customerName, customerPhone, customerAddress, issueDate, dueDate, notes, lineItems: lines, vatRate }),
     });
     const data = await res.json();
     setSaving(false);
@@ -169,9 +171,13 @@ export default function InvoiceDetailClient({ invoiceId, user }: { invoiceId: st
                 <label style={LABEL}>Customer Name *</label>
                 <input style={INPUT} value={customerName} onChange={e => setCustomerName(e.target.value)} />
               </div>
-              <div style={{ gridColumn: '1/-1' }}>
-                <label style={LABEL}>Customer Email</label>
-                <input type="email" style={INPUT} value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} />
+              <div>
+                <label style={LABEL}>Customer Phone</label>
+                <input type="tel" style={INPUT} value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="+44 7700 900000" />
+              </div>
+              <div>
+                <label style={LABEL}>Customer Address</label>
+                <input style={INPUT} value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} placeholder="123 High St, London" />
               </div>
               <div>
                 <label style={LABEL}>Issue Date</label>
@@ -185,7 +191,8 @@ export default function InvoiceDetailClient({ invoiceId, user }: { invoiceId: st
           ) : (
             <div style={{ padding: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px 24px', fontSize: '13px' }}>
               <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Customer</div><div style={{ color: 'var(--ink)', fontWeight: 600 }}>{invoice.customerName}</div></div>
-              <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Email</div><div style={{ color: 'var(--ink)' }}>{invoice.customerEmail || '—'}</div></div>
+              <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Phone</div><div style={{ color: 'var(--ink)' }}>{invoice.customerPhone || '—'}</div></div>
+              <div style={{ gridColumn: '1/-1' }}><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Address</div><div style={{ color: 'var(--ink)' }}>{invoice.customerAddress || '—'}</div></div>
               <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Issue Date</div><div style={{ color: 'var(--ink)' }}>{invoice.issueDate}</div></div>
               <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Due Date</div><div style={{ color: invoice.status === 'overdue' ? '#DC2626' : 'var(--ink)', fontWeight: invoice.status === 'overdue' ? 700 : 400 }}>{invoice.dueDate}</div></div>
               {invoice.paidAt && <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Paid At</div><div style={{ color: '#16A34A', fontWeight: 600 }}>{invoice.paidAt.slice(0, 10)}</div></div>}

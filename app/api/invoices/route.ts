@@ -4,7 +4,7 @@ import { getClientConfig } from '@/lib/sheets';
 import { getInvoices, createInvoice } from '@/lib/invoices';
 import { cleanForSheets } from '@/lib/sheetsSafe';
 
-export const GET = withTierGuard('page.invoices', async (req: NextRequest, session) => {
+export const GET = withTierGuard('page.invoices', async (_req: NextRequest, session) => {
   const clientId = session.clientId;
   if (!clientId) return Response.json({ error: 'No clientId' }, { status: 400 });
 
@@ -12,9 +12,8 @@ export const GET = withTierGuard('page.invoices', async (req: NextRequest, sessi
   if (!config?.sheetId) return Response.json({ invoices: [] });
 
   const invoices = await getInvoices(config.sheetId);
-  // Return most recent first; strip rowIndex before sending
   const sorted = invoices
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+    .sort((a, b) => b.issueDate.localeCompare(a.issueDate))
     .map(({ rowIndex: _r, ...rest }) => rest);
 
   return Response.json({ invoices: sorted });
@@ -28,7 +27,8 @@ export const POST = withTierGuard('page.invoices', async (req: NextRequest, sess
   if (!config?.sheetId) return Response.json({ error: 'Sheet not configured' }, { status: 400 });
 
   const body = await req.json();
-  const { customerName, customerEmail, issueDate, dueDate, lineItems, vatRate, notes } = body;
+  const { customerName, customerPhone, customerAddress, bookingRef,
+          issueDate, dueDate, lineItems, vatRate, notes } = body;
 
   if (!customerName || !issueDate || !dueDate || !Array.isArray(lineItems) || lineItems.length === 0) {
     return Response.json({ error: 'Missing required fields' }, { status: 422 });
@@ -47,7 +47,9 @@ export const POST = withTierGuard('page.invoices', async (req: NextRequest, sess
     clientId,
     status: 'draft',
     customerName: cleanForSheets(customerName),
-    customerEmail: cleanForSheets(customerEmail || ''),
+    customerPhone: cleanForSheets(customerPhone || ''),
+    customerAddress: cleanForSheets(customerAddress || ''),
+    bookingRef: cleanForSheets(bookingRef || ''),
     issueDate,
     dueDate,
     subtotal,

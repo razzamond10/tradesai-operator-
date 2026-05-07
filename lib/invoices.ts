@@ -23,65 +23,77 @@ export interface Invoice {
   invoiceId: string;
   clientId: string;
   status: 'draft' | 'sent' | 'paid' | 'overdue';
-  customerName: string;
-  customerEmail: string;
   issueDate: string;
   dueDate: string;
+  customerName: string;
+  customerPhone: string;
+  customerAddress: string;
+  bookingRef: string;
+  lineItems: LineItem[];
   subtotal: number;
-  vatRate: number;
+  vatRate: number;   // derived at read time (not stored); kept for UI display
   vatAmount: number;
   total: number;
-  lineItems: LineItem[];
-  notes: string;
-  createdAt: string;
   paidAt: string;
+  notes: string;
   rowIndex?: number;
 }
 
-// Columns A–O
+// Columns A–P (16 columns)
+// A=invoiceId  B=clientId  C=invoiceNumber(=invoiceId)  D=status
+// E=issueDate  F=dueDate   G=customerName  H=customerPhone
+// I=customerAddress  J=bookingRef  K=lineItemsJSON
+// L=subtotal  M=vatAmount  N=total  O=paidAt  P=notes
+
 function rowToInvoice(row: string[], rowIndex: number): Invoice {
+  const subtotal = parseFloat(row[11]) || 0;
+  const vatAmount = parseFloat(row[12]) || 0;
+  const vatRate = subtotal > 0 ? Math.round((vatAmount / subtotal) * 100) : 0;
   return {
     invoiceId: row[0] || '',
     clientId: row[1] || '',
-    status: (['draft', 'sent', 'paid', 'overdue'].includes(row[2]) ? row[2] : 'draft') as Invoice['status'],
-    customerName: row[3] || '',
-    customerEmail: row[4] || '',
-    issueDate: row[5] || '',
-    dueDate: row[6] || '',
-    subtotal: parseFloat(row[7]) || 0,
-    vatRate: parseFloat(row[8]) || 0,
-    vatAmount: parseFloat(row[9]) || 0,
-    total: parseFloat(row[10]) || 0,
-    lineItems: (() => { try { return JSON.parse(row[11] || '[]'); } catch { return []; } })(),
-    notes: row[12] || '',
-    createdAt: row[13] || '',
+    // row[2] = invoiceNumber — identical to invoiceId, ignored
+    status: (['draft', 'sent', 'paid', 'overdue'].includes(row[3]) ? row[3] : 'draft') as Invoice['status'],
+    issueDate: row[4] || '',
+    dueDate: row[5] || '',
+    customerName: row[6] || '',
+    customerPhone: row[7] || '',
+    customerAddress: row[8] || '',
+    bookingRef: row[9] || '',
+    lineItems: (() => { try { return JSON.parse(row[10] || '[]'); } catch { return []; } })(),
+    subtotal,
+    vatAmount,
+    vatRate,
+    total: parseFloat(row[13]) || 0,
     paidAt: row[14] || '',
+    notes: row[15] || '',
     rowIndex,
   };
 }
 
 function invoiceToRow(inv: Omit<Invoice, 'rowIndex'>): string[] {
   return [
-    inv.invoiceId,
-    inv.clientId,
-    inv.status,
-    inv.customerName,
-    inv.customerEmail,
-    inv.issueDate,
-    inv.dueDate,
-    inv.subtotal.toFixed(2),
-    inv.vatRate.toString(),
-    inv.vatAmount.toFixed(2),
-    inv.total.toFixed(2),
-    JSON.stringify(inv.lineItems),
-    inv.notes,
-    inv.createdAt,
-    inv.paidAt,
+    inv.invoiceId,                   // A
+    inv.clientId,                    // B
+    inv.invoiceId,                   // C — Invoice Number = Invoice ID
+    inv.status,                      // D
+    inv.issueDate,                   // E
+    inv.dueDate,                     // F
+    inv.customerName,                // G
+    inv.customerPhone,               // H
+    inv.customerAddress,             // I
+    inv.bookingRef,                  // J
+    JSON.stringify(inv.lineItems),   // K
+    inv.subtotal.toFixed(2),         // L
+    inv.vatAmount.toFixed(2),        // M
+    inv.total.toFixed(2),            // N
+    inv.paidAt,                      // O
+    inv.notes,                       // P
   ];
 }
 
 export async function getInvoices(sheetId: string): Promise<Invoice[]> {
-  const rows = await readSheet(sheetId, `${TAB}!A2:O`);
+  const rows = await readSheet(sheetId, `${TAB}!A2:P`);
   return rows.map((row, i) => rowToInvoice(row, i + 2));
 }
 
@@ -101,17 +113,16 @@ export async function nextInvoiceNumber(sheetId: string): Promise<string> {
 
 export async function createInvoice(
   sheetId: string,
-  data: Omit<Invoice, 'invoiceId' | 'createdAt' | 'rowIndex'>
+  data: Omit<Invoice, 'invoiceId' | 'rowIndex'>
 ): Promise<Invoice> {
   const invoiceId = await nextInvoiceNumber(sheetId);
-  const createdAt = new Date().toISOString();
-  const full: Invoice = { ...data, invoiceId, createdAt, paidAt: data.paidAt || '' };
+  const full: Invoice = { ...data, invoiceId, paidAt: data.paidAt || '' };
 
   const auth = getWriteAuth();
   const sheets = google.sheets({ version: 'v4', auth });
   await sheets.spreadsheets.values.append({
     spreadsheetId: sheetId,
-    range: `${TAB}!A:O`,
+    range: `${TAB}!A:P`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [invoiceToRow(full)] },
   });
@@ -121,7 +132,7 @@ export async function createInvoice(
 export async function updateInvoice(
   sheetId: string,
   invoiceId: string,
-  updates: Partial<Omit<Invoice, 'invoiceId' | 'clientId' | 'createdAt' | 'rowIndex'>>
+  updates: Partial<Omit<Invoice, 'invoiceId' | 'clientId' | 'rowIndex'>>
 ): Promise<Invoice | null> {
   const all = await getInvoices(sheetId);
   const existing = all.find(inv => inv.invoiceId === invoiceId);
@@ -134,7 +145,7 @@ export async function updateInvoice(
   const sheets = google.sheets({ version: 'v4', auth });
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
-    range: `${TAB}!A${existing.rowIndex}:O${existing.rowIndex}`,
+    range: `${TAB}!A${existing.rowIndex}:P${existing.rowIndex}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [row] },
   });

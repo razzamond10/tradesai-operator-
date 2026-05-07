@@ -31,7 +31,9 @@ export const PUT = withTierGuard('page.invoices', async (req: NextRequest, sessi
   const updates: Record<string, any> = {};
 
   if (body.customerName !== undefined) updates.customerName = cleanForSheets(body.customerName);
-  if (body.customerEmail !== undefined) updates.customerEmail = cleanForSheets(body.customerEmail);
+  if (body.customerPhone !== undefined) updates.customerPhone = cleanForSheets(body.customerPhone);
+  if (body.customerAddress !== undefined) updates.customerAddress = cleanForSheets(body.customerAddress);
+  if (body.bookingRef !== undefined) updates.bookingRef = cleanForSheets(body.bookingRef);
   if (body.issueDate !== undefined) updates.issueDate = body.issueDate;
   if (body.dueDate !== undefined) updates.dueDate = body.dueDate;
   if (body.notes !== undefined) updates.notes = cleanForSheets(body.notes);
@@ -63,7 +65,6 @@ export const PUT = withTierGuard('page.invoices', async (req: NextRequest, sessi
       return Response.json({ error: 'Invalid status' }, { status: 422 });
     }
     updates.status = body.status;
-    // Set or clear paidAt on status transition
     updates.paidAt = body.status === 'paid' ? new Date().toISOString() : '';
   }
 

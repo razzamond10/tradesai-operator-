@@ -22,7 +22,9 @@ function fmt(n: number) { return `£${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))
 export default function NewInvoiceClient({ user }: { user: User }) {
   const router = useRouter();
   const [customerName, setCustomerName] = useState('');
-  const [customerEmail, setCustomerEmail] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [customerAddress, setCustomerAddress] = useState('');
+  const [bookingRef, setBookingRef] = useState('');
   const [issueDate, setIssueDate] = useState(today());
   const [dueDate, setDueDate] = useState(dueIn(14));
   const [vatEnabled, setVatEnabled] = useState(false);
@@ -53,6 +55,8 @@ export default function NewInvoiceClient({ user }: { user: User }) {
 
   function fillFromBooking(b: RecentBooking) {
     setCustomerName(b.customerName);
+    setCustomerPhone(b.phone || '');
+    setBookingRef('');
     if (b.jobType) setLines([{ description: b.jobType, quantity: 1, unitPrice: 0 }]);
     setShowAutoFill(false);
   }
@@ -66,7 +70,7 @@ export default function NewInvoiceClient({ user }: { user: User }) {
       const res = await fetch('/api/invoices', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ customerName, customerEmail, issueDate, dueDate, lineItems: lines, vatRate, notes }),
+        body: JSON.stringify({ customerName, customerPhone, customerAddress, bookingRef, issueDate, dueDate, lineItems: lines, vatRate, notes }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Failed to create invoice.'); setSaving(false); return; }
@@ -120,9 +124,13 @@ export default function NewInvoiceClient({ user }: { user: User }) {
               <label style={LABEL}>Customer Name *</label>
               <input style={INPUT} value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="e.g. John Smith" />
             </div>
-            <div style={{ gridColumn: '1/-1' }}>
-              <label style={LABEL}>Customer Email</label>
-              <input type="email" style={INPUT} value={customerEmail} onChange={e => setCustomerEmail(e.target.value)} placeholder="john@example.com" />
+            <div>
+              <label style={LABEL}>Customer Phone</label>
+              <input type="tel" style={INPUT} value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="+44 7700 900000" />
+            </div>
+            <div>
+              <label style={LABEL}>Customer Address</label>
+              <input style={INPUT} value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} placeholder="123 High St, London" />
             </div>
             <div>
               <label style={LABEL}>Issue Date *</label>
