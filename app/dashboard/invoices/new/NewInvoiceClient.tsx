@@ -142,13 +142,14 @@ export default function NewInvoiceClient({ user }: { user: User }) {
             <button type="button" onClick={addLine} style={{ fontSize: '11px', fontWeight: 600, padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', background: '#fff', color: '#3D1FA8', cursor: 'pointer' }}>+ Add line</button>
           </div>
           <div style={{ padding: '12px 16px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 110px 90px', gap: '8px', marginBottom: '6px' }}>
+            <div style={{ overflowX: 'auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 110px 90px', gap: '8px', marginBottom: '6px', minWidth: '480px' }}>
               {['Description', 'Qty', 'Unit Price', 'Amount'].map(h => (
                 <div key={h} style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px' }}>{h}</div>
               ))}
             </div>
             {lines.map((line, i) => (
-              <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 110px 90px', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 110px 90px', gap: '8px', marginBottom: '8px', alignItems: 'center', minWidth: '480px' }}>
                 <input style={INPUT} value={line.description} onChange={e => updateLine(i, 'description', e.target.value)} placeholder="e.g. Boiler service" />
                 <input type="number" min="1" style={INPUT} value={line.quantity} onChange={e => updateLine(i, 'quantity', e.target.value)} />
                 <input type="number" min="0" step="0.01" style={INPUT} value={line.unitPrice === 0 ? '' : line.unitPrice} onChange={e => updateLine(i, 'unitPrice', e.target.value)} placeholder="0.00" />
@@ -160,6 +161,7 @@ export default function NewInvoiceClient({ user }: { user: User }) {
                 </div>
               </div>
             ))}
+            </div>{/* end overflowX wrapper */}
 
             {/* Totals */}
             <div style={{ borderTop: '1px solid var(--divider)', marginTop: '12px', paddingTop: '12px', display: 'flex', justifyContent: 'flex-end' }}>

@@ -68,7 +68,7 @@ export default function InvoicesClient({ user }: { user: User }) {
       <div style={{ padding: '20px', maxWidth: '1100px' }}>
 
         {/* KPI strip */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '20px' }}>
           {[
             { label: 'Outstanding', value: fmt(totals.outstanding), color: '#2563EB' },
             { label: 'Collected', value: fmt(totals.paid), color: '#16A34A' },

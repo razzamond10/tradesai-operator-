@@ -201,14 +201,14 @@ export default function InvoiceDetailClient({ invoiceId, user }: { invoiceId: st
           </div>
           <div style={{ padding: '12px 16px' }}>
             {editing ? (
-              <>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 110px 90px', gap: '8px', marginBottom: '6px' }}>
+              <div style={{ overflowX: 'auto' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 80px 110px 90px', gap: '8px', marginBottom: '6px', minWidth: '480px' }}>
                   {['Description', 'Qty', 'Unit Price', 'Amount'].map(h => (
                     <div key={h} style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px' }}>{h}</div>
                   ))}
                 </div>
                 {lines.map((line, i) => (
-                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 110px 90px', gap: '8px', marginBottom: '8px', alignItems: 'center' }}>
+                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 110px 90px', gap: '8px', marginBottom: '8px', alignItems: 'center', minWidth: '480px' }}>
                     <input style={INPUT} value={line.description} onChange={e => updateLine(i, 'description', e.target.value)} />
                     <input type="number" min="1" style={INPUT} value={line.quantity} onChange={e => updateLine(i, 'quantity', e.target.value)} />
                     <input type="number" min="0" step="0.01" style={INPUT} value={line.unitPrice === 0 ? '' : line.unitPrice} onChange={e => updateLine(i, 'unitPrice', e.target.value)} placeholder="0.00" />
@@ -218,7 +218,7 @@ export default function InvoiceDetailClient({ invoiceId, user }: { invoiceId: st
                     </div>
                   </div>
                 ))}
-              </>
+              </div>
             ) : (
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}>
