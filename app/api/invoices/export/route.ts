@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextRequest } from 'next/server';
 import { withTierGuard } from '@/lib/apiAuth';
 import { getClientConfig } from '@/lib/sheets';
@@ -8,7 +10,7 @@ function esc(v: string | number): string {
   return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-export const GET = withTierGuard('page.invoices', async (req: NextRequest, session) => {
+export const GET = withTierGuard('page.invoices', async (_req: NextRequest, session) => {
   const clientId = session.clientId;
   if (!clientId) return Response.json({ error: 'No clientId' }, { status: 400 });
 

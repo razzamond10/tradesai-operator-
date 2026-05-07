@@ -37,6 +37,7 @@ const CLIENT_NAV: Array<{
     label: 'Revenue',
     items: [
       { label: 'Revenue Tracker',   icon: '💰', href: '/dashboard/revenue',        featureKey: 'page.revenueTracker' },
+      { label: 'Invoices',          icon: '🧾', href: '/dashboard/invoices',       featureKey: 'page.invoices' },
       { label: 'Forecasting',       icon: '📈', href: '/dashboard/forecasting',    featureKey: 'page.forecasting' },
       { label: 'Reviews & Ratings', icon: '⭐', href: '/dashboard/reviews',        featureKey: 'page.reviews' },
     ],
