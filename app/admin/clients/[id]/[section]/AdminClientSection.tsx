@@ -1,5 +1,7 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { buildInvoiceCreateUrl } from '@/lib/invoiceUrl';
 import AdminClientShell from '@/components/AdminClientShell';
 import Topbar from '@/components/Topbar';
 import ActivityLineChart from '@/components/charts/ActivityLineChart';
@@ -122,6 +124,18 @@ function EmptyState({ icon, title, sub }: { icon: string; title: string; sub?: s
       <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ink)', marginBottom: '4px' }}>{title}</div>
       {sub && <div style={{ fontSize: '12px', color: 'var(--muted)' }}>{sub}</div>}
     </div>
+  );
+}
+
+function InvoiceButton({ booking }: { booking: { customerName?: string; phone?: string; postcode?: string; bookingId?: string } }) {
+  const router = useRouter();
+  return (
+    <button
+      title="Create invoice"
+      onClick={e => { e.stopPropagation(); router.push(buildInvoiceCreateUrl({ customerName: booking.customerName, customerPhone: booking.phone, customerAddress: booking.postcode, bookingRef: booking.bookingId })); }}
+      style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '26px', height: '26px', background: 'var(--a3b)', border: '1px solid rgba(34,197,94,0.25)', borderRadius: '6px', color: 'var(--a3)', cursor: 'pointer', padding: 0, flexShrink: 0 }}>
+      🧾
+    </button>
   );
 }
 
@@ -1023,7 +1037,7 @@ export function JobScheduleSection({ bookings, pageRange }: { bookings: any[]; p
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
                   <tr style={{ background: 'var(--slate)' }}>
-                    {([['date','Date'],['','Time'],['customer','Customer Name'],['','Phone'],['','Postcode'],['','Issue'],['status','Status'],['value','Value']] as [string,string][]).map(([k,label]) => (
+                    {([['date','Date'],['','Time'],['customer','Customer Name'],['','Phone'],['','Postcode'],['','Issue'],['status','Status'],['value','Value'],['','']] as [string,string][]).map(([k,label]) => (
                       <th key={label} onClick={k ? () => toggleSort(k as SortKey) : undefined} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px', cursor: k ? 'pointer' : 'default', whiteSpace: 'nowrap', userSelect: 'none' }}>
                         {label}{k ? si(k as SortKey) : ''}
                       </th>
@@ -1046,6 +1060,9 @@ export function JobScheduleSection({ bookings, pageRange }: { bookings: any[]; p
                       <td style={{ padding: '8px 12px', color: 'var(--ink2)', maxWidth: '200px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.jobType || '—'}</td>
                       <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}><StatusBadge status={b.status} /></td>
                       <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: parseValue(b.value)>0 ? 'var(--a3)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{parseValue(b.value)>0 ? `£${parseValue(b.value).toLocaleString()}` : '—'}</td>
+                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                        {(() => { const s = (b.status||'').toLowerCase(); return s.includes('confirm') || s.includes('complet') || s.includes('done') || s.includes('book'); })() && <InvoiceButton booking={b} />}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -1067,6 +1084,7 @@ export function JobScheduleSection({ bookings, pageRange }: { bookings: any[]; p
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     {parseValue(b.value) > 0 && <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--a3)' }}>£{parseValue(b.value).toLocaleString()}</span>}
                     <CallButton phone={b.phone} neutral />
+                    {(() => { const s = (b.status||'').toLowerCase(); return s.includes('confirm') || s.includes('complet') || s.includes('done') || s.includes('book'); })() && <InvoiceButton booking={b} />}
                   </div>
                 </div>
               ))}
@@ -1317,7 +1335,10 @@ export function CommunicationsSection({ interactions, businessName = 'client', p
                           <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{item.outcome || 'Unknown'}</span>
                         </td>
                         <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
-                          <CallButton phone={item.phone} neutral />
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <CallButton phone={item.phone} neutral />
+                            {booked && <InvoiceButton booking={{ customerName: item.callerName, phone: item.phone }} />}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -1342,6 +1363,7 @@ export function CommunicationsSection({ interactions, businessName = 'client', p
                       <span style={{ fontSize: '11px', fontWeight: 700, color: booked ? 'var(--a3)' : 'var(--muted)' }}>{booked ? '✓ Booked' : '✗ No booking'}</span>
                       <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '8px', background: os.bg, color: os.color }}>{item.outcome || 'Unknown'}</span>
                       <CallButton phone={item.phone} neutral />
+                      {booked && <InvoiceButton booking={{ customerName: item.callerName, phone: item.phone }} />}
                     </div>
                   </div>
                 );

@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ClientShell from '@/components/ClientShell';
 import Topbar from '@/components/Topbar';
 
@@ -21,6 +21,7 @@ function fmt(n: number) { return `£${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))
 
 export default function NewInvoiceClient({ user }: { user: User }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [customerAddress, setCustomerAddress] = useState('');
@@ -41,6 +42,18 @@ export default function NewInvoiceClient({ user }: { user: User }) {
       .then(d => setBookings(d.bookings ?? []))
       .catch(() => {});
   }, []);
+
+  // Quick-create pre-fill from query string (Job Schedule + Communications buttons)
+  useEffect(() => {
+    const name = searchParams.get('customerName');
+    const phone = searchParams.get('customerPhone');
+    const address = searchParams.get('customerAddress');
+    const ref = searchParams.get('bookingRef');
+    if (name) setCustomerName(name);
+    if (phone) setCustomerPhone(phone);
+    if (address) setCustomerAddress(address);
+    if (ref) setBookingRef(ref);
+  }, [searchParams]);
 
   const vatRate = vatEnabled ? 20 : 0;
   const subtotal = lines.reduce((s, l) => s + l.quantity * l.unitPrice, 0);
