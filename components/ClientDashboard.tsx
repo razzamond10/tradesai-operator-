@@ -9,6 +9,7 @@ import DonutChart from '@/components/charts/DonutChart';
 import BarChart from '@/components/charts/BarChart';
 import DateRangeFilter, { useDateRange } from '@/components/DateRangeFilter';
 import ChartRangeOverride from '@/components/ChartRangeOverride';
+import InvoiceButton from '@/components/InvoiceButton';
 import { filterByRange, rangeSubLabel, type DateRange } from '@/lib/dateRange';
 import type { JWTPayload } from '@/lib/auth';
 
@@ -441,7 +442,10 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
                             <td style={{ padding: '7px 12px', color: 'var(--ink2)', maxWidth: '160px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{b.jobType || '—'}</td>
                             <td style={{ padding: '7px 12px', color: 'var(--muted)', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px' }}>{b.scheduledDate || '—'}</td>
                             <td style={{ padding: '7px 12px' }}>
-                              <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: sb.bg, color: sb.color }}>{b.status || '—'}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                <span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: sb.bg, color: sb.color }}>{b.status || '—'}</span>
+                                {(() => { const s = (b.status||'').toLowerCase(); return s.includes('confirm') || s.includes('complet') || s.includes('done') || s.includes('book'); })() && <InvoiceButton booking={b} />}
+                              </div>
                             </td>
                           </tr>
                         );
@@ -455,7 +459,10 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
                   ) : upcoming.map((b, i) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', borderBottom: '1px solid var(--divider)' }}>
                       <span style={{ fontWeight: 700, fontSize: '12px', color: 'var(--ink)' }}>{b.customerName || '—'}</span>
-                      <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)' }}>{b.scheduledDate || '—'}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <span style={{ fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)' }}>{b.scheduledDate || '—'}</span>
+                        {(() => { const s = (b.status||'').toLowerCase(); return s.includes('confirm') || s.includes('complet') || s.includes('done') || s.includes('book'); })() && <InvoiceButton booking={b} />}
+                      </div>
                     </div>
                   ))}
                 </div>
