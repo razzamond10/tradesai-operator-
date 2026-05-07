@@ -25,6 +25,13 @@ function StatusBadge({ status }: { status: string }) {
 
 function fmt(n: number) { return `£${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}` }
 
+function fmtUKDate(iso: string): string {
+  if (!iso) return '—';
+  const [y, m, d] = iso.split('-');
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y}`;
+}
+
 const INPUT: React.CSSProperties = { width: '100%', padding: '8px 10px', borderRadius: '7px', border: '1px solid var(--divider)', fontSize: '13px', color: 'var(--ink)', background: '#fff', boxSizing: 'border-box' };
 const LABEL: React.CSSProperties = { display: 'block', fontSize: '11px', fontWeight: 700, color: 'var(--muted)', marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '.4px' };
 
@@ -193,8 +200,8 @@ export default function InvoiceDetailClient({ invoiceId, user }: { invoiceId: st
               <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Customer</div><div style={{ color: 'var(--ink)', fontWeight: 600 }}>{invoice.customerName}</div></div>
               <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Phone</div><div style={{ color: 'var(--ink)' }}>{invoice.customerPhone || '—'}</div></div>
               <div style={{ gridColumn: '1/-1' }}><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Address</div><div style={{ color: 'var(--ink)' }}>{invoice.customerAddress || '—'}</div></div>
-              <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Issue Date</div><div style={{ color: 'var(--ink)' }}>{invoice.issueDate}</div></div>
-              <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Due Date</div><div style={{ color: invoice.status === 'overdue' ? '#DC2626' : 'var(--ink)', fontWeight: invoice.status === 'overdue' ? 700 : 400 }}>{invoice.dueDate}</div></div>
+              <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Issue Date</div><div style={{ color: 'var(--ink)' }}>{fmtUKDate(invoice.issueDate)}</div></div>
+              <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Due Date</div><div style={{ color: invoice.status === 'overdue' ? '#DC2626' : 'var(--ink)', fontWeight: invoice.status === 'overdue' ? 700 : 400 }}>{fmtUKDate(invoice.dueDate)}</div></div>
               {invoice.paidAt && <div><div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.4px', marginBottom: '3px' }}>Paid At</div><div style={{ color: '#16A34A', fontWeight: 600 }}>{invoice.paidAt.slice(0, 10)}</div></div>}
             </div>
           )}

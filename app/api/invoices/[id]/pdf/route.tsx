@@ -33,6 +33,13 @@ const styles = StyleSheet.create({
 
 function fmt(n: number) { return `£${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}` }
 
+function fmtUKDate(iso: string): string {
+  if (!iso) return '—';
+  const [y, m, d] = iso.split('-');
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y}`;
+}
+
 const STATUS_LABEL: Record<string, string> = { draft: 'DRAFT', sent: 'SENT', paid: 'PAID', overdue: 'OVERDUE' };
 const STATUS_COLOR: Record<string, string> = { draft: '#6B7280', sent: '#2563EB', paid: '#16A34A', overdue: '#DC2626' };
 
@@ -74,8 +81,8 @@ export const GET = withTierGuard('page.invoices', async (req: NextRequest, sessi
           </View>
           <View style={{ flex: 1 }}>
             <Text style={styles.sectionHdr}>Dates</Text>
-            <View style={styles.row}><Text style={styles.label}>Issue Date</Text><Text style={styles.value}>{invoice.issueDate}</Text></View>
-            <View style={styles.row}><Text style={styles.label}>Due Date</Text><Text style={{ ...styles.value, color: invoice.status === 'overdue' ? '#DC2626' : '#1F2937', fontFamily: invoice.status === 'overdue' ? 'Helvetica-Bold' : 'Helvetica' }}>{invoice.dueDate}</Text></View>
+            <View style={styles.row}><Text style={styles.label}>Issue Date</Text><Text style={styles.value}>{fmtUKDate(invoice.issueDate)}</Text></View>
+            <View style={styles.row}><Text style={styles.label}>Due Date</Text><Text style={{ ...styles.value, color: invoice.status === 'overdue' ? '#DC2626' : '#1F2937', fontFamily: invoice.status === 'overdue' ? 'Helvetica-Bold' : 'Helvetica' }}>{fmtUKDate(invoice.dueDate)}</Text></View>
             {invoice.paidAt ? <View style={styles.row}><Text style={styles.label}>Paid</Text><Text style={{ ...styles.value, color: '#16A34A', fontFamily: 'Helvetica-Bold' }}>{invoice.paidAt.slice(0, 10)}</Text></View> : null}
           </View>
         </View>
