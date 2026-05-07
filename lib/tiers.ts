@@ -40,7 +40,7 @@ export const FEATURE_TIERS: Record<string, Tier> = {
   'page.customerProfiles': 'professional',
   'page.reviews': 'professional',
   'page.smsThreads': 'professional',
-  'page.invoices': 'professional',
+  'page.invoices': 'starter',
   'page.multiEngineer': 'professional',
   'page.routing': 'professional',
   'page.warrantyTracker': 'professional',
