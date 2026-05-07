@@ -171,13 +171,13 @@ export default function InvoiceDetailClient({ invoiceId, user }: { invoiceId: st
                 <label style={LABEL}>Customer Name *</label>
                 <input style={INPUT} value={customerName} onChange={e => setCustomerName(e.target.value)} />
               </div>
-              <div>
+              <div style={{ gridColumn: '1/-1' }}>
                 <label style={LABEL}>Customer Phone</label>
                 <input type="tel" style={INPUT} value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="+44 7700 900000" />
               </div>
-              <div>
+              <div style={{ gridColumn: '1/-1' }}>
                 <label style={LABEL}>Customer Address</label>
-                <input style={INPUT} value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} placeholder="123 High St, London" />
+                <textarea style={{ ...INPUT, minHeight: '60px', resize: 'vertical' } as React.CSSProperties} value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} placeholder="123 High St, London, SW1A 1AA" />
               </div>
               <div>
                 <label style={LABEL}>Issue Date</label>

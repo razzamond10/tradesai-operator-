@@ -94,7 +94,15 @@ function invoiceToRow(inv: Omit<Invoice, 'rowIndex'>): string[] {
 
 export async function getInvoices(sheetId: string): Promise<Invoice[]> {
   const rows = await readSheet(sheetId, `${TAB}!A2:P`);
-  return rows.map((row, i) => rowToInvoice(row, i + 2));
+  const invoices = rows.map((row, i) => rowToInvoice(row, i + 2));
+  // Auto-derived overdue status; not persisted to sheet.
+  const today = new Date().toISOString().slice(0, 10);
+  return invoices.map(inv => {
+    if (inv.status === 'sent' && inv.dueDate && inv.dueDate < today) {
+      return { ...inv, status: 'overdue' as const };
+    }
+    return inv;
+  });
 }
 
 export async function getInvoiceById(sheetId: string, invoiceId: string): Promise<Invoice | null> {
