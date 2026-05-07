@@ -1493,6 +1493,121 @@ export function BookingsSection({ bookings, businessName = 'client' }: { booking
   );
 }
 
+// ── Invoices section ───────────────────────────────────────────────────────────
+
+function fmtUKDate(iso: string): string {
+  if (!iso) return '—';
+  const [y, m, d] = iso.split('-');
+  if (!y || !m || !d) return iso;
+  return `${d}/${m}/${y}`;
+}
+
+const INV_STATUS: Record<string, { bg: string; color: string; label: string }> = {
+  draft:   { bg: '#F3F4F6', color: '#6B7280', label: 'Draft' },
+  sent:    { bg: '#EFF6FF', color: '#2563EB', label: 'Sent' },
+  paid:    { bg: '#F0FDF4', color: '#16A34A', label: 'Paid' },
+  overdue: { bg: '#FEF2F2', color: '#DC2626', label: 'Overdue' },
+};
+
+export function InvoicesSection({ clientId }: { clientId: string }) {
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState('all');
+
+  useEffect(() => {
+    fetch(`/api/clients/${encodeURIComponent(clientId)}/invoices`)
+      .then(r => r.json())
+      .then(d => setInvoices(d.invoices ?? []))
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [clientId]);
+
+  function fmt(n: number) { return `£${n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',')}` }
+
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+  function displayStatus(inv: any): string {
+    if (inv.status === 'sent' && new Date(inv.dueDate) < today) return 'overdue';
+    return inv.status;
+  }
+
+  const filtered = filter === 'all' ? invoices : invoices.filter(inv => displayStatus(inv) === filter);
+  const totals = {
+    outstanding: invoices.filter(i => { const s = displayStatus(i); return s === 'sent' || s === 'overdue'; }).reduce((s, i) => s + i.total, 0),
+    paid:  invoices.filter(i => i.status === 'paid').reduce((s, i) => s + i.total, 0),
+    draft: invoices.filter(i => i.status === 'draft').length,
+  };
+
+  if (loading) return <div style={{ padding: '40px', textAlign: 'center', color: 'var(--muted)', fontSize: '13px' }}>Loading…</div>;
+
+  return (
+    <div style={{ maxWidth: '1100px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: '12px', marginBottom: '20px' }}>
+        {[
+          { label: 'Outstanding', value: fmt(totals.outstanding), color: '#2563EB' },
+          { label: 'Collected',   value: fmt(totals.paid),        color: '#16A34A' },
+          { label: 'Drafts',      value: String(totals.draft),    color: '#6B7280' },
+        ].map(k => (
+          <div key={k.label} style={{ background: '#fff', border: '1px solid var(--divider)', borderRadius: '10px', boxShadow: 'var(--shadow-s)', padding: '16px' }}>
+            <div style={{ fontSize: '10px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.6px', marginBottom: '4px' }}>{k.label}</div>
+            <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '26px', fontWeight: 900, color: k.color }}>{k.value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ background: '#fff', border: '1px solid var(--divider)', borderRadius: '10px', boxShadow: 'var(--shadow-s)', marginBottom: '16px' }}>
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {['all', 'draft', 'sent', 'paid', 'overdue'].map(s => (
+            <button key={s} onClick={() => setFilter(s)} style={{ fontSize: '11px', fontWeight: 600, padding: '4px 12px', borderRadius: '8px', border: '1px solid', borderColor: filter === s ? '#3D1FA8' : 'var(--divider)', background: filter === s ? '#3D1FA8' : '#fff', color: filter === s ? '#fff' : 'var(--muted)', cursor: 'pointer', textTransform: 'capitalize' }}>
+              {s === 'all' ? 'All' : s}
+            </button>
+          ))}
+        </div>
+        {filtered.length === 0 ? (
+          <div style={{ padding: '48px', textAlign: 'center', color: 'var(--muted)', fontSize: '13px' }}>
+            {invoices.length === 0 ? 'No invoices for this client yet.' : `No invoices with status "${filter}".`}
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12.5px' }}>
+              <thead>
+                <tr style={{ background: '#F9FAFB' }}>
+                  {['Invoice', 'Customer', 'Issue Date', 'Due Date', 'Total', 'Status', ''].map(h => (
+                    <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 700, color: 'var(--muted)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px', borderBottom: '1px solid var(--divider)', whiteSpace: 'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((inv: any) => {
+                  const ds = displayStatus(inv);
+                  const sc = INV_STATUS[ds] ?? INV_STATUS.draft;
+                  return (
+                    <tr key={inv.invoiceId} style={{ borderBottom: '1px solid var(--divider)' }}
+                      onMouseEnter={e => (e.currentTarget.style.background = '#F9FAFB')}
+                      onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+                    >
+                      <td style={{ padding: '12px 14px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: 'var(--ink)' }}>{inv.invoiceId}</td>
+                      <td style={{ padding: '12px 14px', color: 'var(--ink)' }}>{inv.customerName}</td>
+                      <td style={{ padding: '12px 14px', color: 'var(--muted)' }}>{fmtUKDate(inv.issueDate)}</td>
+                      <td style={{ padding: '12px 14px', color: ds === 'overdue' ? '#DC2626' : 'var(--muted)', fontWeight: ds === 'overdue' ? 700 : 400 }}>{fmtUKDate(inv.dueDate)}</td>
+                      <td style={{ padding: '12px 14px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: 'var(--ink)' }}>{fmt(inv.total)}</td>
+                      <td style={{ padding: '12px 14px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: 700, padding: '2px 8px', borderRadius: '10px', background: sc.bg, color: sc.color, textTransform: 'uppercase', letterSpacing: '.5px' }}>{sc.label}</span>
+                      </td>
+                      <td style={{ padding: '12px 14px', textAlign: 'right' }}>
+                        <a href={`/admin/clients/${clientId}/invoices/${inv.invoiceId}`} style={{ fontSize: '11px', color: '#3D1FA8', fontWeight: 600, textDecoration: 'none' }}>View →</a>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Section meta ───────────────────────────────────────────────────────────────
 
 export const SECTION_META: Record<string, { label: string; sub: string }> = {
@@ -1508,6 +1623,7 @@ export const SECTION_META: Record<string, { label: string; sub: string }> = {
   config:          { label: 'Configuration',      sub: 'Client settings and AI configuration'         },
   bookings:        { label: 'Bookings Calendar',  sub: 'Monthly view of all scheduled jobs'           },
   'job-schedule':  { label: 'Job Schedule',       sub: 'Sortable table of all booked jobs'            },
+  'invoices':      { label: 'Invoices',           sub: 'View client invoices (read-only)'             },
   'lead-pipeline': { label: 'Lead Pipeline',      sub: 'Unbooked interactions and hot leads'          },
   communications:  { label: 'Communications',     sub: 'Full AI call log and interaction history'     },
   configuration:   { label: 'Configuration',      sub: 'Client settings and AI configuration'         },
@@ -1564,6 +1680,7 @@ export default function AdminClientSection({ clientId, section, user, isDemoEmpt
       case 'config':      return <ConfigSection config={config} />;
       case 'bookings':        return <BookingsSection bookings={db} businessName={businessName} />;
       case 'job-schedule':    return <JobScheduleSection bookings={db} pageRange={pageRange} />;
+      case 'invoices':        return <InvoicesSection clientId={clientId} />;
       case 'lead-pipeline':   return <LeadPipelineSection interactions={di} bookings={db} />;
       case 'communications':  return <CommunicationsSection interactions={di} businessName={businessName} pageRange={pageRange} />;
       case 'configuration':   return <ConfigurationSection config={config} isClientView={isClientView} />;

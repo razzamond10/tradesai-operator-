@@ -33,6 +33,7 @@ const NAV_SECTIONS = (id: string) => [
     label: 'Revenue',
     items: [
       { label: 'Revenue Tracker',   icon: '💰', href: `/admin/clients/${id}/revenue` },
+      { label: 'Invoices',          icon: '📄', href: `/admin/clients/${id}/invoices` },
       { label: 'Forecasting',       icon: '📈', href: `/admin/clients/${id}/forecast` },
       { label: 'Reviews & Ratings', icon: '⭐', href: `/admin/clients/${id}/reviews` },
     ],

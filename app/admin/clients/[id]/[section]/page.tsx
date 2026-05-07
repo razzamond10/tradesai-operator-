@@ -5,7 +5,7 @@ import AdminClientSection from './AdminClientSection';
 
 const VALID_SECTIONS = [
   'analytics', 'schedule', 'pipeline', 'emergencies', 'comms', 'revenue', 'forecast', 'forecasting', 'reviews', 'config', 'bookings',
-  'job-schedule', 'lead-pipeline', 'communications', 'configuration',
+  'job-schedule', 'lead-pipeline', 'communications', 'configuration', 'invoices',
 ];
 
 export default async function AdminClientSectionPage({
