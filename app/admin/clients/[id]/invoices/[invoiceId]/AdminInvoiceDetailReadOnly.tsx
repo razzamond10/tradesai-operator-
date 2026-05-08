@@ -75,7 +75,10 @@ export default function AdminInvoiceDetailReadOnly({ clientId, invoiceId, user }
             <span style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '16px', fontWeight: 900, color: 'var(--ink)' }}>{invoice.invoiceId}</span>
             <StatusBadge status={invoice.status} />
           </div>
-          <a href={`/admin/clients/${clientId}/invoices`} style={{ fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', border: '1px solid var(--divider)', background: '#fff', color: 'var(--muted)', textDecoration: 'none' }}>← Back</a>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <a href={`/api/clients/${encodeURIComponent(clientId)}/invoices/${invoiceId}/pdf`} download style={{ fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', border: '1px solid var(--divider)', background: '#fff', color: 'var(--ink)', textDecoration: 'none' }}>↓ PDF</a>
+            <a href={`/admin/clients/${clientId}/invoices`} style={{ fontSize: '12px', fontWeight: 600, padding: '6px 14px', borderRadius: '8px', border: '1px solid var(--divider)', background: '#fff', color: 'var(--muted)', textDecoration: 'none' }}>← Back</a>
+          </div>
         </div>
 
         {/* Customer Details */}
