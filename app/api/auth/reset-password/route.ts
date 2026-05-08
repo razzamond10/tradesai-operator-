@@ -74,6 +74,18 @@ export async function POST(req: NextRequest) {
       user_agent,
       result: 'success',
     });
+    try {
+      logAudit({
+        actor_email: result.email,
+        actor_role: (role as 'admin' | 'client') || 'anonymous',
+        action: 'password.changed',
+        target: result.email,
+        ip,
+        user_agent,
+        result: 'success',
+        metadata: { source: 'reset-link' },
+      });
+    } catch (e) { console.error('[audit] password.changed failed', e); }
 
     return NextResponse.json({ ok: true });
   } catch (err: any) {
