@@ -50,6 +50,8 @@ export default function InvoicesClient({ user }: { user: User }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState<string>('all');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
   useEffect(() => {
     fetch('/api/invoices')
@@ -58,7 +60,12 @@ export default function InvoicesClient({ user }: { user: User }) {
       .catch(() => { setError('Failed to load invoices.'); setLoading(false); });
   }, []);
 
-  const filtered = filter === 'all' ? invoices : invoices.filter(inv => inv.status === filter);
+  const filtered = invoices.filter(inv => {
+    if (filter !== 'all' && inv.status !== filter) return false;
+    if (fromDate && inv.issueDate < fromDate) return false;
+    if (toDate && inv.issueDate > toDate) return false;
+    return true;
+  });
 
   const totals = {
     outstanding: invoices.filter(i => i.status === 'sent' || i.status === 'overdue').reduce((s, i) => s + i.total, 0),
@@ -106,6 +113,22 @@ export default function InvoicesClient({ user }: { user: User }) {
                 + New Invoice
               </button>
             </div>
+          </div>
+
+          {/* Date filter */}
+          <div style={{ padding: '10px 16px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--muted)' }}>Issue Date</span>
+            <input type="date" value={fromDate} onChange={e => setFromDate(e.target.value)}
+              style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '7px', border: '1px solid var(--divider)', color: 'var(--ink)', background: '#fff' }} />
+            <span style={{ fontSize: '11px', color: 'var(--muted)' }}>–</span>
+            <input type="date" value={toDate} onChange={e => setToDate(e.target.value)}
+              style={{ fontSize: '11px', padding: '4px 8px', borderRadius: '7px', border: '1px solid var(--divider)', color: 'var(--ink)', background: '#fff' }} />
+            {(fromDate || toDate) && (
+              <button onClick={() => { setFromDate(''); setToDate(''); }}
+                style={{ fontSize: '11px', fontWeight: 600, padding: '4px 10px', borderRadius: '7px', border: '1px solid var(--divider)', background: '#fff', color: 'var(--muted)', cursor: 'pointer' }}>
+                ✕ Reset
+              </button>
+            )}
           </div>
 
           {/* Table */}
