@@ -26,6 +26,8 @@ export async function GET(req: NextRequest) {
         phone: b.phone,
         jobType: b.jobType,
         scheduledDate: b.scheduledDate,
+        postcode: b.postcode,    // NEW
+        value: b.value,          // NEW
       }));
 
     return Response.json({ bookings: recent });

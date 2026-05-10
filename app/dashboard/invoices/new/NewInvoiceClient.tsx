@@ -6,7 +6,7 @@ import Topbar from '@/components/Topbar';
 
 type User = { email: string; name: string; role: string; clientId?: string; planTier?: string };
 interface LineItem { description: string; quantity: number; unitPrice: number }
-interface RecentBooking { customerName: string; phone: string; jobType: string; scheduledDate: string }
+interface RecentBooking { customerName: string; phone: string; jobType: string; scheduledDate: string; postcode: string; value: string }
 
 function today() { return new Date().toISOString().slice(0, 10); }
 function dueIn(days: number) {
@@ -69,8 +69,10 @@ export default function NewInvoiceClient({ user }: { user: User }) {
   function fillFromBooking(b: RecentBooking) {
     setCustomerName(b.customerName);
     setCustomerPhone(b.phone || '');
+    if (b.postcode && !customerAddress) setCustomerAddress(b.postcode);
     setBookingRef('');
-    if (b.jobType) setLines([{ description: b.jobType, quantity: 1, unitPrice: 0 }]);
+    const parsedValue = parseFloat((b.value || '').replace(/[^0-9.]/g, '')) || 0;
+    setLines([{ description: b.jobType || '', quantity: 1, unitPrice: parsedValue }]);
     setShowAutoFill(false);
   }
 
