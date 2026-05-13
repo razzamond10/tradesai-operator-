@@ -16,9 +16,9 @@ export async function GET(req: NextRequest) {
     if (!config?.sheetId) return Response.json({ bookings: [] });
 
     const all = await getBookings(config.sheetId);
-    // Return last 20 completed/confirmed bookings with a customer name, most recent first
+    // Return last 20 completed bookings with a final price set, most recent first
     const recent = all
-      .filter(b => b.customerName && b.status !== 'cancelled')
+      .filter(b => b.customerName && b.status.toLowerCase() === 'completed' && parseFloat(b.finalPrice) > 0)
       .sort((a, b) => b.timestamp.localeCompare(a.timestamp))
       .slice(0, 20)
       .map(b => ({
@@ -26,6 +26,8 @@ export async function GET(req: NextRequest) {
         phone: b.phone,
         jobType: b.jobType,
         scheduledDate: b.scheduledDate,
+        postcode: b.postcode,
+        finalPrice: b.finalPrice,
       }));
 
     return Response.json({ bookings: recent });

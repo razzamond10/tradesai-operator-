@@ -316,14 +316,16 @@ export interface Booking {
   bookingDateReadable: string;
   status: string;
   value: string;
+  finalPrice: string;
+  rowIndex: number;
 }
 
 export async function getBookings(sheetId: string): Promise<Booking[]> {
   return sheetsCache.getOrFetch(`bookings:${sheetId}`, async () => {
     const tabName = await resolveTabName(sheetId, 'bookings');
-    // Col layout: A=timestamp, B=businessName, C=customerName, D=phone, E=postcode, F=jobType/issue, G=bookingSlot, H=calendarEventId, I=bookingDateReadable, J=status, K=value
-    const rows = await readSheet(sheetId, `'${tabName}'!A2:K`);
-    return rows.map((r) => ({
+    // Col layout: A=timestamp, B=businessName, C=customerName, D=phone, E=postcode, F=jobType/issue, G=bookingSlot, H=calendarEventId, I=bookingDateReadable, J=status, K=value, L=finalPrice
+    const rows = await readSheet(sheetId, `'${tabName}'!A2:L`);
+    return rows.map((r, idx) => ({
       businessName: r[1] || '',
       timestamp: normTimestamp(r[0] || ''),
       customerName: r[2] || '',
@@ -335,6 +337,8 @@ export async function getBookings(sheetId: string): Promise<Booking[]> {
       bookingDateReadable: r[8] || '',
       status: r[9] || '',
       value: r[10] || '',
+      finalPrice: r[11] || '',
+      rowIndex: idx + 2,
     }));
   }, 30_000);
 }
