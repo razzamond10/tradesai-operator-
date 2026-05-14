@@ -102,8 +102,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL(roleHome(user.role), req.url));
   }
 
-  // Block /api/clients/** for non-admin users
-  if (pathname.startsWith('/api/clients') && user.role !== 'admin') {
+  // Block /api/clients/** for non-admin, non-va users (VA gets read-only via the route handler)
+  if (pathname.startsWith('/api/clients') && user.role !== 'admin' && user.role !== 'va') {
     return NextResponse.redirect(new URL(roleHome(user.role), req.url));
   }
 
