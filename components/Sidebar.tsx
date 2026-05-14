@@ -73,13 +73,21 @@ const vaNavSections = [
   {
     label: 'Overview',
     items: [
-      { label: 'Command Centre', icon: '⊞', href: '/va' },
+      { label: 'Dashboard', icon: '⊞', href: '/va' },
     ],
   },
   {
-    label: 'Settings',
+    label: 'Operations',
     items: [
-      { label: 'Clients', icon: '👥', href: '/va' },
+      { label: 'Emergencies', icon: '🚨', href: '/va/emergencies' },
+      { label: 'Bookings', icon: '📅', href: '/va/bookings' },
+      { label: 'Communications', icon: '💬', href: '/va/communications' },
+    ],
+  },
+  {
+    label: 'Clients',
+    items: [
+      { label: 'All Clients', icon: '👥', href: '/va/clients' },
     ],
   },
 ];
