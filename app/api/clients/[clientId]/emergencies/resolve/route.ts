@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/auth';
 import { getClientConfig, resolveEmergencyByKey } from '@/lib/sheets';
+import { cleanForSheets } from '@/lib/sheetsSafe';
 
 export async function POST(
   req: NextRequest,
@@ -21,8 +22,8 @@ export async function POST(
   let phone: string, timestamp: string;
   try {
     const body = await req.json();
-    phone = String(body.phone || '').trim();
-    timestamp = String(body.timestamp || '').trim();
+    phone = cleanForSheets(String(body.phone || '').trim());
+    timestamp = cleanForSheets(String(body.timestamp || '').trim());
     if (!phone || !timestamp) throw new Error();
   } catch {
     return NextResponse.json({ error: 'phone and timestamp required' }, { status: 400 });
