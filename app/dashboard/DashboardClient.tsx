@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import IdleTimer from '@/components/IdleTimer';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import ActivityLineChart from '@/components/charts/ActivityLineChart';
@@ -185,6 +186,7 @@ export default function DashboardClient({ user }: { user: JWTPayload }) {
 
   return (
     <PortalShell role={user.role} name={user.name}>
+      <IdleTimer />
       <style>{css}</style>
       <Topbar
         breadcrumb="Operations"
