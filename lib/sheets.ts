@@ -343,6 +343,23 @@ export async function getBookings(sheetId: string): Promise<Booking[]> {
   }, 30_000);
 }
 
+export async function updateBookingFinalPrice(
+  sheetId: string,
+  rowIndex: number,
+  finalPrice: number
+): Promise<void> {
+  const auth = getWriteAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  const tabName = await resolveTabName(sheetId, 'bookings');
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: sheetId,
+    range: `'${tabName}'!L${rowIndex}`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: [[finalPrice]] },
+  });
+  sheetsCache.invalidate(`bookings:${sheetId}`);
+}
+
 // ── Emergencies ───────────────────────────────────────────────────────────────
 export interface Emergency {
   businessName: string;

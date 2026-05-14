@@ -96,7 +96,7 @@ export default function ClientSection({
       case 'forecast':
       case 'forecasting':    return <ForecastSection interactions={interactions} bookings={bookings} pageRange={pageRange} />;
       case 'reviews':        return <ReviewsSection interactions={interactions} />;
-      case 'job-schedule':   return <JobScheduleSection bookings={bookings} pageRange={pageRange} />;
+      case 'job-schedule':   return <JobScheduleSection bookings={bookings} pageRange={pageRange} clientId={clientId} />;
       case 'lead-pipeline':  return <LeadPipelineSection interactions={interactions} bookings={bookings} />;
       case 'communications': return <CommunicationsSection interactions={interactions} businessName={businessName} pageRange={pageRange} />;
       case 'configuration':  return <ConfigurationSection config={config} isClientView />;

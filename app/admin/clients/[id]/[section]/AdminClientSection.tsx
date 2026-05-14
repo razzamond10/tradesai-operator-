@@ -956,9 +956,10 @@ function ConfigSection({ config }: { config: any }) {
 
 type SortKey = 'date' | 'customer' | 'status' | 'value';
 
-export function JobScheduleSection({ bookings, pageRange }: { bookings: any[]; pageRange: DateRange }) {
+export function JobScheduleSection({ bookings, pageRange, clientId }: { bookings: any[]; pageRange: DateRange; clientId: string }) {
   const [sortKey, setSortKey] = useState<SortKey>('date');
   const [sortDir, setSortDir] = useState<'asc'|'desc'>('asc');
+  const [draftPrices, setDraftPrices] = useState<Record<number, string>>({});
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
@@ -992,6 +993,29 @@ export function JobScheduleSection({ bookings, pageRange }: { bookings: any[]; p
     else { setSortKey(key); setSortDir('asc'); }
   }
   const si = (key: SortKey) => sortKey === key ? (sortDir === 'asc' ? ' ↑' : ' ↓') : '';
+
+  async function saveFinalPrice(rowIndex: number, value: string) {
+    const num = parseFloat(value);
+    if (isNaN(num) || num < 0 || num > 99999) return;
+    try {
+      const res = await fetch(
+        `/api/clients/${encodeURIComponent(clientId)}/bookings/${rowIndex}/final-price`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ finalPrice: num }),
+        }
+      );
+      if (!res.ok) {
+        console.error('[final-price] PATCH failed', res.status);
+        return;
+      }
+      setDraftPrices(p => { const n = { ...p }; delete n[rowIndex]; return n; });
+    } catch (e) {
+      console.error('[final-price] network error', e);
+    }
+  }
+
   if (bookings.length === 0) {
     return <EmptyState icon="🔧" title="No jobs scheduled" sub="Bookings from your AI will appear here once jobs are confirmed." />;
   }
@@ -1026,7 +1050,7 @@ export function JobScheduleSection({ bookings, pageRange }: { bookings: any[]; p
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
                   <tr style={{ background: 'var(--slate)' }}>
-                    {([['date','Date'],['','Time'],['customer','Customer Name'],['','Phone'],['','Postcode'],['','Issue'],['status','Status'],['value','Value'],['','']] as [string,string][]).map(([k,label]) => (
+                    {([['date','Date'],['','Time'],['customer','Customer Name'],['','Phone'],['','Postcode'],['','Issue'],['status','Status'],['value','Value'],['','Final Price (£)'],['','']] as [string,string][]).map(([k,label]) => (
                       <th key={label} onClick={k ? () => toggleSort(k as SortKey) : undefined} style={{ padding: '8px 12px', textAlign: 'left', fontWeight: 700, color: 'var(--ink)', fontSize: '10px', textTransform: 'uppercase', letterSpacing: '.5px', cursor: k ? 'pointer' : 'default', whiteSpace: 'nowrap', userSelect: 'none' }}>
                         {label}{k ? si(k as SortKey) : ''}
                       </th>
@@ -1050,6 +1074,17 @@ export function JobScheduleSection({ bookings, pageRange }: { bookings: any[]; p
                       <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}><StatusBadge status={b.status} /></td>
                       <td style={{ padding: '8px 12px', fontFamily: '"Inter Tight",sans-serif', fontWeight: 700, color: parseValue(b.value)>0 ? 'var(--a3)' : 'var(--muted)', whiteSpace: 'nowrap' }}>{parseValue(b.value)>0 ? `£${parseValue(b.value).toLocaleString()}` : '—'}</td>
                       <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
+                        {(b.status||'').toLowerCase() === 'completed' ? (
+                          <input type="number" min="0" max="99999" step="0.01"
+                            value={draftPrices[b.rowIndex] ?? b.finalPrice ?? ''}
+                            onChange={e => setDraftPrices(p => ({ ...p, [b.rowIndex]: e.target.value }))}
+                            onBlur={e => saveFinalPrice(b.rowIndex, e.currentTarget.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur(); }}
+                            style={{ width: '80px', padding: '3px 6px', borderRadius: '5px', border: '1px solid var(--divider)', fontSize: '11px', fontFamily: '"IBM Plex Mono",monospace' }}
+                            placeholder="0.00" />
+                        ) : '—'}
+                      </td>
+                      <td style={{ padding: '8px 12px', whiteSpace: 'nowrap' }}>
                         {(() => { const s = (b.status||'').toLowerCase(); return s.includes('confirm') || s.includes('complet') || s.includes('done') || s.includes('book'); })() && <InvoiceButton booking={b} />}
                       </td>
                     </tr>
@@ -1070,6 +1105,17 @@ export function JobScheduleSection({ bookings, pageRange }: { bookings: any[]; p
                   <div style={{ fontWeight: 700, fontSize: '13px', color: 'var(--ink)', marginBottom: '3px' }}>{b.customerName || '—'}</div>
                   <div style={{ fontSize: '11px', color: 'var(--ink2)', marginBottom: '3px' }}>{b.jobType || '—'}</div>
                   {b.phone && <div style={{ fontSize: '11px', fontFamily: '"IBM Plex Mono",monospace', color: 'var(--muted)', marginBottom: '6px' }}><a href={`tel:${b.phone.replace(/\s/g, '')}`} style={{ color: 'var(--muted)', textDecoration: 'none' }}>{b.phone}</a></div>}
+                  {(b.status||'').toLowerCase() === 'completed' && (
+                    <div style={{ marginBottom: '6px' }}>
+                      <input type="number" min="0" max="99999" step="0.01"
+                        value={draftPrices[b.rowIndex] ?? b.finalPrice ?? ''}
+                        onChange={e => setDraftPrices(p => ({ ...p, [b.rowIndex]: e.target.value }))}
+                        onBlur={e => saveFinalPrice(b.rowIndex, e.currentTarget.value)}
+                        onKeyDown={e => { if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur(); }}
+                        style={{ width: '100px', padding: '4px 8px', borderRadius: '5px', border: '1px solid var(--divider)', fontSize: '12px' }}
+                        placeholder="Final Price £" />
+                    </div>
+                  )}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     {parseValue(b.value) > 0 && <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--a3)' }}>£{parseValue(b.value).toLocaleString()}</span>}
                     <CallButton phone={b.phone} neutral />
@@ -1668,7 +1714,7 @@ export default function AdminClientSection({ clientId, section, user, isDemoEmpt
       case 'reviews':     return <ReviewsSection interactions={di} />;
       case 'config':      return <ConfigSection config={config} />;
       case 'bookings':        return <BookingsSection bookings={db} businessName={businessName} />;
-      case 'job-schedule':    return <JobScheduleSection bookings={db} pageRange={pageRange} />;
+      case 'job-schedule':    return <JobScheduleSection bookings={db} pageRange={pageRange} clientId={clientId} />;
       case 'invoices':        return <InvoicesSection clientId={clientId} />;
       case 'lead-pipeline':   return <LeadPipelineSection interactions={di} bookings={db} />;
       case 'communications':  return <CommunicationsSection interactions={di} businessName={businessName} pageRange={pageRange} />;
