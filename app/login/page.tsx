@@ -12,6 +12,9 @@ function ResetToast({ onToast, onError }: { onToast: (msg: string) => void; onEr
     if (params.get('email_changed') === 'true') {
       onToast('Email address updated. Please sign in with your new email.');
     }
+    if (params.get('reason') === 'idle') {
+      onToast('You were logged out due to inactivity. Please sign in again.');
+    }
     const err = params.get('error');
     if (err === 'expired_link') {
       onError('That verification link has expired. Please request a new email change.');
