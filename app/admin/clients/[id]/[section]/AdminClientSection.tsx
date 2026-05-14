@@ -510,12 +510,19 @@ export function EmergenciesSection({ emergencies, clientId, businessName = 'clie
                               if (dataIdx < 0) return;
                               setResolving(prev => ({ ...prev, [dataIdx]: true }));
                               try {
-                                await fetch(`/api/clients/${encodeURIComponent(clientId)}/emergencies/resolve`, {
+                                const res = await fetch(`/api/clients/${encodeURIComponent(clientId)}/emergencies/resolve`, {
                                   method: 'POST',
                                   headers: { 'Content-Type': 'application/json' },
                                   body: JSON.stringify({ phone: em.phone, timestamp: em.timestamp }),
                                 });
+                                if (!res.ok) {
+                                  const errText = await res.text().catch(() => '');
+                                  alert(`Failed to mark resolved (${res.status}). ${errText || 'Please try again.'}`);
+                                  return;
+                                }
                                 setLocalResolved(prev => ({ ...prev, [dataIdx]: true }));
+                              } catch (err) {
+                                alert(`Network error marking resolved: ${err instanceof Error ? err.message : 'Unknown error'}. Please try again.`);
                               } finally {
                                 setResolving(prev => ({ ...prev, [dataIdx]: false }));
                               }
