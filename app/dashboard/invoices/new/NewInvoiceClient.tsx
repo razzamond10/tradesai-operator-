@@ -137,15 +137,15 @@ export default function NewInvoiceClient({ user }: { user: User }) {
           <div style={{ padding: '16px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div style={{ gridColumn: '1/-1' }}>
               <label style={LABEL}>Customer Name *</label>
-              <input style={INPUT} value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="e.g. John Smith" />
+              <input style={INPUT} maxLength={200} value={customerName} onChange={e => setCustomerName(e.target.value)} placeholder="e.g. John Smith" />
             </div>
             <div style={{ gridColumn: '1/-1' }}>
               <label style={LABEL}>Customer Phone</label>
-              <input type="tel" style={INPUT} value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="+44 7700 900000" />
+              <input type="tel" style={INPUT} maxLength={20} value={customerPhone} onChange={e => setCustomerPhone(e.target.value)} placeholder="+44 7700 900000" />
             </div>
             <div style={{ gridColumn: '1/-1' }}>
               <label style={LABEL}>Customer Address</label>
-              <textarea style={{ ...INPUT, minHeight: '60px', resize: 'vertical' } as React.CSSProperties} value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} placeholder="123 High St, London, SW1A 1AA" />
+              <textarea style={{ ...INPUT, minHeight: '60px', resize: 'vertical' } as React.CSSProperties} maxLength={500} value={customerAddress} onChange={e => setCustomerAddress(e.target.value)} placeholder="123 High St, London, SW1A 1AA" />
             </div>
             <div>
               <label style={LABEL}>Issue Date *</label>
@@ -173,7 +173,7 @@ export default function NewInvoiceClient({ user }: { user: User }) {
             </div>
             {lines.map((line, i) => (
               <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 80px 110px 90px', gap: '8px', marginBottom: '8px', alignItems: 'center', minWidth: '480px' }}>
-                <input style={INPUT} value={line.description} onChange={e => updateLine(i, 'description', e.target.value)} placeholder="e.g. Boiler service" />
+                <input style={INPUT} maxLength={500} value={line.description} onChange={e => updateLine(i, 'description', e.target.value)} placeholder="e.g. Boiler service" />
                 <input type="number" min="1" style={INPUT} value={line.quantity} onChange={e => updateLine(i, 'quantity', e.target.value)} />
                 <input type="number" min="0" step="0.01" style={INPUT} value={line.unitPrice === 0 ? '' : line.unitPrice} onChange={e => updateLine(i, 'unitPrice', e.target.value)} placeholder="0.00" />
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -212,7 +212,7 @@ export default function NewInvoiceClient({ user }: { user: User }) {
         {/* Notes */}
         <div style={{ background: '#fff', border: '1px solid var(--divider)', borderRadius: '10px', boxShadow: 'var(--shadow-s)', padding: '16px', marginBottom: '16px' }}>
           <label style={LABEL}>Notes (optional)</label>
-          <textarea style={{ ...INPUT, resize: 'vertical', minHeight: '72px' } as React.CSSProperties} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Payment terms, bank details, thank-you note…" />
+          <textarea style={{ ...INPUT, resize: 'vertical', minHeight: '72px' } as React.CSSProperties} maxLength={2000} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Payment terms, bank details, thank-you note…" />
         </div>
 
         {error && (

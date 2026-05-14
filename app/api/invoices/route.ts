@@ -3,6 +3,7 @@ import { withTierGuard } from '@/lib/apiAuth';
 import { getClientConfig } from '@/lib/sheets';
 import { getInvoices, createInvoice } from '@/lib/invoices';
 import { cleanForSheets } from '@/lib/sheetsSafe';
+import { validateInvoiceLengths } from '@/lib/invoiceValidation';
 
 export const GET = withTierGuard('page.invoices', async (_req: NextRequest, session) => {
   const clientId = session.clientId;
@@ -33,6 +34,9 @@ export const POST = withTierGuard('page.invoices', async (req: NextRequest, sess
   if (!customerName || !issueDate || !dueDate || !Array.isArray(lineItems) || lineItems.length === 0) {
     return Response.json({ error: 'Missing required fields' }, { status: 422 });
   }
+
+  const lengthError = validateInvoiceLengths(body);
+  if (lengthError) return Response.json(lengthError, { status: 400 });
 
   const rate = Number(vatRate) || 0;
   const subtotal = lineItems.reduce(

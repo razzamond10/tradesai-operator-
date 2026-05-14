@@ -3,18 +3,16 @@ import { withTierGuard } from '@/lib/apiAuth';
 import { getClientConfig } from '@/lib/sheets';
 import { getInvoiceById, updateInvoice } from '@/lib/invoices';
 import { cleanForSheets } from '@/lib/sheetsSafe';
+import { validateInvoiceLengths } from '@/lib/invoiceValidation';
 
 export const GET = withTierGuard('page.invoices', async (req: NextRequest, session) => {
   const id = req.nextUrl.pathname.split('/').at(-1) ?? '';
   const clientId = session.clientId;
   if (!clientId) return Response.json({ error: 'No clientId' }, { status: 400 });
-
   const config = await getClientConfig(decodeURIComponent(clientId));
   if (!config?.sheetId) return Response.json({ error: 'Not found' }, { status: 404 });
-
   const invoice = await getInvoiceById(config.sheetId, id);
   if (!invoice) return Response.json({ error: 'Not found' }, { status: 404 });
-
   const { rowIndex: _r, ...rest } = invoice;
   return Response.json({ invoice: rest });
 });
@@ -23,13 +21,14 @@ export const PUT = withTierGuard('page.invoices', async (req: NextRequest, sessi
   const id = req.nextUrl.pathname.split('/').at(-1) ?? '';
   const clientId = session.clientId;
   if (!clientId) return Response.json({ error: 'No clientId' }, { status: 400 });
-
   const config = await getClientConfig(decodeURIComponent(clientId));
   if (!config?.sheetId) return Response.json({ error: 'Not found' }, { status: 404 });
-
   const body = await req.json();
-  const updates: Record<string, any> = {};
 
+  const lengthError = validateInvoiceLengths(body);
+  if (lengthError) return Response.json(lengthError, { status: 400 });
+
+  const updates: Record<string, any> = {};
   if (body.customerName !== undefined) updates.customerName = cleanForSheets(body.customerName);
   if (body.customerPhone !== undefined) updates.customerPhone = cleanForSheets(body.customerPhone);
   if (body.customerAddress !== undefined) updates.customerAddress = cleanForSheets(body.customerAddress);
@@ -37,7 +36,6 @@ export const PUT = withTierGuard('page.invoices', async (req: NextRequest, sessi
   if (body.issueDate !== undefined) updates.issueDate = body.issueDate;
   if (body.dueDate !== undefined) updates.dueDate = body.dueDate;
   if (body.notes !== undefined) updates.notes = cleanForSheets(body.notes);
-
   if (body.lineItems && Array.isArray(body.lineItems)) {
     const lineItems = body.lineItems.map((item: any) => ({
       description: cleanForSheets(item.description || ''),
@@ -51,14 +49,12 @@ export const PUT = withTierGuard('page.invoices', async (req: NextRequest, sessi
     );
     const vatAmount = parseFloat((subtotal * rate / 100).toFixed(2));
     const total = parseFloat((subtotal + vatAmount).toFixed(2));
-
     updates.lineItems = lineItems;
     updates.subtotal = subtotal;
     updates.vatRate = rate;
     updates.vatAmount = vatAmount;
     updates.total = total;
   }
-
   if (body.status) {
     const allowed = ['draft', 'sent', 'paid', 'overdue'] as const;
     if (!allowed.includes(body.status)) {
@@ -67,10 +63,8 @@ export const PUT = withTierGuard('page.invoices', async (req: NextRequest, sessi
     updates.status = body.status;
     updates.paidAt = body.status === 'paid' ? new Date().toISOString() : '';
   }
-
   const updated = await updateInvoice(config.sheetId, id, updates);
   if (!updated) return Response.json({ error: 'Not found' }, { status: 404 });
-
   const { rowIndex: _r, ...rest } = updated;
   return Response.json({ invoice: rest });
 });
