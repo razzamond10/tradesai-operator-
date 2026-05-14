@@ -380,7 +380,7 @@ export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
       businessName: r[1] || '',
       timestamp: normTimestamp(r[0] || ''),
       callerName: r[2] || '',
-      phone: r[3] || '',
+      phone: (r[3] || '').replace(/^'/, ''),
       type: r[4] || '',
       severity: r[5] || '',
       resolved: r[7] || '',
