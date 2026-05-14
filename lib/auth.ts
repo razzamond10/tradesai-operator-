@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 export { signJWT, verifyJWT } from './jwt';
 export type { JWTPayload, Role } from './jwt';
 import type { JWTPayload } from './jwt';
-import { findAdminUserByEmail } from './passwordReset';
+import { findAdminUserByEmail, findVAUserByEmail, updateVALastLogin } from './passwordReset';
 
 function emailToEnvKey(email: string): string {
   return email
@@ -43,6 +43,24 @@ export async function validateUser(
         name: sheetUser.name || envUser?.name || normalEmail,
         role: (sheetUser.role || envUser?.role || 'client') as JWTPayload['role'],
         clientId: envUser?.clientId,
+      };
+    }
+  } catch {
+    // Sheet unavailable — fall through to env vars
+  }
+
+  // Check VA Users sheet — second priority
+  try {
+    const vaUser = await findVAUserByEmail(normalEmail);
+    if (vaUser && vaUser.passwordHash) {
+      const valid = await bcrypt.compare(password, vaUser.passwordHash);
+      if (!valid) return null;
+      // Update lastLogin (non-blocking — failure is logged but does not abort)
+      void updateVALastLogin(vaUser.rowIndex);
+      return {
+        email: normalEmail,
+        name: vaUser.name || normalEmail,
+        role: 'va',
       };
     }
   } catch {

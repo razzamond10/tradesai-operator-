@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
 
     logAudit({
       actor_email: user.email,
-      actor_role: user.role as 'admin' | 'client',
+      actor_role: user.role as 'admin' | 'client' | 'va',
       action: 'login.success',
       target: user.email,
       ip: auditIp,

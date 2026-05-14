@@ -28,7 +28,7 @@ export type AuditAction =
   | 'gdpr.export'
   | 'gdpr.delete';
 
-export type AuditRole = 'admin' | 'client' | 'system' | 'anonymous';
+export type AuditRole = 'admin' | 'client' | 'va' | 'system' | 'anonymous';
 export type AuditResult = 'success' | 'failure';
 
 export interface AuditEvent {

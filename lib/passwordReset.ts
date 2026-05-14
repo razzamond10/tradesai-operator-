@@ -133,6 +133,58 @@ export async function upsertAdminUserPassword(
   }
 }
 
+// ── VA Users ──────────────────────────────────────────────────────────────────
+
+const VA_TAB = 'VA Users';
+const VA_HEADERS = ['email', 'passwordHash (bcrypt)', 'name', 'status (active/disabled)', 'createdAt', 'lastLogin', 'notes'];
+
+export interface VAUser {
+  email: string;
+  passwordHash: string;
+  name: string;
+  status: string;
+  rowIndex: number;
+}
+
+export async function getVAUsers(): Promise<VAUser[]> {
+  await ensureTabExists(VA_TAB, VA_HEADERS);
+  const rows = await readTab(VA_TAB, 'A2:G');
+  return rows
+    .map((r, i) => ({
+      email: (r[0] || '').trim().toLowerCase(),
+      passwordHash: (r[1] || '').trim(),
+      name: (r[2] || '').trim(),
+      status: (r[3] || '').trim().toLowerCase(),
+      rowIndex: i,
+    }))
+    .filter((u) => u.email);
+}
+
+export async function findVAUserByEmail(email: string): Promise<VAUser | null> {
+  const users = await getVAUsers();
+  const found = users.find((u) => u.email === email.toLowerCase().trim());
+  if (!found) return null;
+  // Treat anything that isn't explicitly 'disabled' as active (default-allow for unset values)
+  if (found.status === 'disabled') return null;
+  return found;
+}
+
+/** Update lastLogin timestamp on a VA row. Non-fatal if it fails. */
+export async function updateVALastLogin(rowIndex: number): Promise<void> {
+  try {
+    const sheets = await getSheetsClient();
+    const sheetRow = rowIndex + 2; // +1 header +1 1-based
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: SPREADSHEET_ID,
+      range: `'${VA_TAB}'!F${sheetRow}`,
+      valueInputOption: 'RAW',
+      requestBody: { values: [[new Date().toISOString()]] },
+    });
+  } catch {
+    // Non-fatal — login succeeds even if timestamp write fails
+  }
+}
+
 // ── PasswordResets ────────────────────────────────────────────────────────────
 
 const RESET_TAB = 'PasswordResets';
