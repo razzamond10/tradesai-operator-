@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAdminOrVA } from '@/lib/apiAuth';
 import { logVAAction } from '@/lib/vaActions';
-import { getClientConfig } from '@/lib/sheets';
+import { getClientConfig, resolveTabName } from '@/lib/sheets';
 import { google } from 'googleapis';
 
 export async function POST(req: NextRequest) {
@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
     }
     const config = await getClientConfig(clientId);
     if (!config) return Response.json({ error: 'Client not found' }, { status: 404 });
+    const tabName = await resolveTabName(config.sheetId, 'bookings');
     const auth = new google.auth.GoogleAuth({
       credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT || '{}'),
       scopes: [
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
     const sheets = google.sheets({ version: 'v4', auth });
     const calendar = google.calendar({ version: 'v3', auth });
     const read = await sheets.spreadsheets.values.get({
-      spreadsheetId: config.sheetId, range: "'Bookings'!A1:P",
+      spreadsheetId: config.sheetId, range: "'${tabName}'!A1:P",
     });
     const rows = read.data.values || [];
     const idx = rows.findIndex((r, i) => i > 0 && r[7] === eventId);
@@ -35,11 +36,11 @@ export async function POST(req: NextRequest) {
     const stamp = `[${new Date().toISOString()}] ${session.email}: ${beforeSlot} → ${newSlot}${reason ? ` (${reason})` : ''}`;
     const newHistory = beforeHistory ? `${beforeHistory}\n${stamp}` : stamp;
     await sheets.spreadsheets.values.update({
-      spreadsheetId: config.sheetId, range: `'Bookings'!G${rowNum}`,
+      spreadsheetId: config.sheetId, range: `'${tabName}'!G${rowNum}`,
       valueInputOption: 'RAW', requestBody: { values: [[newSlot]] },
     });
     await sheets.spreadsheets.values.update({
-      spreadsheetId: config.sheetId, range: `'Bookings'!O${rowNum}`,
+      spreadsheetId: config.sheetId, range: `'${tabName}'!O${rowNum}`,
       valueInputOption: 'RAW', requestBody: { values: [[newHistory]] },
     });
     try {

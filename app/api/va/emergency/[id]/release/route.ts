@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAdminOrVA } from '@/lib/apiAuth';
 import { logVAAction } from '@/lib/vaActions';
-import { getClientConfig } from '@/lib/sheets';
+import { getClientConfig, resolveTabName } from '@/lib/sheets';
 import { google } from 'googleapis';
 
 export async function POST(req: NextRequest) {
@@ -10,13 +10,14 @@ export async function POST(req: NextRequest) {
     const { clientId, phone, timestamp } = await req.json();
     const config = await getClientConfig(clientId);
     if (!config) return Response.json({ error: 'Client not found' }, { status: 404 });
+    const tabName = await resolveTabName(config.sheetId, 'emergencies');
     const auth = new google.auth.GoogleAuth({
       credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT || '{}'),
       scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
     const sheets = google.sheets({ version: 'v4', auth });
     const read = await sheets.spreadsheets.values.get({
-      spreadsheetId: config.sheetId, range: "'Emergencies'!A2:M",
+      spreadsheetId: config.sheetId, range: "'${tabName}'!A2:M",
     });
     const rows = read.data.values || [];
     const idx = rows.findIndex(r => (r[3] || '').replace(/^'/, '') === phone && r[0] === timestamp);
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
     const rowNum = idx + 3;
     await sheets.spreadsheets.values.update({
-      spreadsheetId: config.sheetId, range: `'Emergencies'!J${rowNum}`,
+      spreadsheetId: config.sheetId, range: `'${tabName}'!J${rowNum}`,
       valueInputOption: 'RAW', requestBody: { values: [['']] },
     });
     await logVAAction({

@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAdminOrVA } from '@/lib/apiAuth';
 import { logVAAction } from '@/lib/vaActions';
-import { getClientConfig } from '@/lib/sheets';
+import { getClientConfig, resolveTabName } from '@/lib/sheets';
 import { google } from 'googleapis';
 
 const VALID_STATUSES = ['open', 'acknowledged', 'resolved', 'escalated'];
@@ -17,6 +17,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     }
     const config = await getClientConfig(clientId);
     if (!config) return Response.json({ error: 'Client not found' }, { status: 404 });
+    const tabName = await resolveTabName(config.sheetId, 'emergencies');
 
     const auth = new google.auth.GoogleAuth({
       credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT || '{}'),
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const sheets = google.sheets({ version: 'v4', auth });
     const read = await sheets.spreadsheets.values.get({
       spreadsheetId: config.sheetId,
-      range: "'Emergencies'!A2:M",
+      range: "'${tabName}'!A2:M",
     });
     const rows = read.data.values || [];
     const idx = rows.findIndex(r => (r[3] || '').replace(/^'/, '') === phone && r[0] === timestamp);
@@ -35,14 +36,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const rowNum = idx + 3;
     await sheets.spreadsheets.values.update({
       spreadsheetId: config.sheetId,
-      range: `'Emergencies'!I${rowNum}`,
+      range: `'${tabName}'!I${rowNum}`,
       valueInputOption: 'RAW',
       requestBody: { values: [[status]] },
     });
     if (status === 'resolved') {
       await sheets.spreadsheets.values.update({
         spreadsheetId: config.sheetId,
-        range: `'Emergencies'!L${rowNum}:M${rowNum}`,
+        range: `'${tabName}'!L${rowNum}:M${rowNum}`,
         valueInputOption: 'RAW',
         requestBody: { values: [[new Date().toISOString(), session.email]] },
       });

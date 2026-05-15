@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAdminOrVA } from '@/lib/apiAuth';
 import { logVAAction } from '@/lib/vaActions';
-import { getClientConfig } from '@/lib/sheets';
+import { getClientConfig, resolveTabName } from '@/lib/sheets';
 import { google } from 'googleapis';
 
 export async function POST(req: NextRequest) {
@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
     const { clientId, eventId, reason } = await req.json();
     const config = await getClientConfig(clientId);
     if (!config) return Response.json({ error: 'Client not found' }, { status: 404 });
+    const tabName = await resolveTabName(config.sheetId, 'bookings');
     const auth = new google.auth.GoogleAuth({
       credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT || '{}'),
       scopes: [
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
     const sheets = google.sheets({ version: 'v4', auth });
     const calendar = google.calendar({ version: 'v3', auth });
     const read = await sheets.spreadsheets.values.get({
-      spreadsheetId: config.sheetId, range: "'Bookings'!A1:P",
+      spreadsheetId: config.sheetId, range: "'${tabName}'!A1:P",
     });
     const rows = read.data.values || [];
     const idx = rows.findIndex((r, i) => i > 0 && r[7] === eventId);
@@ -28,7 +29,7 @@ export async function POST(req: NextRequest) {
     const before = rows[idx][9] || '';
     const rowNum = idx + 1;
     await sheets.spreadsheets.values.update({
-      spreadsheetId: config.sheetId, range: `'Bookings'!J${rowNum}`,
+      spreadsheetId: config.sheetId, range: `'${tabName}'!J${rowNum}`,
       valueInputOption: 'RAW', requestBody: { values: [['cancelled']] },
     });
     try {

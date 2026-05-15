@@ -103,7 +103,7 @@ function normaliseTabName(name: string): string {
 }
 
 /** Find the exact tab title whose normalised form includes the search string */
-async function resolveTabName(spreadsheetId: string, search: string): Promise<string> {
+export async function resolveTabName(spreadsheetId: string, search: string): Promise<string> {
   const meta = await getSpreadsheetMeta(spreadsheetId);
   const tabs: string[] = (meta.sheets ?? []).map((s: any) => s.properties?.title ?? '');
   const needle = search.toLowerCase();
