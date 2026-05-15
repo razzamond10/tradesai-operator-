@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     });
     const sheets = google.sheets({ version: 'v4', auth });
     const read = await sheets.spreadsheets.values.get({
-      spreadsheetId: config.sheetId, range: "'${tabName}'!A2:M",
+      spreadsheetId: config.sheetId, range: "'${tabName}'!A3:M",
     });
     const rows = read.data.values || [];
     const idx = rows.findIndex(r => (r[3] || '').replace(/^'/, '') === phone && r[0] === timestamp);
