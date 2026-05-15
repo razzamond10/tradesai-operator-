@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     });
     const sheets = google.sheets({ version: 'v4', auth });
     const read = await sheets.spreadsheets.values.get({
-      spreadsheetId: config.sheetId, range: "'${tabName}'!A1:P",
+      spreadsheetId: config.sheetId, range: `'${tabName}'!A2:P`,
     });
     const rows = read.data.values || [];
     const idx = rows.findIndex((r, i) => i > 0 && r[7] === eventId);
