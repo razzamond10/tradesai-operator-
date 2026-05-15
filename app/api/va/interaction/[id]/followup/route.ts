@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       spreadsheetId: config.sheetId, range: `'${tabName}'!A2:W`,
     });
     const rows = read.data.values || [];
-    const idx = rows.findIndex((r, i) => i > 0 && r[1] === conversationId);
+    const idx = rows.findIndex((r) => r[14] === conversationId);
     if (idx < 0) return Response.json({ error: 'Interaction not found' }, { status: 404 });
     const before = `req=${rows[idx][19] || ''} by=${rows[idx][20] || ''} done=${rows[idx][22] || ''}`;
     const rowNum = idx + 1;
