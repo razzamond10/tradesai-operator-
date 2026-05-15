@@ -85,3 +85,14 @@ export function withTierGuard(featureKey: string, handler: GuardedHandler) {
     }
   };
 }
+
+// ---------------------------------------------------------------------------
+// requireAdminOrVA — for VA-portal endpoints; admins also pass
+// ---------------------------------------------------------------------------
+export async function requireAdminOrVA(req: Request | NextRequest): Promise<JWTPayload> {
+  const session = await requireSession(req);
+  if (session.role !== 'admin' && session.role !== 'va') {
+    throw Response.json({ error: 'Forbidden — admin or VA role required' }, { status: 403 });
+  }
+  return session;
+}
