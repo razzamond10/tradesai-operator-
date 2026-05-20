@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
@@ -160,7 +161,7 @@ export default function VAEmergenciesClient({ user }: { user: JWTPayload }) {
                     return (
                       <tr key={i} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', background: rv.label === 'Open' ? 'rgba(192,24,48,0.02)' : 'transparent' }}>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--a1)', fontSize: '10px', whiteSpace: 'nowrap' }}>{em.clientName}</td>
-                        <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)' }}>{em.callerName || '—'}</td>
+                        <td style={{ padding: '8px 12px', fontWeight: 600 }}><Link href={`/va/emergencies/${encodeURIComponent(em.clientId + '__' + (em.timestamp || em.createdAt || ''))}`} style={{ color: 'var(--a1)', textDecoration: 'none' }}>{em.callerName || '—'}</Link></td>
                         <td style={{ padding: '8px 12px', color: 'var(--ink2)' }}>{em.type || '—'}</td>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)' }}>{em.postcode || '—'}</td>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{ts ? `${ts.slice(0,10)} ${ts.slice(11,16)}` : '—'}</td>
