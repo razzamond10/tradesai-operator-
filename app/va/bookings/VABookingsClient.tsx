@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
@@ -66,6 +66,7 @@ function monthEnd(): string {
 }
 
 export default function VABookingsClient({ user }: { user: JWTPayload }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [bookings, setBookings] = useState<AggBooking[]>([]);
@@ -189,9 +190,9 @@ export default function VABookingsClient({ user }: { user: JWTPayload }) {
                     const sb = statusBadge(b.status || '');
                     const slot = b.scheduledDate || b.timestamp || '—';
                     return (
-                      <tr key={i} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                      <tr key={i} onClick={() => router.push(`/va/bookings/${encodeURIComponent(b.calendarEventId || '')}`)} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: 'pointer' }}>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--a1)', fontSize: '10px', whiteSpace: 'nowrap' }}>{b.clientName}</td>
-                        <td style={{ padding: 0, fontWeight: 600 }}><Link href={`/va/bookings/${encodeURIComponent(b.calendarEventId || '')}`} style={{ color: 'var(--a1)', textDecoration: 'none', display: 'inline-block', width: '100%', padding: '8px 12px', boxSizing: 'border-box' }}>{b.customerName || '—'}</Link></td>
+                        <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--a1)' }}>{b.customerName || '—'}</td>
                         <td style={{ padding: '8px 12px', color: 'var(--ink2)' }}>{b.jobType || '—'}</td>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{slot.length > 10 ? `${slot.slice(0,10)} ${slot.slice(11,16)}` : slot}</td>
                         <td style={{ padding: '8px 12px' }}><span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: sb.bg, color: sb.color }}>{b.status || '—'}</span></td>
