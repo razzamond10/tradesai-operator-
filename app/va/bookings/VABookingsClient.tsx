@@ -191,7 +191,7 @@ export default function VABookingsClient({ user }: { user: JWTPayload }) {
                     return (
                       <tr key={i} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--a1)', fontSize: '10px', whiteSpace: 'nowrap' }}>{b.clientName}</td>
-                        <td style={{ padding: 0, fontWeight: 600 }}><Link href={`/va/bookings/${encodeURIComponent(b.calendarEventId || '')}`} style={{ color: 'var(--a1)', textDecoration: 'none', display: 'block', padding: '8px 12px' }}>{b.customerName || '—'}</Link></td>
+                        <td style={{ padding: 0, fontWeight: 600 }}><Link href={`/va/bookings/${encodeURIComponent(b.calendarEventId || '')}`} style={{ color: 'var(--a1)', textDecoration: 'none', display: 'inline-block', width: '100%', padding: '8px 12px', boxSizing: 'border-box' }}>{b.customerName || '—'}</Link></td>
                         <td style={{ padding: '8px 12px', color: 'var(--ink2)' }}>{b.jobType || '—'}</td>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{slot.length > 10 ? `${slot.slice(0,10)} ${slot.slice(11,16)}` : slot}</td>
                         <td style={{ padding: '8px 12px' }}><span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: sb.bg, color: sb.color }}>{b.status || '—'}</span></td>
