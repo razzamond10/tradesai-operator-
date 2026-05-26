@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
@@ -52,6 +53,7 @@ function outcomeBadge(o: string) {
 }
 
 export default function VACommsClient({ user }: { user: JWTPayload }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [interactions, setInteractions] = useState<AggInteraction[]>([]);
@@ -183,7 +185,7 @@ export default function VACommsClient({ user }: { user: JWTPayload }) {
                     const ob = outcomeBadge(it.outcome || '');
                     const ts = it.timestamp || '';
                     return (
-                      <tr key={i} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                      <tr key={i} onClick={it.conversationId ? () => router.push(`/va/communications/${encodeURIComponent(it.conversationId!)}`) : undefined} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: it.conversationId ? 'pointer' : 'default' }}>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--a1)', fontSize: '10px', whiteSpace: 'nowrap' }}>{it.clientName}</td>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)' }}>{it.callerName || '—'}</td>
                         <td style={{ padding: '8px 12px' }}>
