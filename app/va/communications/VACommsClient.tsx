@@ -17,6 +17,7 @@ interface RawInteraction {
   channel?: string;
   phoneNumber?: string;
   summary?: string;
+  conversationId?: string;
 }
 
 interface AggInteraction extends RawInteraction {
