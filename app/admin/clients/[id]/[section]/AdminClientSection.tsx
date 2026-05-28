@@ -412,6 +412,7 @@ export function EmergenciesSection({ emergencies, clientId, businessName = 'clie
   const [filter, setFilter] = useState<'all'|'active'|'resolved'>('all');
   const [resolving, setResolving] = useState<Record<number, boolean>>({});
   const [localResolved, setLocalResolved] = useState<Record<number, boolean>>({});
+  const [expandedKey, setExpandedKey] = useState<string | null>(null);
 
   if (emergencies.length === 0) {
     return <EmptyState icon="🚨" title="No emergencies logged" sub="That's a good thing. Urgent calls will appear here when flagged." />;
@@ -478,8 +479,11 @@ export function EmergenciesSection({ emergencies, clientId, businessName = 'clie
                 const sev = sevStyle(em.severity);
                 const isActive = (em.resolved || '').toLowerCase() !== 'yes';
                 const isResolving = resolving[dataIdx];
+                const key = `${em.timestamp}-${em.phone}`;
+                const hasKey = !!(em.timestamp || em.phone);
+                const isOpen = expandedKey === key;
                 return (
-                  <div key={origIdx} style={{ padding: '12px 14px', borderRadius: '8px', border: `1px solid ${isActive ? '#F5C0C8' : 'var(--divider)'}`, borderLeft: `4px solid ${isActive ? 'var(--a4)' : 'var(--a3)'}`, background: '#fff' }}>
+                  <div key={origIdx} onClick={hasKey ? () => setExpandedKey(isOpen ? null : key) : undefined} style={{ padding: '12px 14px', borderRadius: '8px', border: `1px solid ${isActive ? '#F5C0C8' : 'var(--divider)'}`, borderLeft: `4px solid ${isActive ? 'var(--a4)' : 'var(--a3)'}`, background: '#fff', cursor: hasKey ? 'pointer' : 'default' }}>
                     <div className="em-card-inner" style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                       <span style={{ fontSize: '20px' }}>{isActive ? '🚨' : '✅'}</span>
                       <div style={{ flex: '1 1 0', minWidth: 0 }}>
@@ -501,12 +505,13 @@ export function EmergenciesSection({ emergencies, clientId, businessName = 'clie
                       </div>
                       <div className="em-actions" style={{ display: 'flex', gap: '6px', flexShrink: 0 }}>
                         {em.phone && (
-                          <a href={`tel:${em.phone.replace(/\s/g, '')}`} style={{ padding: '5px 10px', borderRadius: '7px', background: isActive ? 'var(--a4)' : 'var(--slate)', color: isActive ? '#fff' : 'var(--ink)', fontSize: '11px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📞 Call</a>
+                          <a href={`tel:${em.phone.replace(/\s/g, '')}`} onClick={e => e.stopPropagation()} style={{ padding: '5px 10px', borderRadius: '7px', background: isActive ? 'var(--a4)' : 'var(--slate)', color: isActive ? '#fff' : 'var(--ink)', fontSize: '11px', fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>📞 Call</a>
                         )}
                         {isActive && (
                           <button
                             disabled={isResolving || dataIdx < 0}
-                            onClick={async () => {
+                            onClick={async (e) => {
+                              e.stopPropagation();
                               if (dataIdx < 0) return;
                               setResolving(prev => ({ ...prev, [dataIdx]: true }));
                               try {
@@ -541,6 +546,22 @@ export function EmergenciesSection({ emergencies, clientId, businessName = 'clie
                         )}
                       </div>
                     </div>
+                    {isOpen && (
+                      <div style={{ marginTop: '10px', padding: '12px', background: 'var(--a1b)', borderRadius: '6px', borderTop: '1px solid rgba(61,31,168,0.08)', display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '10px 20px' }}>
+                        {([
+                          { label: 'Postcode', val: em.postcode },
+                          { label: 'Issue', val: em.notes || em.issue },
+                          { label: 'Timestamp', val: em.timestamp },
+                          { label: 'Severity', val: em.severity },
+                          { label: 'Status', val: (em.resolved||'').toLowerCase() === 'yes' ? 'Resolved' : 'Open' },
+                        ] as { label: string; val: string | undefined }[]).filter(f => f.val).map(({ label, val }) => (
+                          <div key={label}>
+                            <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '2px' }}>{label}</div>
+                            <div style={{ fontSize: '11px', color: 'var(--ink)' }}>{val}</div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
@@ -1457,6 +1478,12 @@ export function CommunicationsSection({ interactions, businessName = 'client', p
               </div>
             ) : (
               <div style={{ fontSize: '11px', color: 'var(--faint)', fontStyle: 'italic' }}>No transcript recorded for this call.</div>
+            )}
+            {selectedCall.conversationId && (
+              <div style={{ marginTop: '12px' }}>
+                <div style={{ fontSize: '9px', fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '.5px', marginBottom: '3px' }}>Conversation ID</div>
+                <div style={{ fontSize: '11px', color: 'var(--muted)', fontFamily: '"IBM Plex Mono",monospace', wordBreak: 'break-all' }}>{selectedCall.conversationId}</div>
+              </div>
             )}
           </div>
         </div>
