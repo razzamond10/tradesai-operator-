@@ -12,6 +12,7 @@ export default function IdleTimer() {
   const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const logoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const showWarningRef = useRef(false);
 
   const clearAllTimers = useCallback(() => {
     if (warningTimerRef.current) clearTimeout(warningTimerRef.current);
@@ -32,9 +33,11 @@ export default function IdleTimer() {
   const startTimers = useCallback(() => {
     clearAllTimers();
     setShowWarning(false);
+    showWarningRef.current = false;
     setCountdown(120);
     warningTimerRef.current = setTimeout(() => {
       setShowWarning(true);
+      showWarningRef.current = true;
       setCountdown(120);
       countdownIntervalRef.current = setInterval(() => {
         setCountdown((c) => Math.max(0, c - 1));
@@ -52,7 +55,7 @@ export default function IdleTimer() {
   useEffect(() => {
     const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
     const onActivity = () => {
-      if (!showWarning) startTimers();
+      if (!showWarningRef.current) startTimers();
     };
     events.forEach((e) => window.addEventListener(e, onActivity, { passive: true }));
     startTimers();
@@ -60,7 +63,8 @@ export default function IdleTimer() {
       events.forEach((e) => window.removeEventListener(e, onActivity));
       clearAllTimers();
     };
-  }, [showWarning, startTimers, clearAllTimers]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (!showWarning) return null;
 
