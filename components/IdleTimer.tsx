@@ -2,8 +2,8 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 
 // Idle timeout: 60 min total, warning at 58 min (2 min before logout).
-const IDLE_TIMEOUT_MS = 90 * 1000;        // 90s TEMP for S77 live test
-const WARNING_BEFORE_MS = 30 * 1000;      // 30s warning TEMP for S77 live test
+const IDLE_TIMEOUT_MS = 60 * 60 * 1000;   // 60 min
+const WARNING_BEFORE_MS = 2 * 60 * 1000;  // 2 min warning
 const TIME_TO_WARNING_MS = IDLE_TIMEOUT_MS - WARNING_BEFORE_MS;
 
 export default function IdleTimer() {
