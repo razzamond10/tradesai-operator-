@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useClientTime } from '@/lib/hooks/useClientTime';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
@@ -127,7 +128,8 @@ export default function VADashboardClient({ user }: { user: JWTPayload }) {
     load();
   }, []);
 
-  const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  const today = useClientTime('dateLong');
+  const clockTime = useClientTime('time');
 
   const kpis = [
     { label: 'Total Clients', val: loading ? '—' : clientCount, stripe: 'var(--a1)', iconBg: 'var(--a1b)', icon: '👥', badge: 'Portfolio' },
@@ -232,7 +234,7 @@ export default function VADashboardClient({ user }: { user: JWTPayload }) {
 
         <div style={{ paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ fontSize: '10px', color: 'var(--faint)' }}>Powered by <strong>TradesAI Operator</strong></div>
-          <div style={{ fontSize: '10px', color: 'var(--faint)', fontFamily: '"IBM Plex Mono",monospace' }}>{new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
+          <div style={{ fontSize: '10px', color: 'var(--faint)', fontFamily: '"IBM Plex Mono",monospace' }}>{clockTime}</div>
         </div>
         <style>{`@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
       </div>

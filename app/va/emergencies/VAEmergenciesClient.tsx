@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useClientTime } from '@/lib/hooks/useClientTime';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
@@ -50,6 +51,7 @@ function resolvedBadge(r: string) {
 
 export default function VAEmergenciesClient({ user }: { user: JWTPayload }) {
   const router = useRouter();
+  const clockTime = useClientTime('time');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [emergencies, setEmergencies] = useState<AggEmergency[]>([]);
@@ -179,7 +181,7 @@ export default function VAEmergenciesClient({ user }: { user: JWTPayload }) {
 
         <div style={{ marginTop: '24px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ fontSize: '10px', color: 'var(--faint)' }}>Powered by <strong>TradesAI Operator</strong></div>
-          <div style={{ fontSize: '10px', color: 'var(--faint)', fontFamily: '"IBM Plex Mono",monospace' }}>{new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
+          <div style={{ fontSize: '10px', color: 'var(--faint)', fontFamily: '"IBM Plex Mono",monospace' }}>{clockTime}</div>
         </div>
         <style>{`@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
       </div>

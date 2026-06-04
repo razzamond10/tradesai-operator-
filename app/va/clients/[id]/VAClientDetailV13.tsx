@@ -9,6 +9,7 @@
  */
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useClientTime } from '@/lib/hooks/useClientTime';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import ActivityLineChart from '@/components/charts/ActivityLineChart';
@@ -100,6 +101,8 @@ export default function VAClientDetailV13({ user, clientId }: { user: JWTPayload
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [chartMode, setChartMode] = useState<'today' | 'week' | 'month'>('today');
+  const headerDate = useClientTime('date');
+  const clockTime = useClientTime('time');
 
   useEffect(() => {
     fetch(`/api/clients/${clientId}/data`)
@@ -166,7 +169,7 @@ export default function VAClientDetailV13({ user, clientId }: { user: JWTPayload
             {/* KPIs — no revenue for VA */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
               <div style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '11px', fontWeight: 700, color: 'var(--ink)', textTransform: 'uppercase', letterSpacing: '.8px' }}>Today at a glance</div>
-              <div style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: '"IBM Plex Mono",monospace' }}>{new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}</div>
+              <div style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: '"IBM Plex Mono",monospace' }}>{headerDate}</div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: '12px', marginBottom: '18px' }}>
               <KPICard stripe="var(--a1)" iconBg="var(--a1b)" icon="📞" badge={`${kpis.callsToday} today`} label="Total Calls" value={kpis.callsToday} sub="calls today" />
@@ -330,7 +333,7 @@ export default function VAClientDetailV13({ user, clientId }: { user: JWTPayload
 
         <div style={{ paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ fontSize: '10px', color: 'var(--faint)' }}>Powered by <strong>TradesAI Operator</strong></div>
-          <div style={{ fontSize: '10px', color: 'var(--faint)', fontFamily: '"IBM Plex Mono",monospace' }}>{new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
+          <div style={{ fontSize: '10px', color: 'var(--faint)', fontFamily: '"IBM Plex Mono",monospace' }}>{clockTime}</div>
         </div>
         <style>{`@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}`}</style>
       </div>

@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useClientTime } from '@/lib/hooks/useClientTime';
 import Link from 'next/link';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
@@ -55,6 +56,7 @@ function decodeId(id: string): { clientId: string; timestamp: string } | null {
 }
 
 export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload; id: string }) {
+  const clockTime = useClientTime('time');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [record, setRecord] = useState<EmergencyDetail | null>(null);
@@ -197,7 +199,7 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
 
         <div style={{ marginTop: '24px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ fontSize: '10px', color: 'var(--faint)' }}>Powered by <strong>TradesAI Operator</strong></div>
-          <div style={{ fontSize: '10px', color: 'var(--faint)', fontFamily: '"IBM Plex Mono",monospace' }}>{new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</div>
+          <div style={{ fontSize: '10px', color: 'var(--faint)', fontFamily: '"IBM Plex Mono",monospace' }}>{clockTime}</div>
         </div>
       </div>
     </PortalShell>
