@@ -18,6 +18,7 @@ interface RawInteraction {
   intent?: string;
   outcome?: string;
   timestamp?: string;
+  conversationId?: string;
 }
 
 interface RawEmergency {
@@ -43,6 +44,7 @@ interface FeedItem {
   outcome: string;
   timestamp: string;
   clientName: string;
+  conversationId?: string;
 }
 
 function todayStr() { return new Date().toISOString().slice(0, 10); }
@@ -110,6 +112,7 @@ export default function VADashboardClient({ user }: { user: JWTPayload }) {
               outcome: it.outcome || '—',
               timestamp: it.timestamp || '',
               clientName,
+              conversationId: it.conversationId,
             });
           });
         });
@@ -217,7 +220,7 @@ export default function VADashboardClient({ user }: { user: JWTPayload }) {
               </thead>
               <tbody>
                 {feed.map((it, i) => (
-                  <tr key={i} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)' }}>
+                  <tr key={i} onClick={it.conversationId ? () => router.push(`/va/communications/${encodeURIComponent(it.conversationId!)}`) : undefined} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: it.conversationId ? 'pointer' : 'default' }}>
                     <td style={{ padding: '7px 12px', fontWeight: 600, color: 'var(--a1)', fontSize: '10px' }}>{it.clientName}</td>
                     <td style={{ padding: '7px 12px', fontWeight: 600, color: 'var(--ink)' }}>{it.callerName}</td>
                     <td style={{ padding: '7px 12px', color: 'var(--ink2)' }}>{it.intent}</td>
