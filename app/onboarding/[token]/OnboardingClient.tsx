@@ -10,14 +10,19 @@ import Step2ServicesOffered, {
   type ServicesAnswers,
   step2Valid,
 } from './Step2ServicesOffered';
+import Step3Pricing, {
+  type PricingAnswers,
+  step3Valid,
+} from './Step3Pricing';
 
 const TOTAL_STEPS = 5;
 
 // Typed answers — one namespace per step so steps don't collide.
-// Steps 3–5 are added as A3–A5 are built.
+// Steps 4–5 are added as A4–A5 are built.
 interface Answers {
   business?: BusinessAnswers;
   services?: ServicesAnswers;
+  pricing?: PricingAnswers;
 }
 
 interface Props {
@@ -48,7 +53,8 @@ export default function OnboardingClient({ token, initialState }: Props) {
   // Next is gated only on steps with real forms. Placeholders always allow Next.
   const canNext =
     (currentStep === 1 ? step1Valid(answers.business) : true) &&
-    (currentStep === 2 ? step2Valid(answers.services) : true);
+    (currentStep === 2 ? step2Valid(answers.services) : true) &&
+    (currentStep === 3 ? step3Valid(answers.pricing) : true);
 
   function goToStep(step: number) {
     setCurrentStep(Math.max(1, Math.min(TOTAL_STEPS, step)));
@@ -73,6 +79,10 @@ export default function OnboardingClient({ token, initialState }: Props) {
 
   function setServicesAnswers(s: ServicesAnswers) {
     setAnswers((prev) => ({ ...prev, services: s }));
+  }
+
+  function setPricingAnswers(p: PricingAnswers) {
+    setAnswers((prev) => ({ ...prev, pricing: p }));
   }
 
   // Silence unused vars until A8 persistence wires them.
@@ -101,6 +111,14 @@ export default function OnboardingClient({ token, initialState }: Props) {
           onChange={setServicesAnswers}
           tradeType={answers.business?.trade_type ?? ''}
           businessName={answers.business?.business_name ?? initialState.business_name ?? ''}
+        />
+      ) : currentStep === 3 ? (
+        <Step3Pricing
+          initialRows={answers.pricing?.rows}
+          selectedServices={answers.services?.selected ?? []}
+          tradeType={answers.business?.trade_type ?? ''}
+          businessName={answers.business?.business_name ?? initialState.business_name ?? ''}
+          onChange={setPricingAnswers}
         />
       ) : (
         <StepPlaceholder step={currentStep} />
