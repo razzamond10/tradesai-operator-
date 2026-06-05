@@ -5,7 +5,7 @@ export const STEP_NAMES = [
   'Services Offered',
   'Pricing',
   'Working Hours',
-  'Review & Launch',
+  'Finish Setup',
 ] as const;
 
 interface WizardShellProps {

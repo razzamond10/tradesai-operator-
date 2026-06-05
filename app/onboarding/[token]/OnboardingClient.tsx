@@ -19,6 +19,7 @@ import Step4WorkingHours, {
   defaultWorkingHoursAnswers,
   step4Valid,
 } from './Step4WorkingHours';
+import Step5Review from './Step5Review';
 
 const TOTAL_STEPS = 5;
 
@@ -140,6 +141,11 @@ export default function OnboardingClient({ token, initialState }: Props) {
         <Step4WorkingHours
           values={answers.workingHours ?? defaultWorkingHoursAnswers()}
           onChange={setWorkingHoursAnswers}
+        />
+      ) : currentStep === 5 ? (
+        <Step5Review
+          answers={answers}
+          onGoToStep={goToStep}
         />
       ) : (
         <StepPlaceholder step={currentStep} />
