@@ -108,7 +108,9 @@ export default function Step4WorkingHours({ values, onChange }: Props) {
     outline: 'none',
     fontFamily: '"IBM Plex Mono", monospace',
     boxSizing: 'border-box',
-    width: '100%',
+    flex: '1 1 0',
+    minWidth: '88px',
+    width: 'auto',
   };
 
   return (
@@ -132,8 +134,8 @@ export default function Step4WorkingHours({ values, onChange }: Props) {
           <div
             key={row.day}
             style={{
-              display: 'grid',
-              gridTemplateColumns: '100px 52px 1fr 16px 1fr',
+              display: 'flex',
+              flexWrap: 'wrap',
               alignItems: 'center',
               gap: '8px',
               padding: '8px 12px',
@@ -148,53 +150,59 @@ export default function Step4WorkingHours({ values, onChange }: Props) {
               fontSize: '12px',
               fontWeight: 600,
               color: row.open ? 'var(--ink, #1A1A2E)' : 'var(--muted, #888)',
+              width: '52px',
+              flexShrink: 0,
             }}>
               {row.day.slice(0, 3)}
             </div>
 
             {/* Open/closed toggle */}
-            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '5px', cursor: 'pointer', flexShrink: 0 }}>
               <ToggleSwitch
                 checked={row.open}
                 onChange={(v) => setDay(idx, { open: v })}
               />
             </label>
 
-            {/* From time */}
-            <input
-              type="time"
-              value={row.from}
-              disabled={!row.open}
-              onChange={(e) => setDay(idx, { from: e.target.value })}
-              style={{
-                ...timeInput,
-                opacity: row.open ? 1 : 0.3,
-                cursor: row.open ? 'text' : 'not-allowed',
-                borderColor: row.open && row.from >= row.to ? '#D97706' : '#D8D0F0',
-              }}
-            />
+            {/* From – separator – To group: wraps to its own line when row is too narrow */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px', minWidth: 0 }}>
+              {/* From time */}
+              <input
+                type="time"
+                value={row.from}
+                disabled={!row.open}
+                onChange={(e) => setDay(idx, { from: e.target.value })}
+                style={{
+                  ...timeInput,
+                  opacity: row.open ? 1 : 0.3,
+                  cursor: row.open ? 'text' : 'not-allowed',
+                  borderColor: row.open && row.from >= row.to ? '#D97706' : '#D8D0F0',
+                }}
+              />
 
-            {/* separator */}
-            <div style={{
-              textAlign: 'center',
-              fontSize: '11px',
-              color: 'var(--muted, #888)',
-              opacity: row.open ? 1 : 0.3,
-            }}>–</div>
-
-            {/* To time */}
-            <input
-              type="time"
-              value={row.to}
-              disabled={!row.open}
-              onChange={(e) => setDay(idx, { to: e.target.value })}
-              style={{
-                ...timeInput,
+              {/* separator */}
+              <div style={{
+                textAlign: 'center',
+                fontSize: '11px',
+                color: 'var(--muted, #888)',
                 opacity: row.open ? 1 : 0.3,
-                cursor: row.open ? 'text' : 'not-allowed',
-                borderColor: row.open && row.from >= row.to ? '#D97706' : '#D8D0F0',
-              }}
-            />
+                flexShrink: 0,
+              }}>–</div>
+
+              {/* To time */}
+              <input
+                type="time"
+                value={row.to}
+                disabled={!row.open}
+                onChange={(e) => setDay(idx, { to: e.target.value })}
+                style={{
+                  ...timeInput,
+                  opacity: row.open ? 1 : 0.3,
+                  cursor: row.open ? 'text' : 'not-allowed',
+                  borderColor: row.open && row.from >= row.to ? '#D97706' : '#D8D0F0',
+                }}
+              />
+            </div>
           </div>
         ))}
       </div>
