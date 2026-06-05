@@ -55,6 +55,8 @@ export default function OnboardingClient({ token, initialState }: Props) {
       trades: initialState.trade_type ? [initialState.trade_type] : [],
       primaryTrade: initialState.trade_type || '',
     },
+    services: existingDraft.services ?? { selected: [] },
+    workingHours: existingDraft.workingHours ?? defaultWorkingHoursAnswers(),
     voice: existingDraft.voice ?? DEFAULT_VOICE,
   }));
 
@@ -163,7 +165,7 @@ export default function OnboardingClient({ token, initialState }: Props) {
         />
       ) : currentStep === 2 ? (
         <Step2ServicesOffered
-          values={answers.services ?? { selected: [] }}
+          values={answers.services!}
           onChange={setServicesAnswers}
           trades={trades}
           businessName={businessName}
@@ -179,7 +181,7 @@ export default function OnboardingClient({ token, initialState }: Props) {
         />
       ) : currentStep === 4 ? (
         <Step4WorkingHours
-          values={answers.workingHours ?? defaultWorkingHoursAnswers()}
+          values={answers.workingHours!}
           onChange={setWorkingHoursAnswers}
         />
       ) : currentStep === 5 ? (
