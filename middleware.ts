@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/jwt';
 
 const PUBLIC_PATHS = ['/', '/login', '/privacy', '/terms', '/cookies', '/forgot-password', '/reset-password'];
+const PUBLIC_PREFIXES = ['/onboarding'];
 
 function isPublic(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true;
+  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) return true;
   if (pathname.startsWith('/api/auth')) return true;
   if (pathname.startsWith('/api/voice')) return true;
   if (pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/logo')) return true;
@@ -18,6 +20,7 @@ function isAppPath(pathname: string): boolean {
   if (pathname.startsWith('/dashboard')) return true;
   if (pathname.startsWith('/va')) return true;
   if (pathname.startsWith('/login')) return true;
+  if (pathname.startsWith('/onboarding')) return true;
   if (pathname.startsWith('/api')) return true;
   if (pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/logo')) return true;
   if (pathname.match(/\.(ico|png|jpg|jpeg|svg|mp3|webp|woff2?)$/)) return true;
