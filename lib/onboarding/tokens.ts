@@ -65,8 +65,9 @@ export async function validateToken(token: string): Promise<ValidateResult> {
   const row = rows.find((r) => (r[0] || '').replace(/^'+/, '').trim() === token);
   if (!row) return { valid: false };
 
-  const status = (row[3] || '').trim();
-  if (status === 'completed') return { valid: false };
+  const status = (row[3] || '').trim().toLowerCase();
+  // Closed states — reject. Empty/blank → treat as 'pending' (fail-open into wizard).
+  if (status === 'completed' || status === 'abandoned') return { valid: false };
 
   const createdAt = (row[5] || '').trim();
   if (createdAt) {
