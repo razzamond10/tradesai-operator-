@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { tradeKey, TRADE_SERVICES, getUnionServicesForTrades } from '@/lib/onboarding/tradeUtils';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -143,6 +143,16 @@ export default function Step3Pricing({
   const [rows, setRows] = useState<Row[]>(() =>
     initRows(initialRows, selectedServices, primaryTrade)
   );
+
+  // Sync initial rows to parent answers on mount so answers.pricing is never
+  // undefined after Step 3 first renders. Without this, Next stays blocked and
+  // A8 saves no pricing key until the user edits a row.
+  // Empty dep array — runs exactly once on mount, never loops.
+  useEffect(() => {
+    onChange({ rows: rowsToOutput(rows) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [showAdder, setShowAdder] = useState(false);
   const [addSelection, setAddSelection] = useState('');
   const [customName, setCustomName] = useState('');
