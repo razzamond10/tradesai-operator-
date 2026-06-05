@@ -61,6 +61,9 @@ export default function OnboardingClient({ token, initialState }: Props) {
   const isFirstStep = currentStep === 1;
   const isLastStep = currentStep === TOTAL_STEPS;
 
+  // Save status — drives the subtle non-blocking indicator.
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saved' | 'error'>('idle');
+
   // Next is gated only on steps with real forms. Placeholders always allow Next.
   const canNext =
     (currentStep === 1 ? step1Valid(answers.business) : true) &&
@@ -72,8 +75,34 @@ export default function OnboardingClient({ token, initialState }: Props) {
     setCurrentStep(Math.max(1, Math.min(TOTAL_STEPS, step)));
   }
 
+  // Non-blocking background save — navigate immediately, write to sheet in background.
+  // A failed or slow save must never trap the user mid-wizard; in-memory answers
+  // already persist for the session. Sheet write only powers cross-session resume.
+  function saveProgress(landingStep: number, currentAnswers: Answers) {
+    setSaveStatus('idle');
+    fetch(`/api/onboarding/${token}/save`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ currentStep: landingStep, answers: currentAnswers }),
+    })
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.ok) {
+          setSaveStatus('saved');
+          setTimeout(() => setSaveStatus('idle'), 2000);
+        } else {
+          setSaveStatus('error');
+        }
+      })
+      .catch(() => setSaveStatus('error'));
+  }
+
   function next() {
-    if (!isLastStep && canNext) goToStep(currentStep + 1);
+    if (!isLastStep && canNext) {
+      const landingStep = currentStep + 1;
+      goToStep(landingStep);
+      saveProgress(landingStep, answers); // fire-and-forget — do NOT await
+    }
   }
 
   function back() {
@@ -81,7 +110,11 @@ export default function OnboardingClient({ token, initialState }: Props) {
   }
 
   function skip() {
-    if (!isLastStep) goToStep(currentStep + 1);
+    if (!isLastStep) {
+      const landingStep = currentStep + 1;
+      goToStep(landingStep);
+      saveProgress(landingStep, answers); // fire-and-forget — do NOT await
+    }
   }
 
   function setBusinessAnswers(b: BusinessAnswers) {
@@ -104,14 +137,12 @@ export default function OnboardingClient({ token, initialState }: Props) {
     setAnswers((prev) => ({ ...prev, voice: v }));
   }
 
-  // Silence until A8 persistence wires it.
-  void token;
-
   const businessName = answers.business?.business_name || initialState.business_name || '';
   const trades = answers.business?.trades ?? [];
   const primaryTrade = answers.business?.primaryTrade ?? '';
 
   return (
+    <>
     <WizardShell
       currentStep={currentStep}
       totalSteps={TOTAL_STEPS}
@@ -160,6 +191,34 @@ export default function OnboardingClient({ token, initialState }: Props) {
         <StepPlaceholder step={currentStep} />
       )}
     </WizardShell>
+
+    {/* Subtle non-blocking save indicator — fixed overlay, never blocks navigation */}
+    {saveStatus !== 'idle' && (
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 50,
+        padding: '8px 14px',
+        borderRadius: '8px',
+        fontSize: '11px',
+        fontWeight: 600,
+        fontFamily: '"Inter", sans-serif',
+        whiteSpace: 'nowrap',
+        pointerEvents: 'none',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+        ...(saveStatus === 'saved'
+          ? { background: '#E6F9F0', border: '1px solid rgba(0,160,90,0.3)', color: '#00A05A' }
+          : { background: '#FFFBEB', border: '1px solid #FDE68A', color: '#92400E' }
+        ),
+      }}>
+        {saveStatus === 'saved'
+          ? '✓ Progress saved'
+          : '⚠ Couldn\'t save progress — your answers are safe for this session'}
+      </div>
+    )}
+    </>
   );
 }
 

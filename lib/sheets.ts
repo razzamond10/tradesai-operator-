@@ -521,6 +521,72 @@ export async function logBooking(
   });
 }
 
+// ── Onboarding progress ───────────────────────────────────────────────────────
+
+/**
+ * Update E (current_step), G (last_activity_at), I (draft_json) on the
+ * Onboarding row whose col A matches `token`.
+ *
+ * Rules applied:
+ *   Rule 67 — reuses getWriteAuth(), never splits auth.
+ *   Rule 70 — trim() all reads.
+ *   Rule 90 — strip leading apostrophe from col A before comparing.
+ *   draft_json written RAW JSON (no leading apostrophe — Rule 8 is phone cols only).
+ *   last_activity_at stored as ISO (Rule 59).
+ *
+ * Returns { ok: false, reason: 'not_found' } without throwing if the token
+ * has no matching row — caller decides how to surface this.
+ */
+export async function saveOnboardingProgress(
+  token: string,
+  currentStep: number,
+  answers: Record<string, unknown>,
+): Promise<{ ok: boolean; reason?: string }> {
+  const spreadsheetId = process.env.MASTER_SHEET_ID!;
+  const tabName = await resolveTabName(spreadsheetId, 'onboarding');
+
+  // Read only col A — cheaper than the full A2:L validateToken uses.
+  const colA = await readSheet(spreadsheetId, `'${tabName}'!A2:A`);
+
+  let rowIndex = -1;
+  for (let i = 0; i < colA.length; i++) {
+    // Rule 90: strip leading apostrophe  Rule 70: trim
+    if ((colA[i]?.[0] ?? '').replace(/^'+/, '').trim() === token) {
+      rowIndex = i;
+      break;
+    }
+  }
+  if (rowIndex < 0) return { ok: false, reason: 'not_found' };
+
+  const sheetRow = rowIndex + 2; // +1 for header row, +1 for 1-based indexing
+  const auth = getWriteAuth();   // Rule 67: reuse existing write auth
+  const sheets = google.sheets({ version: 'v4', auth });
+
+  // Single batchUpdate call: update E, G, I without disturbing F or H.
+  await sheets.spreadsheets.values.batchUpdate({
+    spreadsheetId,
+    requestBody: {
+      valueInputOption: 'RAW',
+      data: [
+        {
+          range: `'${tabName}'!E${sheetRow}`,
+          values: [[currentStep]],
+        },
+        {
+          range: `'${tabName}'!G${sheetRow}`,
+          values: [[new Date().toISOString()]],  // ISO (Rule 59)
+        },
+        {
+          range: `'${tabName}'!I${sheetRow}`,
+          values: [[JSON.stringify(answers)]],   // raw JSON — no apostrophe prefix
+        },
+      ],
+    },
+  });
+
+  return { ok: true };
+}
+
 /** Find a client config by their Twilio number. */
 export async function getClientByTwilioNumber(twilioNumber: string): Promise<ClientConfig | null> {
   const configs = await getClientConfigs();

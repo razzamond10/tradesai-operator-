@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from '@/lib/jwt';
 
 const PUBLIC_PATHS = ['/', '/login', '/privacy', '/terms', '/cookies', '/forgot-password', '/reset-password'];
-const PUBLIC_PREFIXES = ['/onboarding'];
+const PUBLIC_PREFIXES = ['/onboarding', '/api/onboarding'];
 
 function isPublic(pathname: string): boolean {
   if (PUBLIC_PATHS.includes(pathname)) return true;
