@@ -2,7 +2,7 @@
 
 export const STEP_NAMES = [
   'Business Info',
-  'Service Area',
+  'Services Offered',
   'Call Handling',
   'Calendar & Booking',
   'Review & Launch',

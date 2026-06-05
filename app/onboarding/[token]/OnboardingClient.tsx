@@ -6,13 +6,18 @@ import Step1BusinessDetails, {
   type BusinessAnswers,
   step1Valid,
 } from './Step1BusinessDetails';
+import Step2ServicesOffered, {
+  type ServicesAnswers,
+  step2Valid,
+} from './Step2ServicesOffered';
 
 const TOTAL_STEPS = 5;
 
 // Typed answers — one namespace per step so steps don't collide.
-// Steps 2–5 are added as A2–A5 are built.
+// Steps 3–5 are added as A3–A5 are built.
 interface Answers {
   business?: BusinessAnswers;
+  services?: ServicesAnswers;
 }
 
 interface Props {
@@ -41,7 +46,9 @@ export default function OnboardingClient({ token, initialState }: Props) {
   const isLastStep = currentStep === TOTAL_STEPS;
 
   // Next is gated only on steps with real forms. Placeholders always allow Next.
-  const canNext = currentStep !== 1 || step1Valid(answers.business);
+  const canNext =
+    (currentStep === 1 ? step1Valid(answers.business) : true) &&
+    (currentStep === 2 ? step2Valid(answers.services) : true);
 
   function goToStep(step: number) {
     setCurrentStep(Math.max(1, Math.min(TOTAL_STEPS, step)));
@@ -64,6 +71,10 @@ export default function OnboardingClient({ token, initialState }: Props) {
     setAnswers((prev) => ({ ...prev, business: b }));
   }
 
+  function setServicesAnswers(s: ServicesAnswers) {
+    setAnswers((prev) => ({ ...prev, services: s }));
+  }
+
   // Silence unused vars until A8 persistence wires them.
   void token;
 
@@ -83,6 +94,13 @@ export default function OnboardingClient({ token, initialState }: Props) {
         <Step1BusinessDetails
           values={answers.business!}
           onChange={setBusinessAnswers}
+        />
+      ) : currentStep === 2 ? (
+        <Step2ServicesOffered
+          values={answers.services ?? { selected: [] }}
+          onChange={setServicesAnswers}
+          tradeType={answers.business?.trade_type ?? ''}
+          businessName={answers.business?.business_name ?? initialState.business_name ?? ''}
         />
       ) : (
         <StepPlaceholder step={currentStep} />
