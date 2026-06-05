@@ -14,15 +14,20 @@ import Step3Pricing, {
   type PricingAnswers,
   step3Valid,
 } from './Step3Pricing';
+import Step4WorkingHours, {
+  type WorkingHoursAnswers,
+  defaultWorkingHoursAnswers,
+  step4Valid,
+} from './Step4WorkingHours';
 
 const TOTAL_STEPS = 5;
 
 // Typed answers — one namespace per step so steps don't collide.
-// Steps 4–5 added as A4–A5 are built.
 interface Answers {
   business?: BusinessAnswers;
   services?: ServicesAnswers;
   pricing?: PricingAnswers;
+  workingHours?: WorkingHoursAnswers;
 }
 
 interface Props {
@@ -56,7 +61,8 @@ export default function OnboardingClient({ token, initialState }: Props) {
   const canNext =
     (currentStep === 1 ? step1Valid(answers.business) : true) &&
     (currentStep === 2 ? step2Valid(answers.services) : true) &&
-    (currentStep === 3 ? step3Valid(answers.pricing) : true);
+    (currentStep === 3 ? step3Valid(answers.pricing) : true) &&
+    (currentStep === 4 ? step4Valid(answers.workingHours) : true);
 
   function goToStep(step: number) {
     setCurrentStep(Math.max(1, Math.min(TOTAL_STEPS, step)));
@@ -84,6 +90,10 @@ export default function OnboardingClient({ token, initialState }: Props) {
 
   function setPricingAnswers(p: PricingAnswers) {
     setAnswers((prev) => ({ ...prev, pricing: p }));
+  }
+
+  function setWorkingHoursAnswers(w: WorkingHoursAnswers) {
+    setAnswers((prev) => ({ ...prev, workingHours: w }));
   }
 
   // Silence until A8 persistence wires it.
@@ -125,6 +135,11 @@ export default function OnboardingClient({ token, initialState }: Props) {
           primaryTrade={primaryTrade}
           businessName={businessName}
           onChange={setPricingAnswers}
+        />
+      ) : currentStep === 4 ? (
+        <Step4WorkingHours
+          values={answers.workingHours ?? defaultWorkingHoursAnswers()}
+          onChange={setWorkingHoursAnswers}
         />
       ) : (
         <StepPlaceholder step={currentStep} />
