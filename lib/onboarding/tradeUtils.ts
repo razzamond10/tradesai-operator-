@@ -58,3 +58,47 @@ export function getServicesForTrade(rawTrade: string): string[] {
   const key = tradeKey(rawTrade);
   return (key ? TRADE_SERVICES[key] : null) ?? UNIVERSAL_FALLBACK;
 }
+
+// ── Multi-trade helpers ───────────────────────────────────────────────────────
+
+export interface TradeServiceGroup {
+  key: string;       // canonical trade key e.g. 'plumbing'
+  label: string;     // display name as user entered e.g. 'Plumbing'
+  services: string[];
+}
+
+/**
+ * Merge services across multiple trades, de-duped (first trade wins on collision).
+ * Primary trade (rawTrades[0]) appears first.
+ * Falls back to UNIVERSAL_FALLBACK when rawTrades is empty or all unrecognised.
+ */
+export function getMergedServicesForTrades(rawTrades: string[]): TradeServiceGroup[] {
+  const seen = new Set<string>();
+  const groups: TradeServiceGroup[] = [];
+
+  for (const raw of rawTrades) {
+    const k = tradeKey(raw);
+    if (!k) continue;
+    const all = TRADE_SERVICES[k] ?? [];
+    const unique = all.filter((s) => !seen.has(s));
+    unique.forEach((s) => seen.add(s));
+    if (unique.length > 0) {
+      groups.push({ key: k, label: raw, services: unique });
+    }
+  }
+
+  if (groups.length === 0) {
+    // All trades invalid or empty → universal fallback as a single group
+    return [{ key: 'other', label: 'Other', services: [...UNIVERSAL_FALLBACK] }];
+  }
+
+  return groups;
+}
+
+/**
+ * Flat de-duped union of services across all trades — for Step 3 Add dropdown.
+ * Falls back to UNIVERSAL_FALLBACK when rawTrades is empty or all unrecognised.
+ */
+export function getUnionServicesForTrades(rawTrades: string[]): string[] {
+  return getMergedServicesForTrades(rawTrades).flatMap((g) => g.services);
+}

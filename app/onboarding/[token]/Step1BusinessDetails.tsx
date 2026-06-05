@@ -6,7 +6,8 @@ export interface BusinessAnswers {
   owner_name: string;
   phone: string;
   email: string;
-  trade_type: string;
+  trades: string[];        // display names, e.g. ['Plumbing', 'Gas/Heating']
+  primaryTrade: string;    // = trades[0] || ''
 }
 
 export const TRADE_TYPES = [
@@ -16,7 +17,6 @@ export const TRADE_TYPES = [
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/** Lenient UK phone check — only warns if there are no digits at all. */
 function looksLikePhone(v: string): boolean {
   return /\d/.test(v);
 }
@@ -30,9 +30,11 @@ export function step1Valid(b: BusinessAnswers | undefined): boolean {
     looksLikePhone(b.phone) &&
     b.email.trim() !== '' &&
     EMAIL_RE.test(b.email.trim()) &&
-    b.trade_type !== ''
+    b.trades.length >= 1
   );
 }
+
+type TextFieldKey = 'business_name' | 'owner_name' | 'phone' | 'email';
 
 interface Props {
   values: BusinessAnswers;
@@ -40,18 +42,27 @@ interface Props {
 }
 
 export default function Step1BusinessDetails({ values, onChange }: Props) {
-  const [touched, setTouched] = useState<Partial<Record<keyof BusinessAnswers, true>>>({});
-  const [focused, setFocused] = useState<keyof BusinessAnswers | null>(null);
+  const [touched, setTouched] = useState<Partial<Record<TextFieldKey, true>>>({});
+  const [focused, setFocused] = useState<TextFieldKey | null>(null);
+  const [touchedTrades, setTouchedTrades] = useState(false);
 
-  function set(field: keyof BusinessAnswers, value: string) {
+  function set(field: TextFieldKey, value: string) {
     onChange({ ...values, [field]: value });
   }
 
-  function touch(field: keyof BusinessAnswers) {
+  function touch(field: TextFieldKey) {
     setTouched((t) => ({ ...t, [field]: true }));
   }
 
-  const errors: Partial<Record<keyof BusinessAnswers, string>> = {};
+  function toggleTrade(displayName: string) {
+    setTouchedTrades(true);
+    const next = values.trades.includes(displayName)
+      ? values.trades.filter((t) => t !== displayName)
+      : [...values.trades, displayName];
+    onChange({ ...values, trades: next, primaryTrade: next[0] || '' });
+  }
+
+  const errors: Partial<Record<TextFieldKey, string>> = {};
   if (touched.business_name && !values.business_name.trim()) {
     errors.business_name = 'Business name is required.';
   }
@@ -66,11 +77,8 @@ export default function Step1BusinessDetails({ values, onChange }: Props) {
     if (!values.email.trim()) errors.email = 'Email address is required.';
     else if (!EMAIL_RE.test(values.email.trim())) errors.email = 'Please enter a valid email address.';
   }
-  if (touched.trade_type && !values.trade_type) {
-    errors.trade_type = 'Please select your trade type.';
-  }
 
-  function borderColor(field: keyof BusinessAnswers, hasError: boolean): string {
+  function borderColor(field: TextFieldKey, hasError: boolean): string {
     if (focused === field) return '#3D1FA8';
     if (hasError) return '#C01830';
     return '#D8D0F0';
@@ -91,6 +99,8 @@ export default function Step1BusinessDetails({ values, onChange }: Props) {
     borderStyle: 'solid',
     borderWidth: '1px',
   };
+
+  const noTradesError = touchedTrades && values.trades.length === 0;
 
   return (
     <div style={{ padding: '20px 20px 24px' }}>
@@ -148,30 +158,94 @@ export default function Step1BusinessDetails({ values, onChange }: Props) {
           />
         </Field>
 
-        {/* Trade type */}
-        <Field label="Trade type" required error={errors.trade_type}>
-          <select
-            value={values.trade_type}
-            onChange={(e) => { set('trade_type', e.target.value); touch('trade_type'); }}
-            onFocus={() => setFocused('trade_type')}
-            onBlur={() => { setFocused(null); touch('trade_type'); }}
-            style={{
-              ...baseInput,
-              borderColor: borderColor('trade_type', !!errors.trade_type),
-              color: values.trade_type ? 'var(--ink, #1A1A2E)' : '#888',
-              appearance: 'none',
-              WebkitAppearance: 'none',
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E")`,
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'right 14px center',
-              paddingRight: '36px',
-            }}
-          >
-            <option value="" disabled>Select your trade…</option>
-            {TRADE_TYPES.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
+        {/* Trade type — multi-select checkbox group */}
+        <Field
+          label="Trade type"
+          required
+          error={noTradesError ? 'Select at least one trade to continue.' : undefined}
+        >
+          <div style={{ fontSize: '11px', color: 'var(--muted, #888)', marginBottom: '10px', lineHeight: 1.5 }}>
+            Select all trades{values.business_name ? ` ${values.business_name}` : ''} covers — many cover
+            more than one (e.g. plumbing + gas).
+          </div>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+            gap: '8px',
+          }}>
+            {TRADE_TYPES.map((t) => {
+              const checked = values.trades.includes(t);
+              const isPrimary = checked && values.trades[0] === t;
+              return (
+                <label
+                  key={t}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '9px',
+                    minHeight: '44px',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: `1px solid ${checked ? 'rgba(61,31,168,0.3)' : noTradesError ? '#C01830' : 'var(--divider, #E8E8EE)'}`,
+                    background: checked ? 'var(--a1b, #EDE8FF)' : '#FAFAFC',
+                    cursor: 'pointer',
+                    userSelect: 'none',
+                    transition: 'all .15s',
+                  }}
+                >
+                  {/* Custom checkbox box */}
+                  <div style={{
+                    width: '18px',
+                    height: '18px',
+                    borderRadius: '4px',
+                    border: `2px solid ${checked ? 'var(--a1, #3D1FA8)' : '#D8D0F0'}`,
+                    background: checked ? 'var(--a1, #3D1FA8)' : '#fff',
+                    flexShrink: 0,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all .15s',
+                  }}>
+                    {checked && (
+                      <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                        <path d="M1 4l3 3 5-6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    )}
+                  </div>
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => toggleTrade(t)}
+                    style={{ position: 'absolute', opacity: 0, width: 0, height: 0 }}
+                    aria-label={t}
+                  />
+                  <span style={{
+                    flex: 1,
+                    fontSize: '12px',
+                    fontWeight: checked ? 600 : 500,
+                    color: checked ? 'var(--a1, #3D1FA8)' : 'var(--ink, #1A1A2E)',
+                    lineHeight: 1.3,
+                  }}>
+                    {t}
+                    {isPrimary && values.trades.length > 1 && (
+                      <span style={{
+                        display: 'block',
+                        fontSize: '9px',
+                        fontWeight: 700,
+                        color: 'var(--a1, #3D1FA8)',
+                        opacity: 0.7,
+                        letterSpacing: '.4px',
+                        textTransform: 'uppercase',
+                        marginTop: '1px',
+                      }}>
+                        primary
+                      </span>
+                    )}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
         </Field>
 
       </div>
