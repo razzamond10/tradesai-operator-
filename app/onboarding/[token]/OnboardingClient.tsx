@@ -20,6 +20,7 @@ import Step4WorkingHours, {
   step4Valid,
 } from './Step4WorkingHours';
 import Step5Review from './Step5Review';
+import { type VoiceOption, DEFAULT_VOICE } from '@/components/wizard/VoicePicker';
 
 const TOTAL_STEPS = 5;
 
@@ -29,6 +30,7 @@ interface Answers {
   services?: ServicesAnswers;
   pricing?: PricingAnswers;
   workingHours?: WorkingHoursAnswers;
+  voice?: VoiceOption;
 }
 
 interface Props {
@@ -53,6 +55,7 @@ export default function OnboardingClient({ token, initialState }: Props) {
       trades: initialState.trade_type ? [initialState.trade_type] : [],
       primaryTrade: initialState.trade_type || '',
     },
+    voice: existingDraft.voice ?? DEFAULT_VOICE,
   }));
 
   const isFirstStep = currentStep === 1;
@@ -97,6 +100,10 @@ export default function OnboardingClient({ token, initialState }: Props) {
     setAnswers((prev) => ({ ...prev, workingHours: w }));
   }
 
+  function setVoiceAnswer(v: VoiceOption) {
+    setAnswers((prev) => ({ ...prev, voice: v }));
+  }
+
   // Silence until A8 persistence wires it.
   void token;
 
@@ -120,6 +127,8 @@ export default function OnboardingClient({ token, initialState }: Props) {
         <Step1BusinessDetails
           values={answers.business!}
           onChange={setBusinessAnswers}
+          voice={answers.voice ?? DEFAULT_VOICE}
+          onVoiceChange={setVoiceAnswer}
         />
       ) : currentStep === 2 ? (
         <Step2ServicesOffered

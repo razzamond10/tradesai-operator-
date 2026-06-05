@@ -12,6 +12,7 @@ interface AllAnswers {
   services?: ServicesAnswers;
   pricing?: PricingAnswers;
   workingHours?: WorkingHoursAnswers;
+  voice?: { key: string; label: string };
 }
 
 interface Props {
@@ -194,6 +195,14 @@ export default function Step5Review({ answers, onGoToStep }: Props) {
       <SectionHeading>Review your details</SectionHeading>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '28px' }}>
+
+        {/* AI voice */}
+        <ReviewBlock title="AI voice" onEdit={() => onGoToStep(1)}>
+          {answers.voice
+            ? <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--ink, #1A1A2E)' }}>{answers.voice.label}</span>
+            : <NotProvided />
+          }
+        </ReviewBlock>
 
         {/* Business */}
         <ReviewBlock title="Business" onEdit={() => onGoToStep(1)}>

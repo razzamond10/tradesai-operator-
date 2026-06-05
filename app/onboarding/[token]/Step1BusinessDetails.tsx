@@ -1,5 +1,6 @@
 'use client';
 import { useState } from 'react';
+import VoicePicker, { type VoiceOption } from '@/components/wizard/VoicePicker';
 
 export interface BusinessAnswers {
   business_name: string;
@@ -39,9 +40,11 @@ type TextFieldKey = 'business_name' | 'owner_name' | 'phone' | 'email';
 interface Props {
   values: BusinessAnswers;
   onChange: (values: BusinessAnswers) => void;
+  voice: VoiceOption;
+  onVoiceChange: (v: VoiceOption) => void;
 }
 
-export default function Step1BusinessDetails({ values, onChange }: Props) {
+export default function Step1BusinessDetails({ values, onChange, voice, onVoiceChange }: Props) {
   const [touched, setTouched] = useState<Partial<Record<TextFieldKey, true>>>({});
   const [focused, setFocused] = useState<TextFieldKey | null>(null);
   const [touchedTrades, setTouchedTrades] = useState(false);
@@ -249,6 +252,12 @@ export default function Step1BusinessDetails({ values, onChange }: Props) {
         </Field>
 
       </div>
+
+      {/* ── Voice picker — visually distinct section at bottom of Step 1 ──── */}
+      <div style={{ marginTop: '24px' }}>
+        <VoicePicker value={voice} onChange={onVoiceChange} />
+      </div>
+
     </div>
   );
 }
