@@ -1,10 +1,19 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import WizardShell, { STEP_NAMES } from '@/components/wizard/WizardShell';
 import type { TokenValidResult } from '@/lib/onboarding/tokens';
+import Step1BusinessDetails, {
+  type BusinessAnswers,
+  step1Valid,
+} from './Step1BusinessDetails';
 
 const TOTAL_STEPS = 5;
+
+// Typed answers — one namespace per step so steps don't collide.
+// Steps 2–5 are added as A2–A5 are built.
+interface Answers {
+  business?: BusinessAnswers;
+}
 
 interface Props {
   token: string;
@@ -12,21 +21,34 @@ interface Props {
 }
 
 export default function OnboardingClient({ token, initialState }: Props) {
-  const router = useRouter();
   const [currentStep, setCurrentStep] = useState(initialState.current_step);
-  const [answers, setAnswers] = useState<Record<string, unknown>>(
-    initialState.draft_json ?? {}
-  );
+
+  // Pre-fill step 1 from the token row (business_name, client_email, trade_type).
+  // If draft_json already has a business namespace (resume flow), use that instead.
+  const existingDraft = (initialState.draft_json ?? {}) as Answers;
+  const [answers, setAnswers] = useState<Answers>(() => ({
+    ...existingDraft,
+    business: existingDraft.business ?? {
+      business_name: initialState.business_name || '',
+      owner_name: '',
+      phone: '',
+      email: initialState.client_email || '',
+      trade_type: initialState.trade_type || '',
+    },
+  }));
 
   const isFirstStep = currentStep === 1;
   const isLastStep = currentStep === TOTAL_STEPS;
+
+  // Next is gated only on steps with real forms. Placeholders always allow Next.
+  const canNext = currentStep !== 1 || step1Valid(answers.business);
 
   function goToStep(step: number) {
     setCurrentStep(Math.max(1, Math.min(TOTAL_STEPS, step)));
   }
 
   function next() {
-    if (!isLastStep) goToStep(currentStep + 1);
+    if (!isLastStep && canNext) goToStep(currentStep + 1);
   }
 
   function back() {
@@ -34,27 +56,37 @@ export default function OnboardingClient({ token, initialState }: Props) {
   }
 
   function skip() {
+    // Skip bypasses per-step validation by design (item 8).
     if (!isLastStep) goToStep(currentStep + 1);
   }
 
-  // Expose setAnswers for step bodies when built (A1–A5)
-  void answers;
-  void setAnswers;
-  void router;
+  function setBusinessAnswers(b: BusinessAnswers) {
+    setAnswers((prev) => ({ ...prev, business: b }));
+  }
+
+  // Silence unused vars until A8 persistence wires them.
   void token;
 
   return (
     <WizardShell
       currentStep={currentStep}
       totalSteps={TOTAL_STEPS}
-      businessName={initialState.business_name || undefined}
+      businessName={answers.business?.business_name || initialState.business_name || undefined}
       onBack={back}
       onNext={next}
       onSkip={skip}
       isFirstStep={isFirstStep}
       isLastStep={isLastStep}
+      nextDisabled={!canNext}
     >
-      <StepPlaceholder step={currentStep} />
+      {currentStep === 1 ? (
+        <Step1BusinessDetails
+          values={answers.business!}
+          onChange={setBusinessAnswers}
+        />
+      ) : (
+        <StepPlaceholder step={currentStep} />
+      )}
     </WizardShell>
   );
 }

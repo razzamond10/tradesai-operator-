@@ -17,6 +17,7 @@ interface WizardShellProps {
   onSkip: () => void;
   isFirstStep: boolean;
   isLastStep: boolean;
+  nextDisabled?: boolean;
   children: React.ReactNode;
 }
 
@@ -29,6 +30,7 @@ export default function WizardShell({
   onSkip,
   isFirstStep,
   isLastStep,
+  nextDisabled = false,
   children,
 }: WizardShellProps) {
   const pct = Math.round((currentStep / totalSteps) * 100);
@@ -264,18 +266,20 @@ export default function WizardShell({
             )}
 
             <button
-              onClick={onNext}
+              onClick={nextDisabled ? undefined : onNext}
+              disabled={nextDisabled}
               style={{
                 padding: '10px 24px',
                 borderRadius: '8px',
                 fontSize: '12px',
                 fontWeight: 700,
                 border: 'none',
-                cursor: 'pointer',
-                background: 'var(--a1, #3D1FA8)',
+                cursor: nextDisabled ? 'not-allowed' : 'pointer',
+                background: nextDisabled ? 'var(--a1, #3D1FA8)' : 'var(--a1, #3D1FA8)',
                 color: '#fff',
                 fontFamily: '"Inter", sans-serif',
                 transition: 'all .15s',
+                opacity: nextDisabled ? 0.4 : 1,
               }}
             >
               {isLastStep ? 'Launch →' : 'Next →'}
