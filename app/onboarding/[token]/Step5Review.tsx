@@ -84,6 +84,10 @@ export default function Step5Review({ answers, onGoToStep }: Props) {
 
   // ── Main view ──────────────────────────────────────────────────────────────
 
+  const fwdNoNumber =
+    answers.workingHours?.emergency?.outOfHoursAction === 'forward' &&
+    !answers.workingHours.emergency.onCallNumber?.trim();
+
   return (
     <div style={{ padding: '20px 20px 28px' }}>
 
@@ -354,6 +358,11 @@ export default function Step5Review({ answers, onGoToStep }: Props) {
                   {OUT_OF_HOURS_LABELS[answers.workingHours.emergency.outOfHoursAction]
                     ?? answers.workingHours.emergency.outOfHoursAction}
                 </span>
+                {fwdNoNumber && (
+                  <span style={{ fontSize: '11px', color: '#D97706', fontWeight: 600 }}>
+                    {' '}⚠ no on-call number
+                  </span>
+                )}
               </div>
               {/* On-call number — only shown when action === 'forward' */}
               {answers.workingHours.emergency.outOfHoursAction === 'forward' &&
