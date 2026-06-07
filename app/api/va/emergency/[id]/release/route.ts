@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAdminOrVA } from '@/lib/apiAuth';
 import { logVAAction } from '@/lib/vaActions';
-import { getClientConfig, resolveTabName } from '@/lib/sheets';
+import { getClientConfig, resolveTabName, normTimestamp } from '@/lib/sheets';
 import { google } from 'googleapis';
 
 export async function POST(req: NextRequest) {
@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
       spreadsheetId: config.sheetId, range: `'${tabName}'!A3:M`,
     });
     const rows = read.data.values || [];
-    const idx = rows.findIndex((r) => (r[0] || '').replace(/^'+/, '').trim() === timestamp);
+    const target = normTimestamp(timestamp);
+    const idx = rows.findIndex((r) => normTimestamp((r[0] || '').replace(/^'+/, '').trim()) === target);
     if (idx < 0) return Response.json({ error: 'Emergency not found' }, { status: 404 });
     const before = rows[idx][9] || '';
     if (before && before !== session.email && session.role !== 'admin') {

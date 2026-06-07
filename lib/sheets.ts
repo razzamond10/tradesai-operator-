@@ -79,7 +79,7 @@ function toSlug(name: string): string {
  * Handles: "DD/MM/YYYY HH:MM:SS" (UK Sheets locale), "MM/DD/YYYY ..." (US),
  * and already-ISO "YYYY-MM-DD ..." strings.
  */
-function normTimestamp(raw: string): string {
+export function normTimestamp(raw: string): string {
   if (!raw) return '';
   // Already starts with YYYY- → keep as-is
   if (/^\d{4}-/.test(raw)) return raw;
