@@ -54,10 +54,12 @@ export default function VACommDetailClient({ user, id }: { user: JWTPayload; id:
   const [toast, setToast] = useState('');
   const [noteOpen, setNoteOpen] = useState(false);
 
-  const conversationId = decodeURIComponent(id);
+  const decoded = decodeURIComponent(id);
+  const isCompound = decoded.includes('__');
+  const conversationId = isCompound ? null : decoded;
 
   useEffect(() => {
-    if (!conversationId) {
+    if (!decoded) {
       setError('Invalid conversation ID');
       setLoading(false);
       return;
@@ -65,28 +67,46 @@ export default function VACommDetailClient({ user, id }: { user: JWTPayload; id:
 
     async function load() {
       try {
-        const cr = await fetch('/api/clients');
-        const cd = await cr.json();
-        if (cd.error) { setError(cd.error); setLoading(false); return; }
-        const clients: ClientConfig[] = cd.clients || [];
-
         let found: InteractionDetail | null = null;
-        for (const c of clients) {
-          try {
-            const dr = await fetch(`/api/clients/${encodeURIComponent(c.clientId)}/data`);
-            const dd = await dr.json();
-            const interactions: RawInteraction[] = dd.interactions || [];
-            const match = interactions.find(r => (r.conversationId || '') === conversationId);
-            if (match) {
-              found = {
-                ...match,
-                clientId: c.clientId,
-                clientName: dd.config?.businessName || c.businessName || 'Unknown client',
-              };
-              break;
+
+        if (isCompound) {
+          // Fast path: compound key `clientId__timestamp` — fetch only that client
+          const [scopedClientId, targetTimestamp] = decoded.split('__');
+          const dr = await fetch(`/api/clients/${encodeURIComponent(scopedClientId)}/data`);
+          const dd = await dr.json();
+          const interactions: RawInteraction[] = dd?.interactions || [];
+          const match = interactions.find(r => (r.timestamp || '') === targetTimestamp);
+          if (match) {
+            found = {
+              ...match,
+              clientId: scopedClientId,
+              clientName: dd.config?.businessName || dd.config?.business_name || 'Unknown client',
+            };
+          }
+        } else {
+          // Existing path: iterate all clients, match by conversationId
+          const cr = await fetch('/api/clients');
+          const cd = await cr.json();
+          if (cd.error) { setError(cd.error); setLoading(false); return; }
+          const clients: ClientConfig[] = cd.clients || [];
+
+          for (const c of clients) {
+            try {
+              const dr = await fetch(`/api/clients/${encodeURIComponent(c.clientId)}/data`);
+              const dd = await dr.json();
+              const interactions: RawInteraction[] = dd.interactions || [];
+              const match = interactions.find(r => (r.conversationId || '') === decoded);
+              if (match) {
+                found = {
+                  ...match,
+                  clientId: c.clientId,
+                  clientName: dd.config?.businessName || c.businessName || 'Unknown client',
+                };
+                break;
+              }
+            } catch {
+              // skip clients that fail to load
             }
-          } catch {
-            // skip clients that fail to load
           }
         }
 
@@ -112,10 +132,11 @@ export default function VACommDetailClient({ user, id }: { user: JWTPayload; id:
   }
 
   async function handleAddNote(note: string) {
-    const res = await fetch(`/api/va/interaction/${encodeURIComponent(conversationId)}/note`, {
+    const cid = record?.conversationId || '';
+    const res = await fetch(`/api/va/interaction/${encodeURIComponent(cid)}/note`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ clientId: record?.clientId, conversationId, note }),
+      body: JSON.stringify({ clientId: record?.clientId, conversationId: cid, note }),
     }).catch(() => null);
     if (!res || !res.ok) {
       showToast('Failed to save note — try again');

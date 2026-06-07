@@ -187,7 +187,12 @@ export default function VACommsClient({ user }: { user: JWTPayload }) {
                     const ob = outcomeBadge(it.outcome || '');
                     const ts = it.timestamp || '';
                     return (
-                      <tr key={i} onClick={it.conversationId ? () => router.push(`/va/communications/${encodeURIComponent(it.conversationId!)}`) : undefined} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: it.conversationId ? 'pointer' : 'default' }}>
+                      <tr key={i} onClick={(() => {
+                          const hasKey = !!(it.conversationId || it.timestamp);
+                          if (!hasKey) return undefined;
+                          const key = it.conversationId || `${it.clientId}__${it.timestamp || ''}`;
+                          return () => router.push(`/va/communications/${encodeURIComponent(key)}`);
+                        })()} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: !!(it.conversationId || it.timestamp) ? 'pointer' : 'default' }}>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--a1)', fontSize: '10px', whiteSpace: 'nowrap' }}>{it.clientName}</td>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--ink)' }}>{it.callerName || '—'}</td>
                         <td style={{ padding: '8px 12px' }}>

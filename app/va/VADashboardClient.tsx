@@ -44,6 +44,7 @@ interface FeedItem {
   outcome: string;
   timestamp: string;
   clientName: string;
+  clientId: string;
   conversationId?: string;
 }
 
@@ -83,9 +84,9 @@ export default function VADashboardClient({ user }: { user: JWTPayload }) {
             try {
               const dr = await fetch(`/api/clients/${c.clientId}/data`);
               const dd: ClientData = await dr.json();
-              return { clientName: c.businessName, data: dd };
+              return { clientName: c.businessName, clientId: c.clientId, data: dd };
             } catch {
-              return { clientName: c.businessName, data: null };
+              return { clientName: c.businessName, clientId: c.clientId, data: null };
             }
           })
         );
@@ -96,7 +97,7 @@ export default function VADashboardClient({ user }: { user: JWTPayload }) {
         const allFeed: FeedItem[] = [];
         const td = todayStr();
 
-        results.forEach(({ clientName, data }) => {
+        results.forEach(({ clientName, clientId, data }) => {
           if (!data) return;
           emergCount += (data.emergencies || []).filter(
             (e) => (e.resolved || '').toLowerCase() !== 'yes'
@@ -112,6 +113,7 @@ export default function VADashboardClient({ user }: { user: JWTPayload }) {
               outcome: it.outcome || '—',
               timestamp: it.timestamp || '',
               clientName,
+              clientId,
               conversationId: it.conversationId,
             });
           });
@@ -220,7 +222,12 @@ export default function VADashboardClient({ user }: { user: JWTPayload }) {
               </thead>
               <tbody>
                 {feed.map((it, i) => (
-                  <tr key={i} onClick={it.conversationId ? () => router.push(`/va/communications/${encodeURIComponent(it.conversationId!)}`) : undefined} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: it.conversationId ? 'pointer' : 'default' }}>
+                  <tr key={i} onClick={(() => {
+                      const hasKey = !!(it.conversationId || it.timestamp);
+                      if (!hasKey) return undefined;
+                      const key = it.conversationId || `${it.clientId}__${it.timestamp || ''}`;
+                      return () => router.push(`/va/communications/${encodeURIComponent(key)}`);
+                    })()} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', cursor: !!(it.conversationId || it.timestamp) ? 'pointer' : 'default' }}>
                     <td style={{ padding: '7px 12px', fontWeight: 600, color: 'var(--a1)', fontSize: '10px' }}>{it.clientName}</td>
                     <td style={{ padding: '7px 12px', fontWeight: 600, color: 'var(--ink)' }}>{it.callerName}</td>
                     <td style={{ padding: '7px 12px', color: 'var(--ink2)' }}>{it.intent}</td>
