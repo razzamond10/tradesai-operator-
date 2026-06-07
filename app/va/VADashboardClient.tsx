@@ -5,6 +5,7 @@ import { useClientTime } from '@/lib/hooks/useClientTime';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
+import { isResolved } from '@/lib/emergencyHelpers';
 
 interface ClientConfig {
   businessName: string;
@@ -100,7 +101,7 @@ export default function VADashboardClient({ user }: { user: JWTPayload }) {
         results.forEach(({ clientName, clientId, data }) => {
           if (!data) return;
           emergCount += (data.emergencies || []).filter(
-            (e) => (e.resolved || '').toLowerCase() !== 'yes'
+            (e) => !isResolved(e.resolved)
           ).length;
           bookCount += (data.bookings || []).filter(
             (b) => (b.scheduledDate || b.timestamp || '').startsWith(td)

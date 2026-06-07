@@ -7,6 +7,8 @@ import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
 import NoteModal from '@/components/va/NoteModal';
 import ConfirmModal from '@/components/va/ConfirmModal';
+import SelectModal from '@/components/va/SelectModal';
+import { isResolved } from '@/lib/emergencyHelpers';
 
 interface RawEmergency {
   businessName?: string;
@@ -41,7 +43,7 @@ function severityBadge(s: string) {
 }
 
 function resolvedBadge(r: string) {
-  return (r || '').toLowerCase() === 'yes'
+  return isResolved(r)
     ? { bg: 'var(--a3b)', color: 'var(--a3)', label: 'Resolved' }
     : { bg: 'var(--a4b)', color: 'var(--a4)', label: 'Open' };
 }
@@ -66,6 +68,7 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
   const [noteOpen, setNoteOpen] = useState(false);
   const [claimOpen, setClaimOpen] = useState(false);
   const [releaseOpen, setReleaseOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
 
   useEffect(() => {
     const parsed = decodeId(id);
@@ -133,6 +136,25 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
       throw new Error('release failed');
     }
     showToast('Emergency released');
+  }
+
+  async function handleSetStatus(newStatus: string) {
+    const res = await fetch(`/api/va/emergency/${encodeURIComponent(id)}/status`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientId: record?.clientId,
+        status: newStatus,
+        phone: record?.phone || '',
+        timestamp: ts,
+      }),
+    }).catch(() => null);
+    if (!res || !res.ok) {
+      showToast('Failed to update status — try again');
+      throw new Error('status update failed');
+    }
+    if (record) setRecord({ ...record, resolved: newStatus });
+    showToast('Status updated');
   }
 
   async function handleAddNote(note: string) {
@@ -227,7 +249,7 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <ActionButton label="Claim" onClick={() => setClaimOpen(true)} primary />
               <ActionButton label="Release" onClick={() => setReleaseOpen(true)} />
-              <ActionButton label="Set status" onClick={() => showToast('Wiring in Phase 4 — status dropdown coming')} />
+              <ActionButton label="Set status" onClick={() => setStatusOpen(true)} />
               <ActionButton label="Add note" onClick={() => setNoteOpen(true)} />
             </div>
           </>
@@ -245,6 +267,26 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
           title="Add note"
           onClose={() => setNoteOpen(false)}
           onSubmit={handleAddNote}
+        />
+
+        <SelectModal
+          isOpen={statusOpen}
+          title="Set emergency status"
+          message="This will be visible to all VAs and the client."
+          options={[
+            { value: 'open',         label: 'Open',         description: 'Awaiting action' },
+            { value: 'acknowledged', label: 'Acknowledged', description: 'VA has seen, action pending' },
+            { value: 'resolved',     label: 'Resolved',     description: 'Customer call complete, no further action' },
+            { value: 'escalated',    label: 'Escalated',    description: 'Passed to owner / engineer for follow-up' },
+          ]}
+          initialValue={
+            isResolved(record?.resolved) ? 'resolved' :
+            (record?.resolved && !['no', 'yes'].includes(record.resolved)) ? record.resolved :
+            'open'
+          }
+          confirmLabel="Save"
+          onClose={() => setStatusOpen(false)}
+          onConfirm={handleSetStatus}
         />
 
         <ConfirmModal

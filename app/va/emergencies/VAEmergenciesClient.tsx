@@ -5,6 +5,7 @@ import { useClientTime } from '@/lib/hooks/useClientTime';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
+import { isResolved } from '@/lib/emergencyHelpers';
 
 interface ClientConfig {
   businessName: string;
@@ -44,7 +45,7 @@ function severityBadge(s: string) {
 }
 
 function resolvedBadge(r: string) {
-  return (r || '').toLowerCase() === 'yes'
+  return isResolved(r)
     ? { bg: 'var(--a3b)', color: 'var(--a3)', label: 'Resolved' }
     : { bg: 'var(--a4b)', color: 'var(--a4)', label: 'Open' };
 }
@@ -96,8 +97,8 @@ export default function VAEmergenciesClient({ user }: { user: JWTPayload }) {
     load();
   }, []);
 
-  const open = emergencies.filter(e => (e.resolved || '').toLowerCase() !== 'yes');
-  const resolved = emergencies.filter(e => (e.resolved || '').toLowerCase() === 'yes');
+  const open = emergencies.filter(e => !isResolved(e.resolved));
+  const resolved = emergencies.filter(e => isResolved(e.resolved));
   const visible = filter === 'open' ? open : filter === 'resolved' ? resolved : emergencies;
 
   return (
