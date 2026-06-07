@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
       spreadsheetId: config.sheetId, range: `'${tabName}'!A3:M`,
     });
     const rows = read.data.values || [];
-    const idx = rows.findIndex(r => (r[3] || '').replace(/^'/, '') === phone && r[0] === timestamp);
+    const idx = rows.findIndex((r) => (r[0] || '').replace(/^'+/, '').trim() === timestamp);
     if (idx < 0) return Response.json({ error: 'Emergency not found' }, { status: 404 });
     const before = rows[idx][10] || '';
     const stamp = `[${new Date().toISOString()}] ${session.email}: ${note}`;

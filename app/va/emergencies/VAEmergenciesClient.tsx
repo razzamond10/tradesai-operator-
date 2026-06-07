@@ -14,7 +14,7 @@ interface ClientConfig {
 
 interface RawEmergency {
   callerName?: string;
-  type?: string;
+  issue?: string;
   severity?: string;
   resolved?: string;
   postcode?: string;
@@ -166,7 +166,7 @@ export default function VAEmergenciesClient({ user }: { user: JWTPayload }) {
                       <tr key={i} onClick={() => router.push(`/va/emergencies/${encodeURIComponent(em.clientId + '__' + (em.timestamp || em.createdAt || ''))}`)} style={{ borderBottom: '1px solid rgba(0,0,0,0.04)', background: rv.label === 'Open' ? 'rgba(192,24,48,0.02)' : 'transparent', cursor: 'pointer' }}>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--a1)', fontSize: '10px', whiteSpace: 'nowrap' }}>{em.clientName}</td>
                         <td style={{ padding: '8px 12px', fontWeight: 600, color: 'var(--a1)' }}>{em.callerName || '—'}</td>
-                        <td style={{ padding: '8px 12px', color: 'var(--ink2)' }}>{em.type || '—'}</td>
+                        <td style={{ padding: '8px 12px', color: 'var(--ink2)' }}>{em.issue || '—'}</td>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)' }}>{em.postcode || '—'}</td>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{ts ? `${ts.slice(0,10)} ${ts.slice(11,16)}` : '—'}</td>
                         <td style={{ padding: '8px 12px' }}><span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: sv.bg, color: sv.color }}>{em.severity || '—'}</span></td>

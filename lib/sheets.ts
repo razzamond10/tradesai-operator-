@@ -1,5 +1,6 @@
 import { google } from 'googleapis';
 import { sheetsCache } from './cache';
+import { deriveSeverity } from './emergencyHelpers';
 
 function getAuth() {
   const raw = process.env.GOOGLE_SERVICE_ACCOUNT || '';
@@ -368,8 +369,9 @@ export interface Emergency {
   timestamp: string;
   callerName: string;
   phone: string;
-  type: string;
-  severity: string;
+  postcode: string;
+  issue: string;
+  severity: 'high' | 'medium' | 'low';
   resolved: string;
 }
 
@@ -383,8 +385,9 @@ export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
       timestamp: normTimestamp(r[0] || ''),
       callerName: r[2] || '',
       phone: (r[3] || '').replace(/^'/, ''),
-      type: r[4] || '',
-      severity: r[5] || '',
+      postcode: r[4] || '',
+      issue: r[5] || '',
+      severity: deriveSeverity(r[5]),
       resolved: r[7] || '',
     }));
   }, 30_000);

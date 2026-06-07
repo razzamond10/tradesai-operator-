@@ -15,7 +15,8 @@ interface RawEmergency {
   timestamp?: string;
   callerName?: string;
   phone?: string;
-  type?: string;
+  issue?: string;
+  postcode?: string;
   severity?: string;
   resolved?: string;
 }
@@ -227,8 +228,9 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
               <div style={{ padding: '16px 18px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px' }}>
                 <Field label="Caller name" value={record.callerName || '—'} />
                 <Field label="Phone" value={record.phone || '—'} tel={record.phone} />
-                <Field label="Postcode" value={record.type || '—'} />
-                <Field label="Issue" value={record.severity || '—'} />
+                <Field label="Postcode" value={record.postcode || '—'} />
+                <Field label="Issue" value={record.issue || '—'} />
+                <Field label="Severity" value={record.severity || '—'} />
                 <Field label="Client" value={record.clientName} />
                 <Field label="Timestamp" value={ts || '—'} mono />
               </div>

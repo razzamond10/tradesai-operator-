@@ -106,7 +106,7 @@ export default function VAClientDetail({ user, clientId }: { user: JWTPayload; c
                 ) : data.emergencies.map((em: any, i: number) => (
                   <div key={i} style={{ padding: '12px 16px', borderRadius: '10px', background: em.resolved === 'Yes' ? '#E6FAF4' : '#FDEEF1', border: `1px solid ${em.resolved === 'Yes' ? '#B0E8D4' : '#F5C0C8'}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <div>
-                      <div style={{ fontWeight: 700, color: '#1A0A3C', fontSize: '12px' }}>{em.callerName} — {em.type}</div>
+                      <div style={{ fontWeight: 700, color: '#1A0A3C', fontSize: '12px' }}>{em.callerName} — {em.issue}</div>
                       <div style={{ fontSize: '10px', color: '#7468A0', marginTop: '2px' }}>{em.severity}</div>
                     </div>
                     <span style={{ fontSize: '11px', fontWeight: 700, color: em.resolved === 'Yes' ? '#0A7455' : '#C01830' }}>

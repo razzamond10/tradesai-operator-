@@ -16,6 +16,7 @@ import ActivityLineChart from '@/components/charts/ActivityLineChart';
 import DonutChart from '@/components/charts/DonutChart';
 import BarChart from '@/components/charts/BarChart';
 import type { JWTPayload } from '@/lib/auth';
+import { isResolved } from '@/lib/emergencyHelpers';
 
 function parseValue(v: string) {
   const n = parseFloat((v || '').replace(/[^0-9.]/g, '') || '0');
@@ -129,7 +130,7 @@ export default function VAClientDetailV13({ user, clientId }: { user: JWTPayload
 
   const upcoming = [...bookings].filter(b => b.scheduledDate).sort((a, b) => a.scheduledDate > b.scheduledDate ? 1 : -1).slice(0, 8);
   const feed = [...interactions].reverse().slice(0, 10);
-  const openEmergencies = emergencies.filter(e => (e.resolved || '').toLowerCase() !== 'yes');
+  const openEmergencies = emergencies.filter(e => !isResolved(e.resolved));
   const convRate = interactions.length > 0 ? Math.round((bookings.length / interactions.length) * 100) : 0;
   const wkDates = weekDates();
   const wkCalls = wkDates.reduce((s, d) => s + interactions.filter(i => (i.timestamp || '').startsWith(d)).length, 0);
@@ -261,7 +262,7 @@ export default function VAClientDetailV13({ user, clientId }: { user: JWTPayload
                       <span style={{ fontSize: '14px' }}>🚨</span>
                       <div>
                         <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--ink)' }}>{em.callerName || 'Unknown'}</div>
-                        <div style={{ fontSize: '10px', color: 'var(--a4)', fontWeight: 600 }}>{em.type} · {em.severity}</div>
+                        <div style={{ fontSize: '10px', color: 'var(--a4)', fontWeight: 600 }}>{em.issue} · {em.severity}</div>
                       </div>
                     </div>
                   ))}
