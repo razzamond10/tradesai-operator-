@@ -24,10 +24,10 @@ export async function POST(req: NextRequest) {
       spreadsheetId: config.sheetId, range: `'${tabName}'!A2:P`,
     });
     const rows = read.data.values || [];
-    const idx = rows.findIndex((r, i) => i > 0 && r[7] === eventId);
+    const idx = rows.findIndex((r) => r[7] === eventId);
     if (idx < 0) return Response.json({ error: 'Booking not found' }, { status: 404 });
     const before = rows[idx][9] || '';
-    const rowNum = idx + 1;
+    const rowNum = idx + 2;
     await sheets.spreadsheets.values.update({
       spreadsheetId: config.sheetId, range: `'${tabName}'!J${rowNum}`,
       valueInputOption: 'RAW', requestBody: { values: [['cancelled']] },

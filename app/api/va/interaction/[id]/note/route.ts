@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const before = rows[idx][18] || '';
     const stamp = `[${new Date().toISOString()}] ${session.email}: ${note}`;
     const after = before ? `${before}\n${stamp}` : stamp;
-    const rowNum = idx + 1;
+    const rowNum = idx + 2;
     await sheets.spreadsheets.values.update({
       spreadsheetId: config.sheetId, range: `'${tabName}'!S${rowNum}`,
       valueInputOption: 'RAW', requestBody: { values: [[after]] },

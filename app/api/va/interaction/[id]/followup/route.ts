@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const idx = rows.findIndex((r) => r[14] === conversationId);
     if (idx < 0) return Response.json({ error: 'Interaction not found' }, { status: 404 });
     const before = `req=${rows[idx][19] || ''} by=${rows[idx][20] || ''} done=${rows[idx][22] || ''}`;
-    const rowNum = idx + 1;
+    const rowNum = idx + 2;
     await sheets.spreadsheets.values.update({
       spreadsheetId: config.sheetId, range: `'${tabName}'!T${rowNum}:W${rowNum}`,
       valueInputOption: 'RAW',
