@@ -5,6 +5,7 @@ import Link from 'next/link';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
+import NoteModal from '@/components/va/NoteModal';
 
 interface ClientConfig {
   businessName: string;
@@ -56,6 +57,7 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
   const [error, setError] = useState('');
   const [record, setRecord] = useState<BookingDetail | null>(null);
   const [toast, setToast] = useState('');
+  const [noteOpen, setNoteOpen] = useState(false);
 
   useEffect(() => {
     const eventId = decodeURIComponent(id);
@@ -111,6 +113,19 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(''), 2500);
+  }
+
+  async function handleAddNote(note: string) {
+    const calEventId = decodeURIComponent(id);
+    const res = await fetch(`/api/va/booking/${encodeURIComponent(calEventId)}/note`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: record?.clientId, eventId: calEventId, note }),
+    }).catch(() => null);
+    if (!res || !res.ok) {
+      showToast('Failed to save note — try again');
+      throw new Error('note save failed');
+    }
   }
 
   const sv = record ? statusBadge(record.status || '') : null;
@@ -191,7 +206,7 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <ActionButton label="Reschedule" onClick={() => showToast('Wiring in Phase 4 — reschedule endpoint already verified')} primary />
               <ActionButton label="Cancel booking" onClick={() => showToast('Wiring in Phase 4 — cancel endpoint already verified')} />
-              <ActionButton label="Add note" onClick={() => showToast('Wiring in Phase 4 — note composer coming')} />
+              <ActionButton label="Add note" onClick={() => setNoteOpen(true)} />
             </div>
           </>
         )}
@@ -201,6 +216,13 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
             {toast}
           </div>
         )}
+
+        <NoteModal
+          isOpen={noteOpen}
+          title="Add note"
+          onClose={() => setNoteOpen(false)}
+          onSubmit={handleAddNote}
+        />
 
         <div style={{ marginTop: '24px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ fontSize: '10px', color: 'var(--faint)' }}>Powered by <strong>TradesAI Operator</strong></div>

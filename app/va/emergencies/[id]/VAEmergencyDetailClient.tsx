@@ -5,6 +5,7 @@ import Link from 'next/link';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
+import NoteModal from '@/components/va/NoteModal';
 
 interface RawEmergency {
   businessName?: string;
@@ -61,6 +62,7 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
   const [error, setError] = useState('');
   const [record, setRecord] = useState<EmergencyDetail | null>(null);
   const [toast, setToast] = useState('');
+  const [noteOpen, setNoteOpen] = useState(false);
 
   useEffect(() => {
     const parsed = decodeId(id);
@@ -102,6 +104,18 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(''), 2500);
+  }
+
+  async function handleAddNote(note: string) {
+    const res = await fetch(`/api/va/emergency/${encodeURIComponent(id)}/note`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: record?.clientId, phone: record?.phone || '', timestamp: ts, note }),
+    }).catch(() => null);
+    if (!res || !res.ok) {
+      showToast('Failed to save note — try again');
+      throw new Error('note save failed');
+    }
   }
 
   const sv = record ? severityBadge(record.severity || '') : null;
@@ -185,7 +199,7 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
               <ActionButton label="Claim" onClick={() => showToast('Wiring in Phase 4 — claim endpoint already verified')} primary />
               <ActionButton label="Release" onClick={() => showToast('Wiring in Phase 4 — release endpoint already verified')} />
               <ActionButton label="Set status" onClick={() => showToast('Wiring in Phase 4 — status dropdown coming')} />
-              <ActionButton label="Add note" onClick={() => showToast('Wiring in Phase 4 — note composer coming')} />
+              <ActionButton label="Add note" onClick={() => setNoteOpen(true)} />
             </div>
           </>
         )}
@@ -196,6 +210,13 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
             {toast}
           </div>
         )}
+
+        <NoteModal
+          isOpen={noteOpen}
+          title="Add note"
+          onClose={() => setNoteOpen(false)}
+          onSubmit={handleAddNote}
+        />
 
         <div style={{ marginTop: '24px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ fontSize: '10px', color: 'var(--faint)' }}>Powered by <strong>TradesAI Operator</strong></div>

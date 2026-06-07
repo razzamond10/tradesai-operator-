@@ -5,6 +5,7 @@ import Link from 'next/link';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
+import NoteModal from '@/components/va/NoteModal';
 
 interface ClientConfig {
   businessName: string;
@@ -51,6 +52,7 @@ export default function VACommDetailClient({ user, id }: { user: JWTPayload; id:
   const [error, setError] = useState('');
   const [record, setRecord] = useState<InteractionDetail | null>(null);
   const [toast, setToast] = useState('');
+  const [noteOpen, setNoteOpen] = useState(false);
 
   const conversationId = decodeURIComponent(id);
 
@@ -107,6 +109,18 @@ export default function VACommDetailClient({ user, id }: { user: JWTPayload; id:
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(''), 2500);
+  }
+
+  async function handleAddNote(note: string) {
+    const res = await fetch(`/api/va/interaction/${encodeURIComponent(conversationId)}/note`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: record?.clientId, conversationId, note }),
+    }).catch(() => null);
+    if (!res || !res.ok) {
+      showToast('Failed to save note — try again');
+      throw new Error('note save failed');
+    }
   }
 
   const ob = record ? outcomeBadge(record.outcome || '') : null;
@@ -190,7 +204,7 @@ export default function VACommDetailClient({ user, id }: { user: JWTPayload; id:
             {/* Action buttons — Phase 4 wiring */}
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {/* TODO Phase 4: POST /api/va/interaction/{id}/note with { clientId: record.clientId, conversationId, note } */}
-              <ActionButton label="Add note" onClick={() => showToast('Wiring in Phase 4 — note composer coming')} primary />
+              <ActionButton label="Add note" onClick={() => setNoteOpen(true)} primary />
               {/* TODO Phase 4: follow-up workflow */}
               <ActionButton label="Follow-up" onClick={() => showToast('Wiring in Phase 4 — follow-up endpoint coming')} />
             </div>
@@ -202,6 +216,13 @@ export default function VACommDetailClient({ user, id }: { user: JWTPayload; id:
             {toast}
           </div>
         )}
+
+        <NoteModal
+          isOpen={noteOpen}
+          title="Add note"
+          onClose={() => setNoteOpen(false)}
+          onSubmit={handleAddNote}
+        />
 
         <div style={{ marginTop: '24px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ fontSize: '10px', color: 'var(--faint)' }}>Powered by <strong>TradesAI Operator</strong></div>
