@@ -6,6 +6,7 @@ import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
 import NoteModal from '@/components/va/NoteModal';
+import ConfirmModal from '@/components/va/ConfirmModal';
 
 interface ClientConfig {
   businessName: string;
@@ -58,6 +59,8 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
   const [record, setRecord] = useState<BookingDetail | null>(null);
   const [toast, setToast] = useState('');
   const [noteOpen, setNoteOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
 
   useEffect(() => {
     const eventId = decodeURIComponent(id);
@@ -113,6 +116,20 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(''), 2500);
+  }
+
+  async function handleCancel() {
+    const calEventId = decodeURIComponent(id);
+    const res = await fetch(`/api/va/booking/${encodeURIComponent(calEventId)}/cancel`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: record?.clientId, eventId: calEventId, reason: cancelReason }),
+    }).catch(() => null);
+    if (!res || !res.ok) {
+      showToast('Failed to cancel booking — try again');
+      throw new Error('cancel failed');
+    }
+    showToast('Booking cancelled');
   }
 
   async function handleAddNote(note: string) {
@@ -205,7 +222,7 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               <ActionButton label="Reschedule" onClick={() => showToast('Wiring in Phase 4 — reschedule endpoint already verified')} primary />
-              <ActionButton label="Cancel booking" onClick={() => showToast('Wiring in Phase 4 — cancel endpoint already verified')} />
+              <ActionButton label="Cancel booking" onClick={() => setCancelOpen(true)} />
               <ActionButton label="Add note" onClick={() => setNoteOpen(true)} />
             </div>
           </>
@@ -222,6 +239,18 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
           title="Add note"
           onClose={() => setNoteOpen(false)}
           onSubmit={handleAddNote}
+        />
+
+        <ConfirmModal
+          isOpen={cancelOpen}
+          title="Cancel booking"
+          message={`Cancel the booking for ${record?.customerName || 'this customer'}? This cannot be undone.`}
+          confirmLabel="Cancel booking"
+          destructive
+          optionalReason={{ label: 'Reason (optional)', placeholder: 'e.g. customer requested cancellation', maxLength: 300 }}
+          onReasonChange={setCancelReason}
+          onClose={() => setCancelOpen(false)}
+          onConfirm={handleCancel}
         />
 
         <div style={{ marginTop: '24px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>

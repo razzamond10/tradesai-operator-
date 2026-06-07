@@ -6,6 +6,7 @@ import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
 import NoteModal from '@/components/va/NoteModal';
+import ConfirmModal from '@/components/va/ConfirmModal';
 
 interface RawEmergency {
   businessName?: string;
@@ -63,6 +64,8 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
   const [record, setRecord] = useState<EmergencyDetail | null>(null);
   const [toast, setToast] = useState('');
   const [noteOpen, setNoteOpen] = useState(false);
+  const [claimOpen, setClaimOpen] = useState(false);
+  const [releaseOpen, setReleaseOpen] = useState(false);
 
   useEffect(() => {
     const parsed = decodeId(id);
@@ -104,6 +107,32 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(''), 2500);
+  }
+
+  async function handleClaim() {
+    const res = await fetch(`/api/va/emergency/${encodeURIComponent(id)}/claim`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: record?.clientId, timestamp: ts }),
+    }).catch(() => null);
+    if (!res || !res.ok) {
+      showToast('Failed to claim — try again');
+      throw new Error('claim failed');
+    }
+    showToast('Emergency claimed');
+  }
+
+  async function handleRelease() {
+    const res = await fetch(`/api/va/emergency/${encodeURIComponent(id)}/release`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientId: record?.clientId, timestamp: ts }),
+    }).catch(() => null);
+    if (!res || !res.ok) {
+      showToast('Failed to release — try again');
+      throw new Error('release failed');
+    }
+    showToast('Emergency released');
   }
 
   async function handleAddNote(note: string) {
@@ -196,8 +225,8 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
 
             {/* Action buttons (placeholders — wired in Phase 4) */}
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <ActionButton label="Claim" onClick={() => showToast('Wiring in Phase 4 — claim endpoint already verified')} primary />
-              <ActionButton label="Release" onClick={() => showToast('Wiring in Phase 4 — release endpoint already verified')} />
+              <ActionButton label="Claim" onClick={() => setClaimOpen(true)} primary />
+              <ActionButton label="Release" onClick={() => setReleaseOpen(true)} />
               <ActionButton label="Set status" onClick={() => showToast('Wiring in Phase 4 — status dropdown coming')} />
               <ActionButton label="Add note" onClick={() => setNoteOpen(true)} />
             </div>
@@ -216,6 +245,24 @@ export default function VAEmergencyDetailClient({ user, id }: { user: JWTPayload
           title="Add note"
           onClose={() => setNoteOpen(false)}
           onSubmit={handleAddNote}
+        />
+
+        <ConfirmModal
+          isOpen={claimOpen}
+          title="Claim emergency"
+          message="Assign this emergency to yourself. You'll be responsible for following up with the client."
+          confirmLabel="Claim"
+          onClose={() => setClaimOpen(false)}
+          onConfirm={handleClaim}
+        />
+
+        <ConfirmModal
+          isOpen={releaseOpen}
+          title="Release emergency"
+          message="Remove yourself from this emergency so another VA can pick it up."
+          confirmLabel="Release"
+          onClose={() => setReleaseOpen(false)}
+          onConfirm={handleRelease}
         />
 
         <div style={{ marginTop: '24px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
