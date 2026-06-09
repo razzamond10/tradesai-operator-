@@ -37,6 +37,20 @@ export async function POST(req: NextRequest) {
     } catch (e) {
       console.warn('[va/booking/cancel] Calendar delete failed:', (e as Error).message);
     }
+    try {
+      const noteRead = await sheets.spreadsheets.values.get({
+        spreadsheetId: config.sheetId, range: `'${tabName}'!M${rowNum}`,
+      });
+      const existing = noteRead.data.values?.[0]?.[0] || '';
+      const stamp = `[${new Date().toISOString()}] ${session.email}: cancelled — ${reason || 'no reason given'}`;
+      const merged = existing ? `${existing}\n${stamp}` : stamp;
+      await sheets.spreadsheets.values.update({
+        spreadsheetId: config.sheetId, range: `'${tabName}'!M${rowNum}`,
+        valueInputOption: 'RAW', requestBody: { values: [[merged]] },
+      });
+    } catch (e) {
+      console.warn('[va/booking/cancel] Note append failed:', (e as Error).message);
+    }
     await logVAAction({
       vaEmail: session.email, vaName: session.email.split('@')[0], actionType: 'booking.cancel',
       clientId, targetType: 'booking', targetId: eventId,
