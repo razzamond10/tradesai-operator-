@@ -49,7 +49,10 @@ export async function POST(req: NextRequest) {
         valueInputOption: 'RAW', requestBody: { values: [[merged]] },
       });
     } catch (e) {
-      console.warn('[va/booking/cancel] Note append failed:', (e as Error).message);
+      const errMsg = (e as Error).message + ' | ' + ((e as Error).stack || '').split('\n').slice(0,3).join(' | ');
+      console.error('[va/booking/cancel] Note append failed:', errMsg);
+      // S85 diag — return error in response so DevTools shows it
+      return Response.json({ ok: true, colMError: errMsg });
     }
     await logVAAction({
       vaEmail: session.email, vaName: session.email.split('@')[0], actionType: 'booking.cancel',
