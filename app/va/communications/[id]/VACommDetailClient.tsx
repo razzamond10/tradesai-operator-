@@ -1,11 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useClientTime } from '@/lib/hooks/useClientTime';
 import Link from 'next/link';
 import PortalShell from '@/components/PortalShell';
 import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
 import NoteModal from '@/components/va/NoteModal';
+import { FollowUpModal } from '@/components/va/FollowUpModal';
 
 interface ClientConfig {
   businessName: string;
@@ -21,6 +23,9 @@ interface RawInteraction {
   outcome?: string;
   notes?: string;
   conversationId?: string;
+  followUpRequired?: boolean;
+  followUpDueDate?: string;
+  followUpDone?: boolean;
 }
 
 interface InteractionDetail extends RawInteraction {
@@ -47,12 +52,14 @@ function outcomeBadge(o: string) {
 }
 
 export default function VACommDetailClient({ user, id }: { user: JWTPayload; id: string }) {
+  const router = useRouter();
   const clockTime = useClientTime('time');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [record, setRecord] = useState<InteractionDetail | null>(null);
   const [toast, setToast] = useState('');
   const [noteOpen, setNoteOpen] = useState(false);
+  const [followUpOpen, setFollowUpOpen] = useState(false);
 
   const decoded = decodeURIComponent(id);
   const isCompound = decoded.includes('__');
@@ -226,8 +233,8 @@ export default function VACommDetailClient({ user, id }: { user: JWTPayload; id:
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
               {/* TODO Phase 4: POST /api/va/interaction/{id}/note with { clientId: record.clientId, conversationId, note } */}
               <ActionButton label="Add note" onClick={() => setNoteOpen(true)} primary />
-              {/* TODO Phase 4: follow-up workflow */}
-              <ActionButton label="Follow-up" onClick={() => showToast('Wiring in Phase 4 — follow-up endpoint coming')} />
+              {/* Follow-up — disabled when no conversationId (compound-key rows) */}
+              <ActionButton label="Follow-up" onClick={() => setFollowUpOpen(true)} disabled={!record.conversationId} title={!record.conversationId ? 'Not available for this row (missing conversation ID)' : ''} />
             </div>
           </>
         )}
@@ -243,6 +250,27 @@ export default function VACommDetailClient({ user, id }: { user: JWTPayload; id:
           title="Add note"
           onClose={() => setNoteOpen(false)}
           onSubmit={handleAddNote}
+        />
+
+        <FollowUpModal
+          isOpen={followUpOpen}
+          onClose={() => setFollowUpOpen(false)}
+          initialRequired={record?.followUpRequired || false}
+          initialDueDate={record?.followUpDueDate || ''}
+          initialDone={record?.followUpDone || false}
+          onConfirm={async ({ required, dueDate, done }) => {
+            const res = await fetch(`/api/va/interaction/${encodeURIComponent(record?.conversationId || '')}/followup`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ clientId: record?.clientId, conversationId: record?.conversationId, required, dueDate, done }),
+            }).catch(() => null);
+            if (!res || !res.ok) {
+              showToast('Failed to save follow-up');
+              throw new Error('followup failed');
+            }
+            showToast('Follow-up saved');
+            router.refresh();
+          }}
         />
 
         <div style={{ marginTop: '24px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
@@ -267,20 +295,23 @@ function Field({ label, value, mono, tel }: { label: string; value: string; mono
   );
 }
 
-function ActionButton({ label, onClick, primary }: { label: string; onClick: () => void; primary?: boolean }) {
+function ActionButton({ label, onClick, primary, disabled, title }: { label: string; onClick: () => void; primary?: boolean; disabled?: boolean; title?: string }) {
   return (
     <button
-      onClick={onClick}
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      title={title}
       style={{
         padding: '8px 16px',
         borderRadius: '6px',
         fontSize: '11px',
         fontWeight: 700,
         border: primary ? 'none' : '1px solid var(--divider)',
-        cursor: 'pointer',
+        cursor: disabled ? 'not-allowed' : 'pointer',
         background: primary ? 'var(--a1)' : '#fff',
         color: primary ? '#fff' : 'var(--ink)',
         fontFamily: '"Inter",sans-serif',
+        opacity: disabled ? 0.4 : 1,
       }}
     >
       {label}
