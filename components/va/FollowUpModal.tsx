@@ -35,6 +35,11 @@ export function FollowUpModal({
 
   if (!isOpen) return null;
 
+  const today = new Date();
+  const todayISO = today.toISOString().split('T')[0];
+  const maxDate = new Date(today.getFullYear() + 5, today.getMonth(), today.getDate())
+    .toISOString().split('T')[0];
+
   const saveDisabled = submitting || (required && !dueDate);
 
   async function handleSubmit() {
@@ -42,6 +47,14 @@ export function FollowUpModal({
     if (required && !dueDate) {
       setValidationError('Due date required when follow-up is required');
       return;
+    }
+    if (dueDate) {
+      const year = parseInt(dueDate.split('-')[0], 10);
+      const currentYear = new Date().getFullYear();
+      if (isNaN(year) || year < currentYear || year > currentYear + 5) {
+        setValidationError('Due date must be between today and 5 years from now');
+        return;
+      }
     }
     setValidationError(null);
     setSubmitting(true);
@@ -117,6 +130,8 @@ export function FollowUpModal({
             <input
               type="date"
               value={dueDate}
+              min={todayISO}
+              max={maxDate}
               onChange={(e) => { setDueDate(e.target.value); setValidationError(null); }}
               disabled={submitting}
               style={{
