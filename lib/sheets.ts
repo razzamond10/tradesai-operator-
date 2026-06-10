@@ -286,13 +286,16 @@ export interface Interaction {
   outcome: string;
   notes: string;
   conversationId: string;
+  followUpRequired?: boolean;
+  followUpDueDate?: string;
+  followUpDone?: boolean;
 }
 
 export async function getInteractions(sheetId: string): Promise<Interaction[]> {
   return sheetsCache.getOrFetch(`interactions:${sheetId}`, async () => {
     const tabName = await resolveTabName(sheetId, 'interactionslog');
     // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=intent, F=outcome, G=notes
-    const rows = await readSheet(sheetId, `'${tabName}'!A2:O`);
+    const rows = await readSheet(sheetId, `'${tabName}'!A2:W`);
     return rows.map((r) => ({
       businessName: r[1] || '',
       timestamp: normTimestamp(r[0] || ''),
@@ -302,6 +305,9 @@ export async function getInteractions(sheetId: string): Promise<Interaction[]> {
       outcome: r[5] || '',
       notes: r[6] || '',
       conversationId: r[14] || '',
+      followUpRequired: (r[19] || '').toLowerCase() === 'yes',
+      followUpDueDate: r[20] || '',
+      followUpDone: (r[22] || '').toLowerCase() === 'yes',
     }));
   }, 30_000);
 }
