@@ -43,13 +43,17 @@ export async function POST(req: NextRequest) {
       spreadsheetId: config.sheetId, range: `'${tabName}'!O${rowNum}`,
       valueInputOption: 'RAW', requestBody: { values: [[newHistory]] },
     });
+    let calendarOk = false;
+    let calendarError: string | undefined;
     try {
       await calendar.events.patch({
         calendarId: config.calendarId, eventId,
         requestBody: { start: { dateTime: newStart }, end: { dateTime: newEnd } },
       });
+      calendarOk = true;
     } catch (e) {
-      console.warn('[va/booking/reschedule] Calendar patch failed:', (e as Error).message);
+      calendarError = (e as Error).message;
+      console.warn('[va/booking/reschedule] Calendar patch failed (calendarId=%s): %s', config.calendarId, calendarError);
     }
     await logVAAction({
       vaEmail: session.email, vaName: session.email.split('@')[0], actionType: 'booking.reschedule',
@@ -57,7 +61,7 @@ export async function POST(req: NextRequest) {
       beforeValue: beforeSlot, afterValue: newSlot, notes: reason || '',
       ipAddress: req.headers.get('x-forwarded-for') || '', userAgent: req.headers.get('user-agent') || '',
     });
-    return Response.json({ success: true, newSlot });
+    return Response.json({ success: true, newSlot, calendarId: config.calendarId, calendarOk, ...(calendarError ? { calendarError } : {}) });
   } catch (err) {
     if (err instanceof Response) return err;
     console.error('[va/booking/reschedule]', err);
