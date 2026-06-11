@@ -7,6 +7,7 @@ import Topbar from '@/components/Topbar';
 import type { JWTPayload } from '@/lib/auth';
 import NoteModal from '@/components/va/NoteModal';
 import ConfirmModal from '@/components/va/ConfirmModal';
+import { RescheduleModal } from '@/components/va/RescheduleModal';
 
 interface ClientConfig {
   businessName: string;
@@ -61,6 +62,7 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
   const [noteOpen, setNoteOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+  const [rescheduleOpen, setRescheduleOpen] = useState(false);
 
   useEffect(() => {
     const eventId = decodeURIComponent(id);
@@ -145,6 +147,26 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
     }
   }
 
+  async function handleReschedule(payload: { newStart: string; newEnd: string; reason: string }) {
+    const calEventId = decodeURIComponent(id);
+    const res = await fetch(`/api/va/booking/${encodeURIComponent(calEventId)}/reschedule`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        clientId: record?.clientId,
+        eventId: calEventId,
+        newStart: payload.newStart,
+        newEnd: payload.newEnd,
+        reason: payload.reason,
+      }),
+    }).catch(() => null);
+    if (!res || !res.ok) {
+      showToast('Failed to reschedule — try again');
+      throw new Error('reschedule failed');
+    }
+    showToast('Booking rescheduled');
+  }
+
   const sv = record ? statusBadge(record.status || '') : null;
   const ts = record?.timestamp || '';
   const scheduled = record?.bookingDateReadable || record?.scheduledDate || '';
@@ -221,7 +243,7 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
             </div>
 
             <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-              <ActionButton label="Reschedule" onClick={() => showToast('Wiring in Phase 4 — reschedule endpoint already verified')} primary />
+              <ActionButton label="Reschedule" onClick={() => setRescheduleOpen(true)} primary />
               <ActionButton label="Cancel booking" onClick={() => setCancelOpen(true)} />
               <ActionButton label="Add note" onClick={() => setNoteOpen(true)} />
             </div>
@@ -251,6 +273,13 @@ export default function VABookingDetailClient({ user, id }: { user: JWTPayload; 
           onReasonChange={setCancelReason}
           onClose={() => setCancelOpen(false)}
           onConfirm={handleCancel}
+        />
+
+        <RescheduleModal
+          isOpen={rescheduleOpen}
+          onClose={() => setRescheduleOpen(false)}
+          onSubmit={handleReschedule}
+          bookingTitle={record?.customerName || undefined}
         />
 
         <div style={{ marginTop: '24px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
