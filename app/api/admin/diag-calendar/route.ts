@@ -1,15 +1,12 @@
 import { NextRequest } from 'next/server';
 import { requireAdminOrVA } from '@/lib/apiAuth';
 import { google } from 'googleapis';
+import { getCalendarAuth } from '@/lib/google';
 
 export async function GET(req: NextRequest) {
   try {
     await requireAdminOrVA(req);
-    const auth = new google.auth.GoogleAuth({
-      credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT || '{}'),
-      scopes: ['https://www.googleapis.com/auth/calendar'],
-    });
-    const calendar = google.calendar({ version: 'v3', auth });
+    const calendar = google.calendar({ version: 'v3', auth: getCalendarAuth() });
     const calendarId = 'admin@tradesaioperator.uk';
     const testEventId = '0gpg1prd5pho9oqkjjj7cile4i';
 

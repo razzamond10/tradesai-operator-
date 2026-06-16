@@ -3,6 +3,7 @@ import { requireAdminOrVA } from '@/lib/apiAuth';
 import { logVAAction } from '@/lib/vaActions';
 import { getClientConfig, resolveTabName } from '@/lib/sheets';
 import { google } from 'googleapis';
+import { getCalendarAuth } from '@/lib/google';
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,15 +15,12 @@ export async function POST(req: NextRequest) {
     const config = await getClientConfig(clientId);
     if (!config) return Response.json({ error: 'Client not found' }, { status: 404 });
     const tabName = await resolveTabName(config.sheetId, 'bookings');
-    const auth = new google.auth.GoogleAuth({
+    const sheetsAuth = new google.auth.GoogleAuth({
       credentials: JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT || '{}'),
-      scopes: [
-        'https://www.googleapis.com/auth/spreadsheets',
-        'https://www.googleapis.com/auth/calendar',
-      ],
+      scopes: ['https://www.googleapis.com/auth/spreadsheets'],
     });
-    const sheets = google.sheets({ version: 'v4', auth });
-    const calendar = google.calendar({ version: 'v3', auth });
+    const sheets = google.sheets({ version: 'v4', auth: sheetsAuth });
+    const calendar = google.calendar({ version: 'v3', auth: getCalendarAuth() });
     const read = await sheets.spreadsheets.values.get({
       spreadsheetId: config.sheetId, range: `'${tabName}'!A2:P`,
     });
