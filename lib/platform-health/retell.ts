@@ -22,7 +22,7 @@ export async function checkRetell(): Promise<VendorHealth> {
   let rawData: any = null;
 
   try {
-    const res = await fetch('https://api.retellai.com/v2/list-calls', {
+    const res = await fetch('https://api.retellai.com/v3/list-calls', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -66,7 +66,7 @@ export async function checkRetell(): Promise<VendorHealth> {
     const json = await res.json().catch(() => ({}));
     rawData = json;
 
-    const callsArray: Array<{ start_timestamp?: number }> = Array.isArray(json) ? json : (json?.calls ?? []);
+    const callsArray: Array<{ start_timestamp?: number }> = json?.items ?? (Array.isArray(json) ? json : (json?.calls ?? []));
     const todayStart = new Date();
     todayStart.setUTCHours(0, 0, 0, 0);
     const todayStartMs = todayStart.getTime();
