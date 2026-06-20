@@ -176,6 +176,13 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
   const [error, setError] = useState('');
   const [pageRange, setPageRange] = useDateRange('month');
   const [actOverride, setActOverride] = useState<DateRange | null>(null);
+  const [displayDate, setDisplayDate] = useState('');
+  const [displayTime, setDisplayTime] = useState('');
+
+  useEffect(() => {
+    setDisplayDate(new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }));
+    setDisplayTime(new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
+  }, []);
 
   useEffect(() => {
     fetch('/api/dashboard/data')
@@ -285,7 +292,7 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
                 {subLabel === 'today' ? 'Today at a glance' : `Overview · ${subLabel}`}
               </div>
               <div style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: '"IBM Plex Mono",monospace' }}>
-                {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                {displayDate}
               </div>
             </div>
 
@@ -535,7 +542,7 @@ export default function ClientDashboard({ user, isDemoEmpty }: { user: JWTPayloa
         <div style={{ paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ fontSize: '10px', color: 'var(--faint)' }}>Powered by <strong>TradesAI</strong> — never miss a lead</div>
           <div style={{ fontSize: '10px', color: 'var(--faint)', fontFamily: '"IBM Plex Mono",monospace' }}>
-            {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+            {displayTime}
           </div>
         </div>
 
