@@ -449,7 +449,6 @@ export default function AdminClient({ user }: { user: JWTPayload }) {
       </main>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@600;700;800;900&display=swap');
         :root{
           --bg:#F2F2F8;--slate:#EAEAF4;--ink:#1A0A3C;--muted:#7468A0;--faint:#B8B0D4;--divider:#D8D0F0;
           --a1:#3D1FA8;--a1b:#EDE8FF;--a2:#C9A84C;--a2b:#FEF8EC;

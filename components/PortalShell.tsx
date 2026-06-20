@@ -22,7 +22,6 @@ export default function PortalShell({ role, name, children }: PortalShellProps) 
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=IBM+Plex+Mono:wght@400;500&family=Inter+Tight:wght@600;700;800;900&display=swap');
         :root {
           --bg:#F2F2F8;--white:#FFFFFF;--slate:#EAEAF4;--slate2:#E0E0EE;
           --ink:#1A0A3C;--ink2:#2A1560;--ink3:#3D2580;
