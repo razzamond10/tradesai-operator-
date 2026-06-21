@@ -22,6 +22,17 @@ interface RawInteraction {
   conversationId?: string;
 }
 
+interface ThreadReply {
+  timestamp: string;
+  direction: 'in' | 'out';
+  from: string;
+  to: string;
+  body: string;
+  messageSid: string;
+  status: string;
+  linkedPhone: string;
+}
+
 interface AggInteraction extends RawInteraction {
   clientName: string;
   clientId: string;
@@ -62,6 +73,38 @@ export default function VACommsClient({ user }: { user: JWTPayload }) {
   const [clients, setClients] = useState<string[]>([]);
   const [channelFilter, setChannelFilter] = useState<'all' | 'sms' | 'email' | 'call'>('all');
   const [clientFilter, setClientFilter] = useState<string>('all');
+  const [selectedPhone, setSelectedPhone] = useState('');
+  const [thread, setThread] = useState<ThreadReply[]>([]);
+  const [threadLoading, setThreadLoading] = useState(false);
+  const [threadError, setThreadError] = useState('');
+  const [threadTsMap, setThreadTsMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (!thread.length) { setThreadTsMap({}); return; }
+    const m: Record<string, string> = {};
+    thread.forEach((r) => {
+      const key = r.messageSid || r.timestamp;
+      if (key) m[key] = r.timestamp ? `${r.timestamp.slice(0, 10)} ${r.timestamp.slice(11, 16)}` : '';
+    });
+    setThreadTsMap(m);
+  }, [thread]);
+
+  async function loadThread(phone: string) {
+    if (!phone) return;
+    setSelectedPhone(phone);
+    setThreadLoading(true);
+    setThreadError('');
+    try {
+      const r = await fetch(`/api/va/sms/thread?phone=${encodeURIComponent(phone)}`);
+      const d = await r.json();
+      if (d.error) { setThreadError(d.error); setThread([]); }
+      else setThread(d.replies || []);
+    } catch {
+      setThreadError('Failed to load thread');
+    } finally {
+      setThreadLoading(false);
+    }
+  }
 
   useEffect(() => {
     async function load() {
@@ -177,7 +220,7 @@ export default function VACommsClient({ user }: { user: JWTPayload }) {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
                 <thead>
-                  <tr>{['Client','Caller','Channel','Intent','Outcome','Conv ID','Time'].map(h => (
+                  <tr>{['Client','Caller','Channel','Intent','Outcome','Conv ID','Time','Thread'].map(h => (
                     <th key={h} style={{ padding: '7px 12px', textAlign: 'left', fontSize: '9px', fontWeight: 700, color: 'var(--muted)', letterSpacing: '.6px', textTransform: 'uppercase', borderBottom: '1px solid var(--divider)', background: 'var(--slate)', whiteSpace: 'nowrap' }}>{h}</th>
                   ))}</tr>
                 </thead>
@@ -204,6 +247,16 @@ export default function VACommsClient({ user }: { user: JWTPayload }) {
                         <td style={{ padding: '8px 12px' }}><span style={{ fontSize: '9px', fontWeight: 700, padding: '2px 7px', borderRadius: '10px', background: ob.bg, color: ob.color }}>{it.outcome || '—'}</span></td>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{it.conversationId || '—'}</td>
                         <td style={{ padding: '8px 12px', fontFamily: '"IBM Plex Mono",monospace', fontSize: '10px', color: 'var(--muted)', whiteSpace: 'nowrap' }}>{ts ? `${ts.slice(0,10)} ${ts.slice(11,16)}` : '—'}</td>
+                        <td style={{ padding: '8px 12px' }}>
+                          {(it.channel || '').toLowerCase() === 'sms' && it.phoneNumber ? (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); loadThread(it.phoneNumber!); }}
+                              style={{ fontSize: '10px', padding: '2px 8px', borderRadius: '5px', border: '1px solid var(--divider)', background: selectedPhone === it.phoneNumber ? 'var(--a1)' : '#fff', color: selectedPhone === it.phoneNumber ? '#fff' : 'var(--a1)', cursor: 'pointer', fontFamily: '"Inter",sans-serif', fontWeight: 600, whiteSpace: 'nowrap' }}
+                            >
+                              💬 Thread
+                            </button>
+                          ) : <span style={{ color: 'var(--faint)', fontSize: '10px' }}>—</span>}
+                        </td>
                       </tr>
                     );
                   })}
@@ -212,6 +265,42 @@ export default function VACommsClient({ user }: { user: JWTPayload }) {
             </div>
           )}
         </div>
+
+        {/* SMS Reply Thread panel */}
+        {selectedPhone && (
+          <div style={{ marginTop: '14px', background: '#fff', borderRadius: '10px', border: '1px solid var(--divider)', boxShadow: 'var(--shadow-s)', overflow: 'hidden' }}>
+            <div style={{ padding: '12px 14px', borderBottom: '1px solid var(--divider)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontFamily: '"Inter Tight",sans-serif', fontSize: '12.5px', fontWeight: 700, color: 'var(--ink)' }}>💬 SMS Thread</span>
+              <span style={{ fontSize: '10px', color: 'var(--muted)', fontFamily: '"IBM Plex Mono",monospace' }}>{selectedPhone}</span>
+              <button
+                onClick={() => { setSelectedPhone(''); setThread([]); setThreadError(''); }}
+                style={{ marginLeft: 'auto', fontSize: '10px', padding: '2px 10px', borderRadius: '5px', border: '1px solid var(--divider)', background: '#fff', color: 'var(--muted)', cursor: 'pointer', fontFamily: '"Inter",sans-serif' }}
+              >✕ Close</button>
+            </div>
+            <div style={{ padding: '14px', maxHeight: '440px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {threadLoading ? (
+                <div style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '12px', padding: '24px' }}>Loading thread…</div>
+              ) : threadError ? (
+                <div style={{ padding: '10px 14px', background: 'var(--a4b)', border: '1px solid #F5C0C8', borderRadius: '8px', color: 'var(--a4)', fontSize: '12px' }}>⚠ {threadError}</div>
+              ) : thread.length === 0 ? (
+                <div style={{ textAlign: 'center', color: 'var(--muted)', fontSize: '12px', padding: '24px' }}>No messages yet for this number</div>
+              ) : thread.map((msg) => {
+                const isOut = msg.direction === 'out';
+                const tsKey = msg.messageSid || msg.timestamp;
+                return (
+                  <div key={tsKey} style={{ display: 'flex', flexDirection: 'column', alignItems: isOut ? 'flex-end' : 'flex-start' }}>
+                    <div style={{ maxWidth: '72%', padding: '8px 12px', borderRadius: isOut ? '12px 12px 2px 12px' : '12px 12px 12px 2px', background: isOut ? 'var(--a1)' : 'var(--slate)', color: isOut ? '#fff' : 'var(--ink)', fontSize: '12px', lineHeight: '1.55', wordBreak: 'break-word' }}>
+                      {msg.body}
+                    </div>
+                    <div style={{ fontSize: '9px', color: 'var(--faint)', marginTop: '3px', fontFamily: '"IBM Plex Mono",monospace' }}>
+                      {threadTsMap[tsKey] || ''}{isOut ? ` · You → ${msg.to}` : ` · ${msg.from}`}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div style={{ marginTop: '24px', paddingTop: '14px', borderTop: '1px solid var(--divider)', display: 'flex', justifyContent: 'space-between' }}>
           <div style={{ fontSize: '10px', color: 'var(--faint)' }}>Powered by <strong>TradesAI Operator</strong></div>

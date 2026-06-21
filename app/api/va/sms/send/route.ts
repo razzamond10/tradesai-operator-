@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { requireAdminOrVA } from '@/lib/apiAuth';
 import { logVAAction } from '@/lib/vaActions';
-import { getClientConfig } from '@/lib/sheets';
+import { getClientConfig, appendReply } from '@/lib/sheets';
 import twilio from 'twilio';
 
 export async function POST(req: NextRequest) {
@@ -36,6 +36,16 @@ export async function POST(req: NextRequest) {
       beforeValue: '', afterValue: prefixedMessage, notes: `to=${toPhone}`,
       ipAddress: req.headers.get('x-forwarded-for') || '', userAgent: req.headers.get('user-agent') || '',
     });
+    // Mirror outbound to Replies thread — non-fatal if it fails
+    appendReply({
+      direction: 'out',
+      from: config.twilioNumber,
+      to: toPhone,
+      body: prefixedMessage,
+      messageSid: result.sid,
+      status: 'sent',
+      linkedPhone: toPhone,
+    }).catch((err) => console.error('[va/sms/send] Replies append failed:', (err as Error).message));
     return Response.json({ success: true, sid: result.sid });
   } catch (err) {
     if (err instanceof Response) return err;

@@ -653,3 +653,93 @@ export async function updateAdminUserEmail(currentEmail: string, newEmail: strin
     requestBody: { values: [[next]] },
   });
 }
+
+// ── SMS Replies ───────────────────────────────────────────────────────────────
+// Tab: "Replies" in MASTER_SHEET_ID. Headers in row 1, data from row 2.
+// Cols: A Timestamp | B Direction | C From | D To | E Body | F MessageSid | G Status | H LinkedPhone
+
+export interface Reply {
+  timestamp: string;
+  direction: 'in' | 'out';
+  from: string;
+  to: string;
+  body: string;
+  messageSid: string;
+  status: string;
+  linkedPhone: string;
+}
+
+/** Append one inbound or outbound SMS to the Replies tab.
+ *  Idempotent: skips the write if MessageSid (col F) already exists. */
+export async function appendReply(row: {
+  direction: 'in' | 'out';
+  from: string;
+  to: string;
+  body: string;
+  messageSid: string;
+  status: string;
+  linkedPhone: string;
+}): Promise<{ duplicate: boolean }> {
+  const spreadsheetId = process.env.MASTER_SHEET_ID!;
+  const auth = getWriteAuth();
+  const sheets = google.sheets({ version: 'v4', auth });
+  const tabName = await resolveTabName(spreadsheetId, 'replies');
+
+  // Idempotency check — read existing MessageSids (col F) before writing
+  const existing = await readSheet(spreadsheetId, `'${tabName}'!F2:F`);
+  const knownSids = existing.map((r) => (r[0] || '').trim());
+  if (row.messageSid && knownSids.includes(row.messageSid)) {
+    return { duplicate: true };
+  }
+
+  // British-locale timestamp e.g. "21/06/2026 14:30:45"
+  const ts = new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' }).replace(',', '');
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId,
+    range: `'${tabName}'!A:H`,
+    valueInputOption: 'RAW',
+    requestBody: {
+      values: [[
+        ts,
+        row.direction,
+        `'${row.from}`,
+        `'${row.to}`,
+        row.body,
+        row.messageSid,
+        row.status,
+        `'${row.linkedPhone}`,
+      ]],
+    },
+  });
+
+  return { duplicate: false };
+}
+
+/** Return all Reply rows matching the given phone (matched against col C From
+ *  or col H LinkedPhone). Sheet append order is chronological — no sort needed. */
+export async function getRepliesByPhone(phone: string): Promise<Reply[]> {
+  const spreadsheetId = process.env.MASTER_SHEET_ID!;
+  const tabName = await resolveTabName(spreadsheetId, 'replies');
+  const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:H`);
+
+  // Last-10-digit match — handles +44 vs 07 vs bare digits uniformly
+  function normPhone(raw: string): string {
+    const digits = (raw || '').replace(/\D/g, '');
+    return digits.slice(-10);
+  }
+  const q = normPhone(phone);
+
+  return rows
+    .filter((r) => normPhone(r[2] || '') === q || normPhone(r[7] || '') === q)
+    .map((r) => ({
+      timestamp: normTimestamp(r[0] || ''),
+      direction: (r[1] || '') === 'out' ? 'out' : ('in' as 'in' | 'out'),
+      from: (r[2] || '').replace(/^'+/, ''),
+      to: (r[3] || '').replace(/^'+/, ''),
+      body: r[4] || '',
+      messageSid: r[5] || '',
+      status: r[6] || '',
+      linkedPhone: (r[7] || '').replace(/^'+/, ''),
+    }));
+}
