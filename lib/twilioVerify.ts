@@ -20,10 +20,12 @@ export function validateTwilioSignature(req: NextRequest, body: string): boolean
     return false;
   }
 
-  const proto = req.headers.get('x-forwarded-proto') || 'https';
-  const host = req.headers.get('x-forwarded-host') || req.headers.get('host') || '';
-  const path = new URL(req.url).pathname + new URL(req.url).search;
-  const fullUrl = `${proto}://${host}${path}`;
+  // Twilio signs the exact public webhook URL. Pin it — do NOT trust
+  // x-forwarded-host (Vercel may report the internal *.vercel.app host).
+  const PUBLIC_BASE = process.env.PUBLIC_APP_URL || 'https://app.tradesaioperator.uk';
+  const pathname = new URL(req.url).pathname;   // no query string
+  const fullUrl = `${PUBLIC_BASE}${pathname}`;
+  console.log('[TWILIO_VERIFY] url=%s sigPresent=%s', fullUrl, !!sig);
 
   const params = Object.fromEntries(new URLSearchParams(body));
 
