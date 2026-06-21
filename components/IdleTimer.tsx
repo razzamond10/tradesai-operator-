@@ -8,7 +8,7 @@ const TIME_TO_WARNING_MS = IDLE_TIMEOUT_MS - WARNING_BEFORE_MS;
 
 export default function IdleTimer() {
   const [showWarning, setShowWarning] = useState(false);
-  const [countdown, setCountdown] = useState(120);
+  const [countdown, setCountdown] = useState(WARNING_BEFORE_MS / 1000);
   const warningTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const logoutTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -34,11 +34,11 @@ export default function IdleTimer() {
     clearAllTimers();
     setShowWarning(false);
     showWarningRef.current = false;
-    setCountdown(120);
+    setCountdown(WARNING_BEFORE_MS / 1000);
     warningTimerRef.current = setTimeout(() => {
       setShowWarning(true);
       showWarningRef.current = true;
-      setCountdown(120);
+      setCountdown(WARNING_BEFORE_MS / 1000);
       countdownIntervalRef.current = setInterval(() => {
         setCountdown((c) => Math.max(0, c - 1));
       }, 1000);
