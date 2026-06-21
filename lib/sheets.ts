@@ -379,13 +379,18 @@ export interface Emergency {
   issue: string;
   severity: 'high' | 'medium' | 'low';
   resolved: string;
+  status?: string;
+  assignedVa?: string;
+  internalNotes?: string;
+  resolvedAt?: string;
+  resolvedBy?: string;
 }
 
 export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
   return sheetsCache.getOrFetch(`emergencies:${sheetId}`, async () => {
     const tabName = await resolveTabName(sheetId, 'emergencies');
     // Col layout: A=timestamp, B=businessName, C=callerName, D=phone, E=postcode, F=issue, G=smsSentToOwner, H=resolved, I=conversationId
-    const rows = await readSheet(sheetId, `'${tabName}'!A2:H`);
+    const rows = await readSheet(sheetId, `'${tabName}'!A3:M`);
     return rows.map((r) => ({
       businessName: r[1] || '',
       timestamp: normTimestamp(r[0] || ''),
@@ -395,6 +400,11 @@ export async function getEmergencies(sheetId: string): Promise<Emergency[]> {
       issue: r[5] || '',
       severity: deriveSeverity(r[5]),
       resolved: r[7] || '',
+      status: r[8] || '',
+      assignedVa: r[9] || '',
+      internalNotes: r[10] || '',
+      resolvedAt: r[11] || '',
+      resolvedBy: r[12] || '',
     }));
   }, 30_000);
 }
@@ -404,7 +414,7 @@ export async function resolveEmergency(sheetId: string, rowIndex: number): Promi
   const auth = getWriteAuth();
   const sheets = google.sheets({ version: 'v4', auth });
   const tabName = await resolveTabName(sheetId, 'emergencies');
-  const range = `'${tabName}'!H${rowIndex + 2}`; // +2: skip header row + convert 0-based to 1-based
+  const range = `'${tabName}'!H${rowIndex + 3}`; // +3: skip 2 header rows + convert 0-based to 1-based
   await sheets.spreadsheets.values.update({
     spreadsheetId: sheetId,
     range,
