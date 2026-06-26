@@ -716,6 +716,30 @@ export async function appendReply(row: {
   return { duplicate: false };
 }
 
+/** Return ALL Reply rows from the Replies tab.
+ *  Append order is chronological — no sort needed.
+ *  Returns [] on read failure (logs only, never throws). */
+export async function getAllReplies(): Promise<Reply[]> {
+  try {
+    const spreadsheetId = process.env.MASTER_SHEET_ID!;
+    const tabName = await resolveTabName(spreadsheetId, 'replies');
+    const rows = await readSheet(spreadsheetId, `'${tabName}'!A2:H`);
+    return rows.map((r) => ({
+      timestamp: normTimestamp(r[0] || ''),
+      direction: (r[1] || '') === 'out' ? 'out' : ('in' as 'in' | 'out'),
+      from: (r[2] || '').replace(/^'+/, ''),
+      to: (r[3] || '').replace(/^'+/, ''),
+      body: r[4] || '',
+      messageSid: r[5] || '',
+      status: r[6] || '',
+      linkedPhone: (r[7] || '').replace(/^'+/, ''),
+    }));
+  } catch (err) {
+    console.error('[getAllReplies] failed to read Replies tab', err);
+    return [];
+  }
+}
+
 /** Return all Reply rows matching the given phone (matched against col C From
  *  or col H LinkedPhone). Sheet append order is chronological — no sort needed. */
 export async function getRepliesByPhone(phone: string): Promise<Reply[]> {

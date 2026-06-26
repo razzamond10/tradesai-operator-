@@ -131,6 +131,16 @@ export default function VACommsClient({ user }: { user: JWTPayload }) {
         results.forEach(({ clientId, clientName, interactions: its }) => {
           its.forEach((it) => all.push({ ...it, clientId, clientName }));
         });
+
+        // Fetch SMS replies from the VA-scoped list endpoint
+        try {
+          const smsRes = await fetch('/api/va/sms/list');
+          const smsData = await smsRes.json();
+          if (Array.isArray(smsData.items)) {
+            smsData.items.forEach((it: AggInteraction) => all.push(it));
+          }
+        } catch { /* SMS list unavailable — degrade silently */ }
+
         all.sort((a, b) => {
           const ta = a.timestamp || '';
           const tb = b.timestamp || '';
