@@ -9,6 +9,7 @@ function isPublic(pathname: string): boolean {
   if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) return true;
   if (pathname.startsWith('/api/auth')) return true;
   if (pathname.startsWith('/api/voice')) return true;
+  if (pathname.startsWith('/api/twilio')) return true;
   if (pathname.startsWith('/_next') || pathname.startsWith('/favicon') || pathname.startsWith('/logo')) return true;
   if (pathname.match(/\.(ico|png|jpg|jpeg|svg|mp3|webp|woff2?)$/)) return true;
   return false;
